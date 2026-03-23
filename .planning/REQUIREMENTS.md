@@ -98,13 +98,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | Populated by roadmapper |
+| TEAM-01 | Phase 4 | Pending |
+| TEAM-02 | Phase 4 | Pending |
+| TEAM-03 | Phase 4 | Pending |
+| TEAM-04 | Phase 4 | Pending |
+| TEAM-05 | Phase 4 | Pending |
+| SIZE-01 | Phase 4 | Pending |
+| SIZE-02 | Phase 4 | Pending |
+| SIZE-03 | Phase 4 | Pending |
+| SIZE-04 | Phase 4 | Pending |
+| SIZE-05 | Phase 4 | Pending |
+| TIME-01 | Phase 4 | Pending |
+| TIME-02 | Phase 4 | Pending |
+| COST-01 | Phase 4 | Pending |
+| COST-02 | Phase 4 | Pending |
+| COST-03 | Phase 5 | Pending |
+| COST-04 | Phase 5 | Pending |
+| COST-05 | Phase 5 | Pending |
+| COST-06 | Phase 5 | Pending |
+| COST-07 | Phase 5 | Pending |
+| COST-08 | Phase 5 | Pending |
+| ADV-01 | Phase 5 | Pending |
+| ADV-02 | Phase 5 | Pending |
+| ADV-03 | Phase 5 | Pending |
+| ADV-04 | Phase 5 | Pending |
+| ADV-05 | Phase 5 | Pending |
+| ADV-06 | Phase 5 | Pending |
+| ADV-07 | Phase 5 | Pending |
+| ADV-08 | Phase 5 | Pending |
+| VIZ-01 | Phase 5 | Pending |
+| VIZ-02 | Phase 5 | Pending |
+| VIZ-03 | Phase 5 | Pending |
+| VIZ-04 | Phase 5 | Pending |
+| SHARE-01 | Phase 6 | Pending |
+| SHARE-02 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 34 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 34
+- Mapped to phases: 34
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — v1.0 React Rebuild*
+*Last updated: 2026-03-23 — v1.0 React Rebuild roadmap created (Phases 4-6)*
