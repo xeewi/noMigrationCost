@@ -13,15 +13,15 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 - [x] **TEAM-02**: User sees French loaded-cost salary defaults auto-filled based on seniority selection
 - [ ] **TEAM-03**: User can override the default hourly cost for any individual team member
 - [x] **TEAM-04**: User can remove team members from the team
-- [ ] **TEAM-05**: User can see the team's average loaded hourly cost update in real-time
+- [x] **TEAM-05**: User can see the team's average loaded hourly cost update in real-time
 
 ### Feature Sizing
 
-- [ ] **SIZE-01**: User can define a feature size in story points
-- [ ] **SIZE-02**: User can define a feature size in direct hours or days as an alternative to story points
-- [ ] **SIZE-03**: User can set team velocity (story points per sprint) to convert SP to hours
-- [ ] **SIZE-04**: User can set sprint duration (1-4 weeks) for the SP-to-hours conversion
-- [ ] **SIZE-05**: User can see the estimated development hours derived from inputs
+- [x] **SIZE-01**: User can define a feature size in story points
+- [x] **SIZE-02**: User can define a feature size in direct hours or days as an alternative to story points
+- [x] **SIZE-03**: User can set team velocity (story points per sprint) to convert SP to hours
+- [x] **SIZE-04**: User can set sprint duration (1-4 weeks) for the SP-to-hours conversion
+- [x] **SIZE-05**: User can see the estimated development hours derived from inputs
 
 ### Time Horizon
 
@@ -102,12 +102,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEAM-02 | Phase 4 | Complete |
 | TEAM-03 | Phase 4 | Pending |
 | TEAM-04 | Phase 4 | Complete |
-| TEAM-05 | Phase 4 | Pending |
-| SIZE-01 | Phase 4 | Pending |
-| SIZE-02 | Phase 4 | Pending |
-| SIZE-03 | Phase 4 | Pending |
-| SIZE-04 | Phase 4 | Pending |
-| SIZE-05 | Phase 4 | Pending |
+| TEAM-05 | Phase 4 | Complete |
+| SIZE-01 | Phase 4 | Complete |
+| SIZE-02 | Phase 4 | Complete |
+| SIZE-03 | Phase 4 | Complete |
+| SIZE-04 | Phase 4 | Complete |
+| SIZE-05 | Phase 4 | Complete |
 | TIME-01 | Phase 4 | Pending |
 | TIME-02 | Phase 4 | Pending |
 | COST-01 | Phase 4 | Pending |
