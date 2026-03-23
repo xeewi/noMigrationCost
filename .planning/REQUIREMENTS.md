@@ -9,10 +9,10 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 ### Team Composition
 
-- [ ] **TEAM-01**: User can add team members with a name and seniority level (Junior/Mid/Senior/Lead)
-- [ ] **TEAM-02**: User sees French loaded-cost salary defaults auto-filled based on seniority selection
+- [x] **TEAM-01**: User can add team members with a name and seniority level (Junior/Mid/Senior/Lead)
+- [x] **TEAM-02**: User sees French loaded-cost salary defaults auto-filled based on seniority selection
 - [ ] **TEAM-03**: User can override the default hourly cost for any individual team member
-- [ ] **TEAM-04**: User can remove team members from the team
+- [x] **TEAM-04**: User can remove team members from the team
 - [ ] **TEAM-05**: User can see the team's average loaded hourly cost update in real-time
 
 ### Feature Sizing
@@ -98,10 +98,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 4 | Pending |
-| TEAM-02 | Phase 4 | Pending |
+| TEAM-01 | Phase 4 | Complete |
+| TEAM-02 | Phase 4 | Complete |
 | TEAM-03 | Phase 4 | Pending |
-| TEAM-04 | Phase 4 | Pending |
+| TEAM-04 | Phase 4 | Complete |
 | TEAM-05 | Phase 4 | Pending |
 | SIZE-01 | Phase 4 | Pending |
 | SIZE-02 | Phase 4 | Pending |
