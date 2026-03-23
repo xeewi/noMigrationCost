@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. User can see total standalone feature cost and a breakdown by category (initial dev, maintenance, coordination, bugs, sync)
 **Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Data layer and formula engine (data.js constants + app.js formula functions)
+- [x] 01-01-PLAN.md — Data layer and formula engine (data.js constants + app.js formula functions)
 - [ ] 01-02-PLAN.md — HTML markup, Alpine wiring, and CSS styling (index.html + styles.css)
 **UI hint**: yes
 
@@ -63,6 +63,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Inputs and Standalone Cost | 0/2 | Planning complete | - |
+| 1. Inputs and Standalone Cost | 1/2 | In Progress|  |
 | 2. Comparison, Visualization, and Advanced Controls | 0/? | Not started | - |
 | 3. URL Sharing | 0/? | Not started | - |
