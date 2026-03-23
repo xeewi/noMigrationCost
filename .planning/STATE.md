@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: React Rebuild
 status: Ready to execute
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-23T19:09:59.087Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-23T19:18:46.546Z"
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 04 (scaffold-engine-and-standalone-cost) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 2 of 3
 
 *Updated after each plan completion*
 | Phase 04 P01 | 4m | 3 tasks | 23 files |
+| Phase 04 P02 | 4m | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -59,6 +60,8 @@ Recent decisions affecting current work:
 - [Pivot]: Engine-before-UI build discipline still applies — formula functions verified before UI construction
 - [Phase 04]: Used vitest/config defineConfig instead of vite defineConfig to include Vitest type support in vite.config.ts
 - [Phase 04]: Added compilerOptions.paths to root tsconfig.json for shadcn CLI alias validation (CLI doesn't follow project references)
+- [Phase 04]: calcBreakEven uses ENGINE_DEFAULTS.maintenanceRateShared for shared side — inputs.maintenanceRate is the duplicated rate
+- [Phase 04]: Double maintenance factor starts at 1.80 for year 1 (increments from year-1), matches §7.2 research doc model
 
 ### Pending Todos
 
@@ -71,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T19:09:59.085Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-23T19:18:46.544Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
