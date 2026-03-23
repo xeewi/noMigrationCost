@@ -28,7 +28,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can define feature size via story points (with velocity and sprint duration) or direct hours, and see estimated development hours derived
   4. User can select a time horizon (1, 3, 5, 10 years) and see cost projections update
   5. User can see total standalone feature cost and a breakdown by category (initial dev, maintenance, coordination, bugs, sync)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Data layer and formula engine (data.js constants + app.js formula functions)
+- [ ] 01-02-PLAN.md — HTML markup, Alpine wiring, and CSS styling (index.html + styles.css)
 **UI hint**: yes
 
 ### Phase 2: Comparison, Visualization, and Advanced Controls
@@ -60,6 +63,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Inputs and Standalone Cost | 0/? | Not started | - |
+| 1. Inputs and Standalone Cost | 0/2 | Planning complete | - |
 | 2. Comparison, Visualization, and Advanced Controls | 0/? | Not started | - |
 | 3. URL Sharing | 0/? | Not started | - |
