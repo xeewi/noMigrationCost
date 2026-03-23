@@ -28,7 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### v1.0 React Rebuild
 
-- [ ] **Phase 4: Scaffold, Engine, and Standalone Cost** - React+Vite project, TypeScript formula engine verified against research doc, input form wired to real-time cost output
+- [x] **Phase 4: Scaffold, Engine, and Standalone Cost** - React+Vite project, TypeScript formula engine verified against research doc, input form wired to real-time cost output (completed 2026-03-23)
 - [ ] **Phase 5: Comparison View, Chart, and Advanced Controls** - Shared vs duplicated cost curves, break-even detection, Recharts visualization, and all adjustable research-backed formula constants
 - [ ] **Phase 6: URL Sharing** - Full scenario state encoded in URL hash for sharing and presentation replay
 
@@ -44,12 +44,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can define feature size in story points (with velocity and sprint duration) or direct hours, and see derived development hours
   4. User can select a time horizon (1, 3, 5, 10 years) and see cost projections update
   5. User can see the total standalone feature cost and a breakdown table by category (initial dev, maintenance, coordination, bugs, sync)
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 04-01-PLAN.md — Scaffold Vite + React + shadcn project, install dependencies, define engine types
 - [x] 04-02-PLAN.md — TDD formula engine: all cost functions verified against research doc worked examples
-- [ ] 04-03-PLAN.md — Build input/output UI components and wire to engine with two-column layout
+- [x] 04-03-PLAN.md — Build input/output UI components and wire to engine with two-column layout
 
 **UI hint**: yes
 
@@ -81,6 +81,6 @@ Phases execute in numeric order: 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Scaffold, Engine, and Standalone Cost | 2/3 | In Progress|  |
+| 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete   | 2026-03-23 |
 | 5. Comparison View, Chart, and Advanced Controls | 0/? | Not started | - |
 | 6. URL Sharing | 0/? | Not started | - |
