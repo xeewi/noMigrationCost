@@ -11,7 +11,7 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 - [x] **TEAM-01**: User can add team members with a name and seniority level (Junior/Mid/Senior/Lead)
 - [x] **TEAM-02**: User sees French loaded-cost salary defaults auto-filled based on seniority selection
-- [ ] **TEAM-03**: User can override the default hourly cost for any individual team member
+- [x] **TEAM-03**: User can override the default hourly cost for any individual team member
 - [x] **TEAM-04**: User can remove team members from the team
 - [x] **TEAM-05**: User can see the team's average loaded hourly cost update in real-time
 
@@ -25,13 +25,13 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 ### Time Horizon
 
-- [ ] **TIME-01**: User can select a projection horizon from preset values (1, 3, 5, 10 years)
-- [ ] **TIME-02**: User can see cost projections update when changing the time horizon
+- [x] **TIME-01**: User can select a projection horizon from preset values (1, 3, 5, 10 years)
+- [x] **TIME-02**: User can see cost projections update when changing the time horizon
 
 ### Cost Calculation
 
-- [ ] **COST-01**: User can see the total cost of a feature for their team (standalone calculation)
-- [ ] **COST-02**: User can see a cost breakdown table with categories: initial dev, maintenance, coordination, bugs, sync
+- [x] **COST-01**: User can see the total cost of a feature for their team (standalone calculation)
+- [x] **COST-02**: User can see a cost breakdown table with categories: initial dev, maintenance, coordination, bugs, sync
 - [ ] **COST-03**: User can see side-by-side comparison of shared code vs duplicated code total costs
 - [ ] **COST-04**: User can see the break-even point (month) when shared code becomes cheaper than duplicated
 - [ ] **COST-05**: User can see a clear message when break-even does not exist (shared never cheaper)
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | TEAM-01 | Phase 4 | Complete |
 | TEAM-02 | Phase 4 | Complete |
-| TEAM-03 | Phase 4 | Pending |
+| TEAM-03 | Phase 4 | Complete |
 | TEAM-04 | Phase 4 | Complete |
 | TEAM-05 | Phase 4 | Complete |
 | SIZE-01 | Phase 4 | Complete |
@@ -108,10 +108,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SIZE-03 | Phase 4 | Complete |
 | SIZE-04 | Phase 4 | Complete |
 | SIZE-05 | Phase 4 | Complete |
-| TIME-01 | Phase 4 | Pending |
-| TIME-02 | Phase 4 | Pending |
-| COST-01 | Phase 4 | Pending |
-| COST-02 | Phase 4 | Pending |
+| TIME-01 | Phase 4 | Complete |
+| TIME-02 | Phase 4 | Complete |
+| COST-01 | Phase 4 | Complete |
+| COST-02 | Phase 4 | Complete |
 | COST-03 | Phase 5 | Pending |
 | COST-04 | Phase 5 | Pending |
 | COST-05 | Phase 5 | Pending |
