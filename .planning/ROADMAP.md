@@ -62,7 +62,7 @@ Plans:
   2. User can see the break-even point highlighted on the chart with an annotation, or a clear message when break-even does not exist within the selected horizon
   3. User can see divergence rate modeling driving non-linear cost growth for the duplicated path, with bug propagation and coordination overhead as explicit line items in the breakdown table
   4. User can adjust all formula constants (generalization factor, porting factor, divergence rate, maintenance rates, bug duplication factor, number of consuming teams) and see research-backed defaults and source citations pre-filled
-**Plans:** 3/3 plans complete
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 05-01-PLAN.md — Engine extensions (sub-totals, flexible maintenanceRateShared), chart utilities, shadcn component install
@@ -88,5 +88,5 @@ Phases execute in numeric order: 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete   | 2026-03-23 |
-| 5. Comparison View, Chart, and Advanced Controls | 3/3 | Complete   | 2026-03-23 |
+| 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete   | 2026-03-23 |
 | 6. URL Sharing | 0/? | Not started | - |
