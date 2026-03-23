@@ -119,6 +119,19 @@ None — all implementations are fully functional. No placeholder data or TODO s
 - Plan 03 (cost chart and advanced controls) can now import formatEuroAbbrev, buildMonthlyChartData, MonthCostPoint from utils.ts, and all three shadcn primitives are ready
 - calcBreakEven is ready to accept maintenanceRateShared from Plan 03's advanced parameter sliders
 
+## Self-Check: PASSED
+
+- FOUND: src/components/ui/slider.tsx
+- FOUND: src/components/ui/popover.tsx
+- FOUND: src/components/ui/collapsible.tsx
+- FOUND: src/lib/utils.ts (with formatEuroAbbrev, MonthCostPoint, buildMonthlyChartData)
+- FOUND: src/engine/types.ts (with totalBugsCost, totalSyncCost, maintenanceRateShared)
+- FOUND: src/engine/formulas.ts (with sub-total accumulation and flexible sharedRate)
+- FOUND commit 975b57e (feat: install shadcn components)
+- FOUND commit e356bd6 (feat: engine extensions)
+- FOUND commit 360906e (feat: utils additions)
+- All 42 tests pass, TypeScript clean
+
 ---
 *Phase: 05-comparison-view-chart-and-advanced-controls*
 *Completed: 2026-03-23*
