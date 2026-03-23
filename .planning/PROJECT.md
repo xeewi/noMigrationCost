@@ -2,7 +2,7 @@
 
 ## What This Is
 
-An interactive dashboard that calculates and visualizes the real cost of software features — both as standalone cost estimation and as a comparison between shared code vs duplicated code approaches. Built as a standalone HTML/JS app for internal use and stakeholder presentations, with data models based on industry research (COCOMO II, IEEE studies, French labor market data).
+An interactive dashboard that calculates and visualizes the real cost of software features — both as standalone cost estimation and as a comparison between shared code vs duplicated code approaches. Built with React and shadcn/ui for internal use and stakeholder presentations, with data models based on industry research (COCOMO II, IEEE studies, French labor market data).
 
 ## Core Value
 
@@ -12,7 +12,7 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 
 ### Validated
 
-(None yet — ship to validate)
+(None yet — restarting with React stack)
 
 ### Active
 
@@ -46,15 +46,15 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 
 ## Constraints
 
-- **Tech stack**: Standalone HTML/CSS/JS — no build step, no framework, single file or minimal files
+- **Tech stack**: React + Vite + TypeScript + shadcn/ui + Tailwind CSS + Recharts
 - **Data source**: All reference data (salaries, ratios, factors) embedded in the app from the research doc
-- **Deployment**: Static file, can be opened directly in a browser or served from any static host
+- **Deployment**: Static build output, can be served from any static host
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Standalone HTML/JS, no framework | Must be easy to share, open, and present without setup | — Pending |
+| React + shadcn/ui + Recharts | Polished component library for presentation-quality UI | Pivoted from Alpine+Pico on 2026-03-23 |
 | French salary defaults | Primary audience is France-based teams, data available in research doc | — Pending |
 | Story points + direct time as input options | Teams use different estimation methods, support both | — Pending |
 | English interface | Stakeholder presentations often in English even in French companies | — Pending |
@@ -77,4 +77,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 after initialization*
+*Last updated: 2026-03-23 — tech stack pivot to React + shadcn/ui + Recharts*

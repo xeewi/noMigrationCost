@@ -105,6 +105,15 @@ None.
 - All appState getters are reactive and ready for x-data binding
 - Break-even "no break-even" UX blocker (STATE.md) applies to Phase 2, not Plan 02
 
+## Self-Check: PASSED
+
+- data.js exists: FOUND
+- app.js exists: FOUND
+- 01-01-SUMMARY.md exists: FOUND
+- Commit e6183d4 exists: FOUND
+- Commit 25e0df1 exists: FOUND
+- Formula verification (Node.js): computeStandaloneCost(400,65,3)=40040, spToHours(40,30,2)≈93.33, computeBreakdown total=40040
+
 ---
 *Phase: 01-inputs-and-standalone-cost*
 *Completed: 2026-03-23*
