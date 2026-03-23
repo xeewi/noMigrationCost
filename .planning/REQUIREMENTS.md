@@ -5,12 +5,12 @@
 
 ## v1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 ### Team Composition
 
 - [ ] **TEAM-01**: User can add team members with a name and seniority level (Junior/Mid/Senior/Lead)
-- [x] **TEAM-02**: User sees French loaded-cost salary defaults auto-filled based on seniority selection
+- [ ] **TEAM-02**: User sees French loaded-cost salary defaults auto-filled based on seniority selection
 - [ ] **TEAM-03**: User can override the default hourly cost for any individual team member
 - [ ] **TEAM-04**: User can remove team members from the team
 - [ ] **TEAM-05**: User can see the team's average loaded hourly cost update in real-time
@@ -30,8 +30,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Cost Calculation
 
-- [x] **COST-01**: User can see the total cost of a feature for their team (standalone calculation)
-- [x] **COST-02**: User can see a cost breakdown table with categories: initial dev, maintenance, coordination, bugs, sync
+- [ ] **COST-01**: User can see the total cost of a feature for their team (standalone calculation)
+- [ ] **COST-02**: User can see a cost breakdown table with categories: initial dev, maintenance, coordination, bugs, sync
 - [ ] **COST-03**: User can see side-by-side comparison of shared code vs duplicated code total costs
 - [ ] **COST-04**: User can see the break-even point (month) when shared code becomes cheaper than duplicated
 - [ ] **COST-05**: User can see a clear message when break-even does not exist (shared never cheaper)
@@ -85,7 +85,7 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| User accounts / database persistence | Standalone HTML/JS constraint; URL sharing covers the need |
+| User accounts / database persistence | Static app constraint; URL sharing covers the need |
 | Full COCOMO II implementation | Target users think in story points, not KSLOC; simplified model sufficient |
 | Mobile-specific layout | Desktop presentation tool; responsive as bonus only |
 | PDF export | Browser Print-to-PDF is sufficient for v1 |
@@ -98,46 +98,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 1 | Pending |
-| TEAM-02 | Phase 1 | Complete |
-| TEAM-03 | Phase 1 | Pending |
-| TEAM-04 | Phase 1 | Pending |
-| TEAM-05 | Phase 1 | Pending |
-| SIZE-01 | Phase 1 | Pending |
-| SIZE-02 | Phase 1 | Pending |
-| SIZE-03 | Phase 1 | Pending |
-| SIZE-04 | Phase 1 | Pending |
-| SIZE-05 | Phase 1 | Pending |
-| TIME-01 | Phase 1 | Pending |
-| TIME-02 | Phase 1 | Pending |
-| COST-01 | Phase 1 | Complete |
-| COST-02 | Phase 1 | Complete |
-| COST-03 | Phase 2 | Pending |
-| COST-04 | Phase 2 | Pending |
-| COST-05 | Phase 2 | Pending |
-| COST-06 | Phase 2 | Pending |
-| COST-07 | Phase 2 | Pending |
-| COST-08 | Phase 2 | Pending |
-| ADV-01 | Phase 2 | Pending |
-| ADV-02 | Phase 2 | Pending |
-| ADV-03 | Phase 2 | Pending |
-| ADV-04 | Phase 2 | Pending |
-| ADV-05 | Phase 2 | Pending |
-| ADV-06 | Phase 2 | Pending |
-| ADV-07 | Phase 2 | Pending |
-| ADV-08 | Phase 2 | Pending |
-| VIZ-01 | Phase 2 | Pending |
-| VIZ-02 | Phase 2 | Pending |
-| VIZ-03 | Phase 2 | Pending |
-| VIZ-04 | Phase 2 | Pending |
-| SHARE-01 | Phase 3 | Pending |
-| SHARE-02 | Phase 3 | Pending |
+| — | — | Populated by roadmapper |
 
 **Coverage:**
 - v1 requirements: 34 total
-- Mapped to phases: 34
-- Unmapped: 0 ✓
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 34
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after roadmap creation*
+*Last updated: 2026-03-23 — v1.0 React Rebuild*
