@@ -5,6 +5,8 @@ import { TimeHorizon } from '@/components/TimeHorizon';
 import { CostOutput } from '@/components/CostOutput';
 import { ConsumingTeams } from '@/components/ConsumingTeams';
 import { AdvancedParameters } from '@/components/AdvancedParameters';
+import { ComparisonTab } from '@/components/ComparisonTab';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
 import {
   calcTeamAvgRate,
@@ -180,7 +182,25 @@ function App() {
           </div>
           {/* Output column: 45% */}
           <div className="flex-[45]">
-            <CostOutput output={costOutput} emptyReason={emptyReason} />
+            <Tabs defaultValue="comparison">
+              <TabsList>
+                <TabsTrigger value="comparison">Comparison</TabsTrigger>
+                <TabsTrigger value="standalone">Standalone</TabsTrigger>
+              </TabsList>
+              <TabsContent value="comparison">
+                <ComparisonTab
+                  sharedCost={sharedCostOutput}
+                  duplicatedCost={duplicatedCostOutput}
+                  breakEven={breakEvenResult}
+                  horizonYears={horizonYears}
+                  standaloneTotalCost={costOutput?.totalStandaloneCost ?? 0}
+                  emptyReason={emptyReason}
+                />
+              </TabsContent>
+              <TabsContent value="standalone">
+                <CostOutput output={costOutput} emptyReason={emptyReason} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
