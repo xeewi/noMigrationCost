@@ -35,9 +35,9 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 - [ ] **COST-03**: User can see side-by-side comparison of shared code vs duplicated code total costs
 - [ ] **COST-04**: User can see the break-even point (month) when shared code becomes cheaper than duplicated
 - [ ] **COST-05**: User can see a clear message when break-even does not exist (shared never cheaper)
-- [ ] **COST-06**: User can see divergence rate modeling showing non-linear cost growth for duplicated code over time
-- [ ] **COST-07**: User can see bug propagation cost as a separate line item in the duplicated code breakdown
-- [ ] **COST-08**: User can see coordination overhead as an explicit cost line in the shared code breakdown
+- [x] **COST-06**: User can see divergence rate modeling showing non-linear cost growth for duplicated code over time
+- [x] **COST-07**: User can see bug propagation cost as a separate line item in the duplicated code breakdown
+- [x] **COST-08**: User can see coordination overhead as an explicit cost line in the shared code breakdown
 
 ### Advanced Inputs
 
@@ -115,9 +115,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COST-03 | Phase 5 | Pending |
 | COST-04 | Phase 5 | Pending |
 | COST-05 | Phase 5 | Pending |
-| COST-06 | Phase 5 | Pending |
-| COST-07 | Phase 5 | Pending |
-| COST-08 | Phase 5 | Pending |
+| COST-06 | Phase 5 | Complete |
+| COST-07 | Phase 5 | Complete |
+| COST-08 | Phase 5 | Complete |
 | ADV-01 | Phase 5 | Pending |
 | ADV-02 | Phase 5 | Pending |
 | ADV-03 | Phase 5 | Pending |
