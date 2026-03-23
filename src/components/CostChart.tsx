@@ -10,7 +10,6 @@ import {
   Legend,
   CartesianGrid,
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
 import { buildMonthlyChartData, formatEuroAbbrev, formatEuro } from '@/lib/utils';
 import type { YearCost, BreakEvenResult } from '@/engine/types';
 
@@ -27,12 +26,17 @@ interface TooltipPayloadItem {
   dataKey: string;
 }
 
-function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadItem[];
+  label?: number | string;
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) return null;
 
-  const items = payload as TooltipPayloadItem[];
-  const shared = items.find((p) => p.dataKey === 'shared')?.value ?? 0;
-  const duplicated = items.find((p) => p.dataKey === 'duplicated')?.value ?? 0;
+  const shared = payload.find((p) => p.dataKey === 'shared')?.value ?? 0;
+  const duplicated = payload.find((p) => p.dataKey === 'duplicated')?.value ?? 0;
   const diff = Math.abs(duplicated - shared);
   const sharedWins = shared < duplicated;
 
