@@ -351,8 +351,9 @@ describe('calcDivergence', () => {
     expect(calcDivergence(8500, 0.20, 1)).toBeCloseTo(10382, 0);
   });
 
-  it('calculates divergence at Year 2: 8500 * e^(0.20 * 2) ≈ 12680', () => {
-    expect(calcDivergence(8500, 0.20, 2)).toBeCloseTo(12680, 0);
+  it('calculates divergence at Year 2: 8500 * e^(0.20 * 2) ≈ 12681', () => {
+    // Research doc shows 12,680 (rounded) — actual value is ~12680.5, within ±1
+    expect(calcDivergence(8500, 0.20, 2)).toBeCloseTo(12681, 0);
   });
 
   it('calculates divergence at Year 3: 8500 * e^(0.20 * 3) ≈ 15488', () => {
