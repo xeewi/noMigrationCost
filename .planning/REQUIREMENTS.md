@@ -98,46 +98,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | — | Pending |
-| TEAM-02 | — | Pending |
-| TEAM-03 | — | Pending |
-| TEAM-04 | — | Pending |
-| TEAM-05 | — | Pending |
-| SIZE-01 | — | Pending |
-| SIZE-02 | — | Pending |
-| SIZE-03 | — | Pending |
-| SIZE-04 | — | Pending |
-| SIZE-05 | — | Pending |
-| TIME-01 | — | Pending |
-| TIME-02 | — | Pending |
-| COST-01 | — | Pending |
-| COST-02 | — | Pending |
-| COST-03 | — | Pending |
-| COST-04 | — | Pending |
-| COST-05 | — | Pending |
-| COST-06 | — | Pending |
-| COST-07 | — | Pending |
-| COST-08 | — | Pending |
-| ADV-01 | — | Pending |
-| ADV-02 | — | Pending |
-| ADV-03 | — | Pending |
-| ADV-04 | — | Pending |
-| ADV-05 | — | Pending |
-| ADV-06 | — | Pending |
-| ADV-07 | — | Pending |
-| ADV-08 | — | Pending |
-| VIZ-01 | — | Pending |
-| VIZ-02 | — | Pending |
-| VIZ-03 | — | Pending |
-| VIZ-04 | — | Pending |
-| SHARE-01 | — | Pending |
-| SHARE-02 | — | Pending |
+| TEAM-01 | Phase 1 | Pending |
+| TEAM-02 | Phase 1 | Pending |
+| TEAM-03 | Phase 1 | Pending |
+| TEAM-04 | Phase 1 | Pending |
+| TEAM-05 | Phase 1 | Pending |
+| SIZE-01 | Phase 1 | Pending |
+| SIZE-02 | Phase 1 | Pending |
+| SIZE-03 | Phase 1 | Pending |
+| SIZE-04 | Phase 1 | Pending |
+| SIZE-05 | Phase 1 | Pending |
+| TIME-01 | Phase 1 | Pending |
+| TIME-02 | Phase 1 | Pending |
+| COST-01 | Phase 1 | Pending |
+| COST-02 | Phase 1 | Pending |
+| COST-03 | Phase 2 | Pending |
+| COST-04 | Phase 2 | Pending |
+| COST-05 | Phase 2 | Pending |
+| COST-06 | Phase 2 | Pending |
+| COST-07 | Phase 2 | Pending |
+| COST-08 | Phase 2 | Pending |
+| ADV-01 | Phase 2 | Pending |
+| ADV-02 | Phase 2 | Pending |
+| ADV-03 | Phase 2 | Pending |
+| ADV-04 | Phase 2 | Pending |
+| ADV-05 | Phase 2 | Pending |
+| ADV-06 | Phase 2 | Pending |
+| ADV-07 | Phase 2 | Pending |
+| ADV-08 | Phase 2 | Pending |
+| VIZ-01 | Phase 2 | Pending |
+| VIZ-02 | Phase 2 | Pending |
+| VIZ-03 | Phase 2 | Pending |
+| VIZ-04 | Phase 2 | Pending |
+| SHARE-01 | Phase 3 | Pending |
+| SHARE-02 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 34 total
-- Mapped to phases: 0
-- Unmapped: 34 ⚠️
+- Mapped to phases: 34
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initial definition*
+*Last updated: 2026-03-23 after roadmap creation*
