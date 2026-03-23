@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: React Rebuild
-status: Defining requirements
+status: Ready to plan
 stopped_at: null
 last_updated: "2026-03-23"
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** Defining requirements for v1.0 React Rebuild
+**Current focus:** Phase 4 — Scaffold, Engine, and Standalone Cost
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-23 — Milestone v1.0 React Rebuild started
+Phase: 4 of 6 (Scaffold, Engine, and Standalone Cost)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-03-23 — Roadmap created for v1.0 React Rebuild (Phases 4-6)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -65,11 +67,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Formula mapping exercise required before coding — trace each formula from docs/feature-cost-shared-vs-duplicated.md sections 7.1–7.5 to function signatures before writing any code
-- Break-even "no break-even" UX needs a design decision before implementation
+- Formula mapping exercise required before coding — trace each formula from docs/feature-cost-shared-vs-duplicated.md sections 7.1-7.5 to TypeScript function signatures before writing any code
+- Break-even "no break-even" UX needs a design decision before Phase 5 implementation
 
 ## Session Continuity
 
 Last session: 2026-03-23
-Stopped at: null
+Stopped at: Roadmap created — ready to plan Phase 4
 Resume file: None
