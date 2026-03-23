@@ -41,21 +41,21 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 ### Advanced Inputs
 
-- [ ] **ADV-01**: User can adjust the generalization factor (default 1.3, range 1.0-2.0)
-- [ ] **ADV-02**: User can adjust the porting factor (default 0.65, range 0.3-1.0)
-- [ ] **ADV-03**: User can adjust the divergence rate (default 0.20, range 0.05-0.50)
-- [ ] **ADV-04**: User can adjust the maintenance rate for shared code (default 0.18, range 0.10-0.30)
-- [ ] **ADV-05**: User can adjust the maintenance rate for duplicated code (default 0.22, range 0.15-0.40)
-- [ ] **ADV-06**: User can adjust the bug duplication factor (default 2.0, range 1.0-3.0)
-- [ ] **ADV-07**: User can adjust the number of consuming codebases/teams (default 2, range 2-10)
-- [ ] **ADV-08**: User can see all defaults are pre-filled from research-backed values with source references
+- [x] **ADV-01**: User can adjust the generalization factor (default 1.3, range 1.0-2.0)
+- [x] **ADV-02**: User can adjust the porting factor (default 0.65, range 0.3-1.0)
+- [x] **ADV-03**: User can adjust the divergence rate (default 0.20, range 0.05-0.50)
+- [x] **ADV-04**: User can adjust the maintenance rate for shared code (default 0.18, range 0.10-0.30)
+- [x] **ADV-05**: User can adjust the maintenance rate for duplicated code (default 0.22, range 0.15-0.40)
+- [x] **ADV-06**: User can adjust the bug duplication factor (default 2.0, range 1.0-3.0)
+- [x] **ADV-07**: User can adjust the number of consuming codebases/teams (default 2, range 2-10)
+- [x] **ADV-08**: User can see all defaults are pre-filled from research-backed values with source references
 
 ### Visualization
 
 - [ ] **VIZ-01**: User can see temporal cost curves (cumulative) for both shared and duplicated approaches on a single chart
 - [ ] **VIZ-02**: User can see the break-even point highlighted on the chart with annotation
 - [ ] **VIZ-03**: Chart has high-contrast, presentation-ready styling with labeled axes
-- [ ] **VIZ-04**: User can see citation tooltips showing the research source for each formula constant
+- [x] **VIZ-04**: User can see citation tooltips showing the research source for each formula constant
 
 ### Sharing
 
@@ -118,18 +118,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COST-06 | Phase 5 | Complete |
 | COST-07 | Phase 5 | Complete |
 | COST-08 | Phase 5 | Complete |
-| ADV-01 | Phase 5 | Pending |
-| ADV-02 | Phase 5 | Pending |
-| ADV-03 | Phase 5 | Pending |
-| ADV-04 | Phase 5 | Pending |
-| ADV-05 | Phase 5 | Pending |
-| ADV-06 | Phase 5 | Pending |
-| ADV-07 | Phase 5 | Pending |
-| ADV-08 | Phase 5 | Pending |
+| ADV-01 | Phase 5 | Complete |
+| ADV-02 | Phase 5 | Complete |
+| ADV-03 | Phase 5 | Complete |
+| ADV-04 | Phase 5 | Complete |
+| ADV-05 | Phase 5 | Complete |
+| ADV-06 | Phase 5 | Complete |
+| ADV-07 | Phase 5 | Complete |
+| ADV-08 | Phase 5 | Complete |
 | VIZ-01 | Phase 5 | Pending |
 | VIZ-02 | Phase 5 | Pending |
 | VIZ-03 | Phase 5 | Pending |
-| VIZ-04 | Phase 5 | Pending |
+| VIZ-04 | Phase 5 | Complete |
 | SHARE-01 | Phase 6 | Pending |
 | SHARE-02 | Phase 6 | Pending |
 
