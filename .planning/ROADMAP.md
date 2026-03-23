@@ -12,7 +12,7 @@ A standalone HTML/JS dashboard that quantifies the real cost of code duplication
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Inputs and Standalone Cost** - Team composition, feature sizing, time horizon, and single-feature cost output — built on top of a verified formula engine
+- [x] **Phase 1: Inputs and Standalone Cost** - Team composition, feature sizing, time horizon, and single-feature cost output — built on top of a verified formula engine (completed 2026-03-23)
 - [ ] **Phase 2: Comparison, Visualization, and Advanced Controls** - Shared vs duplicated cost curves, break-even detection, chart, cost breakdown table, and all adjustable research-backed factors
 - [ ] **Phase 3: URL Sharing** - Full scenario state encoded in URL hash for sharing and presentation replay
 
@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 Plans:
 - [x] 01-01-PLAN.md — Data layer and formula engine (data.js constants + app.js formula functions)
-- [ ] 01-02-PLAN.md — HTML markup, Alpine wiring, and CSS styling (index.html + styles.css)
+- [x] 01-02-PLAN.md — HTML markup, Alpine wiring, and CSS styling (index.html + styles.css)
 **UI hint**: yes
 
 ### Phase 2: Comparison, Visualization, and Advanced Controls
@@ -63,6 +63,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Inputs and Standalone Cost | 1/2 | In Progress|  |
+| 1. Inputs and Standalone Cost | 2/2 | Complete   | 2026-03-23 |
 | 2. Comparison, Visualization, and Advanced Controls | 0/? | Not started | - |
 | 3. URL Sharing | 0/? | Not started | - |
