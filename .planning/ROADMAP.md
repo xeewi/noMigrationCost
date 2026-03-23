@@ -44,7 +44,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can define feature size in story points (with velocity and sprint duration) or direct hours, and see derived development hours
   4. User can select a time horizon (1, 3, 5, 10 years) and see cost projections update
   5. User can see the total standalone feature cost and a breakdown table by category (initial dev, maintenance, coordination, bugs, sync)
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Scaffold Vite + React + shadcn project, install dependencies, define engine types
+- [ ] 04-02-PLAN.md — TDD formula engine: all cost functions verified against research doc worked examples
+- [ ] 04-03-PLAN.md — Build input/output UI components and wire to engine with two-column layout
+
 **UI hint**: yes
 
 ### Phase 5: Comparison View, Chart, and Advanced Controls
@@ -75,6 +81,6 @@ Phases execute in numeric order: 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Scaffold, Engine, and Standalone Cost | 0/? | Not started | - |
+| 4. Scaffold, Engine, and Standalone Cost | 0/3 | Planned | - |
 | 5. Comparison View, Chart, and Advanced Controls | 0/? | Not started | - |
 | 6. URL Sharing | 0/? | Not started | - |
