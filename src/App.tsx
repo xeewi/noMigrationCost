@@ -48,7 +48,7 @@ function App() {
     bugDuplicationFactor: ENGINE_DEFAULTS.bugDuplicationFactor,
   });
 
-  const [nbConsumingCodebases, setNbConsumingCodebases] = useState(
+  const [nbConsumingCodebases, setNbConsumingCodebases] = useState<number>(
     ENGINE_DEFAULTS.nbConsumingCodebases,
   );
 
