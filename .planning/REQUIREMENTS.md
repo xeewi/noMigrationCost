@@ -32,9 +32,9 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 - [x] **COST-01**: User can see the total cost of a feature for their team (standalone calculation)
 - [x] **COST-02**: User can see a cost breakdown table with categories: initial dev, maintenance, coordination, bugs, sync
-- [ ] **COST-03**: User can see side-by-side comparison of shared code vs duplicated code total costs
-- [ ] **COST-04**: User can see the break-even point (month) when shared code becomes cheaper than duplicated
-- [ ] **COST-05**: User can see a clear message when break-even does not exist (shared never cheaper)
+- [x] **COST-03**: User can see side-by-side comparison of shared code vs duplicated code total costs
+- [x] **COST-04**: User can see the break-even point (month) when shared code becomes cheaper than duplicated
+- [x] **COST-05**: User can see a clear message when break-even does not exist (shared never cheaper)
 - [x] **COST-06**: User can see divergence rate modeling showing non-linear cost growth for duplicated code over time
 - [x] **COST-07**: User can see bug propagation cost as a separate line item in the duplicated code breakdown
 - [x] **COST-08**: User can see coordination overhead as an explicit cost line in the shared code breakdown
@@ -52,9 +52,9 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 ### Visualization
 
-- [ ] **VIZ-01**: User can see temporal cost curves (cumulative) for both shared and duplicated approaches on a single chart
-- [ ] **VIZ-02**: User can see the break-even point highlighted on the chart with annotation
-- [ ] **VIZ-03**: Chart has high-contrast, presentation-ready styling with labeled axes
+- [x] **VIZ-01**: User can see temporal cost curves (cumulative) for both shared and duplicated approaches on a single chart
+- [x] **VIZ-02**: User can see the break-even point highlighted on the chart with annotation
+- [x] **VIZ-03**: Chart has high-contrast, presentation-ready styling with labeled axes
 - [x] **VIZ-04**: User can see citation tooltips showing the research source for each formula constant
 
 ### Sharing
@@ -112,9 +112,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TIME-02 | Phase 4 | Complete |
 | COST-01 | Phase 4 | Complete |
 | COST-02 | Phase 4 | Complete |
-| COST-03 | Phase 5 | Pending |
-| COST-04 | Phase 5 | Pending |
-| COST-05 | Phase 5 | Pending |
+| COST-03 | Phase 5 | Complete |
+| COST-04 | Phase 5 | Complete |
+| COST-05 | Phase 5 | Complete |
 | COST-06 | Phase 5 | Complete |
 | COST-07 | Phase 5 | Complete |
 | COST-08 | Phase 5 | Complete |
@@ -126,9 +126,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADV-06 | Phase 5 | Complete |
 | ADV-07 | Phase 5 | Complete |
 | ADV-08 | Phase 5 | Complete |
-| VIZ-01 | Phase 5 | Pending |
-| VIZ-02 | Phase 5 | Pending |
-| VIZ-03 | Phase 5 | Pending |
+| VIZ-01 | Phase 5 | Complete |
+| VIZ-02 | Phase 5 | Complete |
+| VIZ-03 | Phase 5 | Complete |
 | VIZ-04 | Phase 5 | Complete |
 | SHARE-01 | Phase 6 | Pending |
 | SHARE-02 | Phase 6 | Pending |
