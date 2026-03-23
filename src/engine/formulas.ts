@@ -17,6 +17,7 @@ import type {
   SharedCostOutputs,
   DuplicatedCostOutputs,
   BreakEvenResult,
+  YearCost,
 } from './types';
 import { HOURS_PER_WEEK, HOURS_PER_DAY, ENGINE_DEFAULTS } from './types';
 
@@ -215,7 +216,7 @@ export function calcSharedCost(inputs: EngineInputs): SharedCostOutputs {
   // Build cumulative yearly breakdown
   // Year 0: setup costs only (initialDev + libSetup)
   // Year N (N >= 1): previous cumulative + all annual costs
-  const yearlyBreakdown = [];
+  const yearlyBreakdown: YearCost[] = [];
   const year0Cost = initialDevCost + libSetupCost;
   yearlyBreakdown.push({ year: 0, cumulativeCost: year0Cost });
 
@@ -262,7 +263,7 @@ export function calcDuplicatedCost(inputs: EngineInputs): DuplicatedCostOutputs 
   const duplicatedDevCost = baseDev * (1 + portingFactor);
   const baseMaintenance = baseDev * maintenanceRate;
 
-  const yearlyBreakdown = [];
+  const yearlyBreakdown: YearCost[] = [];
   yearlyBreakdown.push({ year: 0, cumulativeCost: duplicatedDevCost });
 
   for (let year = 1; year <= horizonYears; year++) {
@@ -322,7 +323,6 @@ export function calcBreakEven(inputs: EngineInputs): BreakEvenResult {
     devHours,
     maintenanceRate,
     generalizationFactor,
-    portingFactor,
     divergenceRate,
     nbConsumingCodebases,
   } = inputs;
