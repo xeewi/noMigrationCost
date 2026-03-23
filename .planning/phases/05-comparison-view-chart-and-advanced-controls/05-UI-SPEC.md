@@ -57,11 +57,11 @@ Inherits Geist Variable from Phase 4 base. No new font families introduced.
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px | 400 | 1.5 | Parameter labels, table cells, tooltip copy, citation text |
-| Label | 12px | 500 | 1.4 | Category row labels in breakdown table, badge text, axis tick labels |
+| Label | 12px | 400 | 1.4 | Category row labels in breakdown table, badge text, axis tick labels |
 | Heading | 20px | 600 | 1.2 | Tab labels, summary card headings ("Shared Path", "Duplicated Path") |
-| Display | 28px | 700 | 1.1 | Summary card total cost values (€42K format) |
+| Display | 28px | 600 | 1.1 | Summary card total cost values (€42K format) |
 
-Note: 14px body and 12px label are the two working sizes for dense data tables. Display size (28px) is reserved strictly for the two path total values — it is the visual anchor of the comparison tab.
+Note: Body (14px) and Label (12px) are differentiated by size, not weight — both use weight 400. Heading (20px) and Display (28px) are differentiated by size, not weight — both use weight 600. Display size (28px) is reserved strictly for the two path total values — it is the visual anchor of the comparison tab.
 
 ---
 
@@ -121,7 +121,7 @@ Info icon: `Info` from lucide-react. ChevronDown/ChevronRight for collapsible to
 ### Summary Cards (D-06)
 
 - Two cards side-by-side with equal width: "Shared Path" and "Duplicated Path"
-- Each card: colored left border (green / red), path name heading (20px/600), total cost in display size (28px/700)
+- Each card: colored left border (green / red), path name heading (20px/600), total cost in display size (28px/600)
 - Delta/savings: third element below both cards — label "You save" + value in green when shared < duplicated; label "Shared costs more" + value in amber when shared > duplicated
 - Standalone total badge (D-04): small `Badge` variant="outline" inside the Comparison tab header area showing "Standalone: €X" — sourced from existing standalone calculation
 
@@ -150,7 +150,7 @@ Info icon: `Info` from lucide-react. ChevronDown/ChevronRight for collapsible to
 - Collapsed by default; animates open/close
 - Each parameter row: label (14px/400) + `Info` icon (16px, lucide) | `Slider` | `Input` (number, width ~72px)
   - Label and icon left-aligned, slider fills remaining width, input right-aligned
-  - Info icon click opens `Popover` with citation text (research section reference, default value, valid range)
+  - Info icon: `aria-label="View citation for [parameter name]"` (substitute the actual parameter name, e.g. `aria-label="View citation for Generalization factor"`). Click opens `Popover` with citation text (research section reference, default value, valid range).
   - Slider and input are bound — changing either updates the shared state value
   - Input accepts free-form typing; clamps to valid range on blur
 - "Reset to defaults" `Button` variant="outline" size="sm" at the bottom of the expanded section. Copy: "Reset to defaults"
