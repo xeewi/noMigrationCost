@@ -120,10 +120,6 @@ function ParamRow({ config, value, onValueChange }: ParamRowProps) {
     setInputStr(value.toFixed(decimalPlaces));
   }, [value, decimalPlaces]);
 
-  function handleSliderChange(newValue: number) {
-    onValueChange(newValue);
-  }
-
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setInputStr(e.target.value);
   }
@@ -162,7 +158,7 @@ function ParamRow({ config, value, onValueChange }: ParamRowProps) {
             max={max}
             step={step}
             value={value}
-            onValueChange={handleSliderChange}
+            onValueChange={(v) => onValueChange(Array.isArray(v) ? v[0] : v)}
             aria-label={label}
           />
         </div>
@@ -196,27 +192,24 @@ export function AdvancedParameters({
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger asChild>
-        <button
-          type="button"
-          className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-left hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ChevronDown
-            size={16}
-            className={cn(
-              'shrink-0 text-muted-foreground transition-transform duration-200',
-              open && 'rotate-180',
-            )}
-          />
-          <span className="text-sm font-normal text-foreground">
-            Advanced Parameters
-          </span>
-          {isModified && (
-            <Badge variant="outline" className="ml-auto text-xs">
-              Modified
-            </Badge>
+      <CollapsibleTrigger
+        className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-left hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <ChevronDown
+          size={16}
+          className={cn(
+            'shrink-0 text-muted-foreground transition-transform duration-200',
+            open && 'rotate-180',
           )}
-        </button>
+        />
+        <span className="text-sm font-normal text-foreground">
+          Advanced Parameters
+        </span>
+        {isModified && (
+          <Badge variant="outline" className="ml-auto text-xs">
+            Modified
+          </Badge>
+        )}
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-card px-4 py-4">
         <div className="space-y-5">
