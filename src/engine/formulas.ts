@@ -303,17 +303,18 @@ export function calcDuplicatedCost(inputs: EngineInputs): DuplicatedCostOutputs 
  * Calculates the break-even point where shared code becomes more cost-effective.
  *
  * Formula (§7.3):
- *   generalizationOverhead = initialDev × (genFactor - 1)
- *   libSetup = LIB_SETUP_WEEKS × HOURS_PER_WEEK × rate
- *   upfrontCost = generalizationOverhead + libSetup
- *   monthlyDuplicatedCosts = (maintenance_yr1 + sync_yr1 + bugs_yr1) / 12
- *   monthlySharedCosts = (annualMaintenance + onboarding) / 12
- *   monthlySavings = monthlyDuplicatedCosts - monthlySharedCosts
+ *   upfrontCost = generalizationOverhead + libSetupCost
+ *     where generalizationOverhead = baseDev × (genFactor - 1)
+ *   annualDuplicatedCosts = year1Maintenance + year1Sync + bugsCost
+ *   annualSharedMaintenance uses ENGINE_DEFAULTS.maintenanceRateShared (0.18)
+ *     because break-even compares shared vs duplicated approaches
+ *   monthlySavings = (annualDuplicatedCosts - annualSharedMaintenance) / 12
  *   monthlyCoordination = annualCoordination / 12
  *   netMonthlySavings = monthlySavings - monthlyCoordination
- *
  *   months = upfrontCost / netMonthlySavings
- *   If netMonthlySavings <= 0: { exists: false, months: null }
+ *   Returns { exists: false, months: null } when netMonthlySavings <= 0
+ *
+ * Note: inputs.maintenanceRate is the duplicated rate (typically 0.22).
  */
 export function calcBreakEven(inputs: EngineInputs): BreakEvenResult {
   const {
