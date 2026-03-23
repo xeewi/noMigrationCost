@@ -73,8 +73,7 @@ Declared values (all multiples of 4):
 | 3xl | 64px | Not used in Phase 1 |
 
 Exceptions:
-- Time horizon preset buttons: minimum tap target 44px height (accessibility)
-- Team grid headcount inputs: minimum 44px height (touch target)
+- Time horizon preset buttons and team grid headcount inputs: `min-height: 44px` (touch target accessibility). This 44px value applies only to `min-height` on interactive controls — it is not a layout spacing token and does not appear in margin or padding declarations.
 
 ---
 
@@ -87,9 +86,9 @@ Exceptions:
 | Body | 16px | 400 (regular) | 1.5 | Form labels, table body, helper text |
 | Label | 14px | 400 (regular) | 1.4 | Column headers, input sub-labels (e.g. "SP/sprint") |
 | Heading | 20px | 600 (semibold) | 1.2 | Section headings (Team Composition, Feature Sizing, Time Horizon, Cost Output) |
-| Display | 32px | 700 (bold) | 1.1 | Total cost figure in summary card |
+| Display | 32px | 600 (semibold) | 1.1 | Total cost figure in summary card |
 
-**Constraint:** Two weights only in interactive UI (400 + 600). 700 reserved exclusively for the total cost display number — it is the single most important data point on the screen.
+**Two-weight system: 400 (body/label) and 600 (heading/display).** At 32px, semibold provides sufficient visual dominance for the total cost figure without introducing a third weight. No exceptions.
 
 ---
 
@@ -141,14 +140,14 @@ Components required in Phase 1, specified for the executor:
 - Four `<button>` elements in a `<div role="group">`: 1 yr, 3 yrs, 5 yrs, 10 yrs
 - Active state: `background-color: #0172ad; color: #fff`
 - Inactive state: `background-color: #f8f9fa; color: #373c44; border: 1px solid #dee2e6`
-- Height: 44px minimum
+- Height: `min-height: 44px` (touch target — not a spacing token)
 - Rendered as a button group (inline, no gaps between buttons — connected borders)
 
 ### Cost Summary Card
 
 - `<article>` element (Pico gives it card styling)
 - Top: section heading "Standalone Feature Cost" (20px, weight 600)
-- Center: total cost figure — large display number (32px, weight 700), formatted as "€XX,XXX"
+- Center: total cost figure — large display number (32px, weight 600), formatted as "€XX,XXX"
 - Below: secondary label "over {N} year(s)" (14px, weight 400, color #6c757d)
 
 ### Cost Breakdown Table
