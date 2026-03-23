@@ -266,6 +266,9 @@ export function calcDuplicatedCost(inputs: EngineInputs): DuplicatedCostOutputs 
   const yearlyBreakdown: YearCost[] = [];
   yearlyBreakdown.push({ year: 0, cumulativeCost: duplicatedDevCost });
 
+  let totalBugsCost = 0;
+  let totalSyncCost = 0;
+
   for (let year = 1; year <= horizonYears; year++) {
     const prev = yearlyBreakdown[yearlyBreakdown.length - 1].cumulativeCost;
 
@@ -285,6 +288,9 @@ export function calcDuplicatedCost(inputs: EngineInputs): DuplicatedCostOutputs 
     // Additional bugs cost (fixed from research doc)
     const yearBugs = ADDITIONAL_BUGS_ANNUAL_COST;
 
+    totalBugsCost += yearBugs;
+    totalSyncCost += yearSync;
+
     yearlyBreakdown.push({
       year,
       cumulativeCost: prev + yearMaintenance + yearSync + yearBugs,
@@ -297,6 +303,8 @@ export function calcDuplicatedCost(inputs: EngineInputs): DuplicatedCostOutputs 
     duplicatedDevCost,
     yearlyBreakdown,
     totalCost,
+    totalBugsCost,
+    totalSyncCost,
   };
 }
 
@@ -347,7 +355,8 @@ export function calcBreakEven(inputs: EngineInputs): BreakEvenResult {
   // Annual shared maintenance (§7.3 uses only the 33774 maintenance term, not onboarding)
   // Matches the research doc: Monthly_Maintenance_Savings = (dup_costs - shared_maintenance) / 12
   // The shared maintenance uses the shared rate (0.18), not the duplicated rate from inputs.
-  const sharedBaseMaintenance = initialDevCost * ENGINE_DEFAULTS.maintenanceRateShared;
+  const sharedRate = inputs.maintenanceRateShared ?? ENGINE_DEFAULTS.maintenanceRateShared;
+  const sharedBaseMaintenance = initialDevCost * sharedRate;
   const versioningCost = VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * rate;
   const supportCost = SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * rate;
   const annualSharedMaintenance = sharedBaseMaintenance + versioningCost + supportCost;
