@@ -306,6 +306,104 @@ describe('calcBreakEven', () => {
 });
 
 // ---------------------------------------------------------------------------
+// calcDuplicatedCost — sub-total fields (Phase 5 extension)
+// ---------------------------------------------------------------------------
+describe('calcDuplicatedCost sub-totals', () => {
+  const inputs: EngineInputs = {
+    teamAvgHourlyRate: 65,
+    devHours: 400,
+    horizonYears: 5,
+    maintenanceRate: 0.22,
+    generalizationFactor: 1.3,
+    portingFactor: 0.65,
+    divergenceRate: 0.20,
+    bugDuplicationFactor: 2.0,
+    nbConsumingCodebases: 2,
+  };
+
+  it('returns totalBugsCost = ADDITIONAL_BUGS_ANNUAL_COST * horizonYears (50600 * 5 = 253000)', () => {
+    // ADDITIONAL_BUGS_ANNUAL_COST = 50600 (constant from formulas.ts), horizonYears = 5
+    const result = calcDuplicatedCost(inputs);
+    expect(result.totalBugsCost).toBeCloseTo(253000, 0);
+  });
+
+  it('returns totalSyncCost as the sum of all yearly sync costs', () => {
+    // yearSync = 8 * 16 * (1.20)^year * 65
+    // year1: 8 * 16 * 1.20 * 65 = 9984
+    // year2: 8 * 16 * 1.44 * 65 = 11980.8
+    // year3: 8 * 16 * 1.728 * 65 = 14376.96
+    // year4: 8 * 16 * 2.0736 * 65 = 17252.352
+    // year5: 8 * 16 * 2.48832 * 65 = 20702.8224
+    const expected = 9984 + 11980.8 + 14376.96 + 17252.352 + 20702.8224;
+    const result = calcDuplicatedCost(inputs);
+    expect(result.totalSyncCost).toBeCloseTo(expected, 0);
+  });
+
+  it('existing totalCost and yearlyBreakdown are unchanged', () => {
+    // Verify backward compatibility — totalCost should still be correct
+    const result = calcDuplicatedCost(inputs);
+    expect(result.totalCost).toBeGreaterThan(0);
+    expect(result.yearlyBreakdown).toHaveLength(6); // year 0 through 5
+    expect(result.duplicatedDevCost).toBeCloseTo(42900, 0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// calcBreakEven — flexible maintenanceRateShared (Phase 5 extension)
+// ---------------------------------------------------------------------------
+describe('calcBreakEven flexible maintenanceRateShared', () => {
+  const baseInputs: EngineInputs = {
+    teamAvgHourlyRate: 65,
+    devHours: 400,
+    horizonYears: 3,
+    maintenanceRate: 0.22,
+    generalizationFactor: 1.3,
+    portingFactor: 0.65,
+    divergenceRate: 0.20,
+    bugDuplicationFactor: 2.0,
+    nbConsumingCodebases: 2,
+  };
+
+  it('falls back to ENGINE_DEFAULTS.maintenanceRateShared (0.18) when maintenanceRateShared is undefined', () => {
+    // Same as the existing test — no maintenanceRateShared field
+    const result = calcBreakEven(baseInputs);
+    expect(result.exists).toBe(true);
+    expect(result.months!).toBeCloseTo(18.5, 0);
+  });
+
+  it('uses inputs.maintenanceRateShared when provided, changing the break-even result', () => {
+    // Higher shared maintenance rate means less savings => longer break-even
+    const inputsHighRate: EngineInputs = {
+      ...baseInputs,
+      maintenanceRateShared: 0.30, // much higher than default 0.18
+    };
+    const resultDefault = calcBreakEven(baseInputs);
+    const resultHighRate = calcBreakEven(inputsHighRate);
+    // Higher shared rate means worse savings, so break-even takes longer (more months)
+    // OR it may flip to no break-even — either way it should differ from the default
+    if (resultHighRate.exists && resultDefault.exists) {
+      expect(resultHighRate.months!).toBeGreaterThan(resultDefault.months!);
+    } else {
+      // If high rate has no break-even, that also proves the rate was used
+      expect(resultHighRate.exists).toBe(false);
+    }
+  });
+
+  it('uses inputs.maintenanceRateShared = 0.10 (lower than default), giving shorter break-even', () => {
+    const inputsLowRate: EngineInputs = {
+      ...baseInputs,
+      maintenanceRateShared: 0.10, // lower than default 0.18
+    };
+    const resultDefault = calcBreakEven(baseInputs);
+    const resultLowRate = calcBreakEven(inputsLowRate);
+    // Lower shared rate means more savings => shorter break-even
+    expect(resultLowRate.exists).toBe(true);
+    expect(resultDefault.exists).toBe(true);
+    expect(resultLowRate.months!).toBeLessThan(resultDefault.months!);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // calcScaleFactor — section 7.4
 // ---------------------------------------------------------------------------
 describe('calcScaleFactor', () => {

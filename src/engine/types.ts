@@ -28,6 +28,7 @@ export interface EngineInputs {
   divergenceRate: number;          // default 0.20
   bugDuplicationFactor: number;    // default 2.0
   nbConsumingCodebases: number;    // default 2
+  maintenanceRateShared?: number;  // optional — overrides ENGINE_DEFAULTS.maintenanceRateShared in calcBreakEven
 }
 
 export interface BreakdownRow {
@@ -61,6 +62,8 @@ export interface DuplicatedCostOutputs {
   duplicatedDevCost: number;
   yearlyBreakdown: YearCost[];
   totalCost: number;
+  totalBugsCost: number;   // sum of all yearly bug costs over the horizon
+  totalSyncCost: number;   // sum of all yearly sync costs over the horizon
 }
 
 export interface YearCost {
