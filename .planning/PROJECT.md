@@ -12,7 +12,11 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 
 ### Validated
 
-(None yet — restarting with React stack)
+- [x] User can compare shared code vs duplicated code total costs over time — Validated in Phase 5: Comparison View, Chart, and Advanced Controls
+- [x] Dashboard displays temporal graphs showing cumulative cost curves for both approaches — Validated in Phase 5
+- [x] Dashboard displays detailed tables with cost breakdowns by category (maintenance, coordination, bugs, sync) — Validated in Phase 5
+- [x] Break-even point is calculated and highlighted on the graph — Validated in Phase 5
+- [x] Variables from the research doc (generalization factor, porting factor, divergence rate, etc.) are adjustable — Validated in Phase 5
 
 ### Active
 
@@ -91,4 +95,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — milestone v1.0 React Rebuild started*
+*Last updated: 2026-03-23 — Phase 5 complete: comparison view, chart, and advanced controls*
