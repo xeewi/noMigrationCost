@@ -69,9 +69,11 @@ Exceptions:
 | Body | 14px | 400 | 1.5 | Table cell text, input labels, descriptions |
 | Label | 14px | 600 | 1.4 | Field labels, column headers, section titles |
 | Heading | 20px | 600 | 1.2 | Card section headings (e.g. "Team Composition") |
-| Display | 32px | 700 | 1.1 | Total standalone cost number in summary card |
+| Display | 32px | 600 | 1.1 | Total standalone cost number in summary card |
 
 Font: Inter. Fallback: ui-sans-serif, system-ui, -apple-system.
+
+Two weights only: regular (400) for body, semibold (600) for label/heading/display. Display role achieves visual separation through size (32px vs 20px), not weight.
 
 ---
 
@@ -84,7 +86,7 @@ Using shadcn default theme (zinc base, CSS variables). All values reference shad
 | Dominant (60%) | `background` / `card` | Page background, input column surface |
 | Secondary (30%) | `muted` / `muted-foreground` | Output column card, table row alternation, inactive tab background |
 | Accent (10%) | `primary` | Active time-horizon button, active sizing tab indicator, derived-hours label |
-| Destructive | `destructive` | Not used in Phase 4 (no delete actions — headcount=0 replaces removal) |
+| Destructive | `destructive` | Input field validation error — border ring on invalid fields |
 
 Accent reserved for:
 - Active state of the 4 time-horizon preset buttons (1, 3, 5, 10 years)
