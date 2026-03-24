@@ -147,12 +147,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VIZ-04 | Phase 5 | Complete |
 | SHARE-01 | Phase 6 | Complete |
 | SHARE-02 | Phase 6 | Complete |
+| FOOT-01 | Phase 7 | Pending |
+| FOOT-02 | Phase 7 | Pending |
+| FOOT-03 | Phase 7 | Pending |
+| FOOT-04 | Phase 7 | Pending |
+| HEAD-01 | Phase 8 | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total
-- Mapped to phases: 34
+- v1.0 requirements: 34 total
+- v1.1 requirements: 5 total
+- Mapped to phases: 39
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-24 — v1.1 Author Branding requirements added*
+*Last updated: 2026-03-24 — v1.1 traceability added (Phase 7, Phase 8)*

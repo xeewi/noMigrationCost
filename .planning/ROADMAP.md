@@ -7,7 +7,8 @@ A React + Vite + TypeScript + shadcn/ui + Recharts dashboard that quantifies the
 ## Milestones
 
 - (abandoned) **Phases 1-3: Alpine+Pico CSS prototype** — abandoned on stack pivot 2026-03-23
-- **Phases 4-6: v1.0 React Rebuild** — in progress
+- **Phases 4-6: v1.0 React Rebuild** — complete
+- **Phases 7-8: v1.1 Author Branding** — in progress
 
 ## Phases
 
@@ -31,6 +32,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Scaffold, Engine, and Standalone Cost** - React+Vite project, TypeScript formula engine verified against research doc, input form wired to real-time cost output (completed 2026-03-23)
 - [x] **Phase 5: Comparison View, Chart, and Advanced Controls** - Shared vs duplicated cost curves, break-even detection, Recharts visualization, and all adjustable research-backed formula constants (completed 2026-03-23)
 - [x] **Phase 6: URL Sharing** - Full scenario state encoded in URL hash for sharing and presentation replay (completed 2026-03-24)
+
+### v1.1 Author Branding
+
+- [ ] **Phase 7: Author Footer** - Fixed footer banner with author name and links to GitHub, Malt, and LinkedIn profiles
+- [ ] **Phase 8: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
 ## Phase Details
 
@@ -86,13 +92,36 @@ Plans:
 
 **UI hint**: yes
 
+### Phase 7: Author Footer
+**Goal**: Users see a persistent footer banner identifying the author with direct links to professional profiles
+**Depends on**: Phase 6
+**Requirements**: FOOT-01, FOOT-02, FOOT-03, FOOT-04
+**Success Criteria** (what must be TRUE):
+  1. User can see the author name (Guillaume Gautier / xeewi) displayed in a fixed footer that is visible on every page without scrolling
+  2. User can click a GitHub icon/link in the footer and land on the author's GitHub profile in a new tab
+  3. User can click a Malt icon/link in the footer and land on the author's Malt profile in a new tab
+  4. User can click a LinkedIn icon/link in the footer and land on the author's LinkedIn profile in a new tab
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 8: Source File Headers
+**Goal**: Every source file carries a consistent comment header that establishes authorship and project identity for the codebase
+**Depends on**: Nothing (independent of Phase 7)
+**Requirements**: HEAD-01
+**Success Criteria** (what must be TRUE):
+  1. Every TypeScript and TSX source file opens with a comment block containing the author name, creation date, and project identifier
+  2. The header format is consistent across all files (same fields, same comment style)
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 4 → 5 → 6
+Phases execute in numeric order: 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete   | 2026-03-23 |
-| 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete   | 2026-03-23 |
-| 6. URL Sharing | 2/2 | Complete   | 2026-03-24 |
+| 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete | 2026-03-23 |
+| 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete | 2026-03-23 |
+| 6. URL Sharing | 2/2 | Complete | 2026-03-24 |
+| 7. Author Footer | 0/? | Not started | - |
+| 8. Source File Headers | 0/? | Not started | - |

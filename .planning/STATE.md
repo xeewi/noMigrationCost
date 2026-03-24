@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Author Branding
-status: Defining requirements
-stopped_at: "Milestone v1.1 started — defining requirements"
+status: Ready to plan
+stopped_at: "Roadmap created — Phase 7 is next"
 last_updated: "2026-03-24T12:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,43 +19,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** Milestone v1.1 — Author Branding
+**Current focus:** Milestone v1.1 — Author Branding (Phase 7: Author Footer)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-24 — Milestone v1.1 started
+Phase: 7 — Author Footer
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-24 — Roadmap created for v1.1
+
+Progress: [----------] 0/2 phases complete
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (v1.0 history):**
 
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: —
+- Total plans completed (v1.0): 9
+- Average duration: ~3-4 min/plan
 
-**By Phase:**
+**By Phase (v1.0):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| Phase 04 | 3 | ~11m | ~3.7m |
+| Phase 05 | 4 | ~12m | ~3m |
+| Phase 06 | 2 | ~4m | ~2m |
 
-**Recent Trend:**
+**v1.1 Trend:**
 
 - Last 5 plans: —
 - Trend: —
 
 *Updated after each plan completion*
-| Phase 04 P01 | 4m | 3 tasks | 23 files |
-| Phase 04 P02 | 4m | 3 tasks | 2 files |
-| Phase 04 P03 | 155 | 3 tasks | 6 files |
-| Phase 05 P01 | 4 | 3 tasks | 7 files |
-| Phase 05 P02 | 3min | 2 tasks | 3 files |
-| Phase 05 P03 | 2min | 3 tasks | 3 files |
-| Phase 05 P04 | 3min | 1 tasks | 2 files |
-| Phase 06 P01 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -86,15 +81,14 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- Formula mapping exercise required before coding — trace each formula from docs/feature-cost-shared-vs-duplicated.md sections 7.1-7.5 to TypeScript function signatures before writing any code
-- Break-even "no break-even" UX needs a design decision before Phase 5 implementation
+None for v1.1.
 
 ## Session Continuity
 
-Last session: 2026-03-24T10:11:30.608Z
-Stopped at: Checkpoint: 06-02 Task 2 human-verify
+Last session: 2026-03-24
+Stopped at: Roadmap created — ready to plan Phase 7
 Resume file: None
