@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
 import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
+import { useHashRoute } from '@/hooks/useHashRoute';
 import {
   encodeAppState, decodeAppState, applyStateToSetters,
   getDefaultTeam, getDefaultAdvancedParams,
@@ -28,6 +29,8 @@ import {
 import type { SeniorityRow, SizingMode, DirectHoursUnit, EngineInputs } from '@/engine/types';
 
 function App() {
+  const { view, navigateTo } = useHashRoute();
+
   // Raw input state
   const [team, setTeam] = useState<SeniorityRow[]>([
     { label: 'Junior', headcount: 0, hourlyRate: SENIORITY_DEFAULTS.Junior },
@@ -75,6 +78,7 @@ function App() {
 
   // Hash write on state change — live URL updates with 300ms debounce (D-01)
   useEffect(() => {
+    if (view !== 'calculator') return; // D-08: don't overwrite route hash with calculator state
     const id = setTimeout(() => {
       window.location.hash = encodeAppState(
         team, sizingMode, storyPoints, velocity, sprintWeeks,
@@ -83,7 +87,7 @@ function App() {
       );
     }, 300);
     return () => clearTimeout(id);
-  }, [team, sizingMode, storyPoints, velocity, sprintWeeks,
+  }, [view, team, sizingMode, storyPoints, velocity, sprintWeeks,
       directValue, directUnit, horizonYears, advancedParams,
       nbConsumingCodebases, activeTab]);
 
@@ -192,70 +196,82 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader onReset={handleReset} />
-      <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16">
-        <div className="flex gap-8 md:flex-row flex-col">
-          {/* Inputs column: 55% */}
-          <div className="flex-[55] space-y-6">
-            <TeamComposition
-              team={team}
-              onTeamChange={setTeam}
-              teamAvgRate={teamAvgRate}
-            />
-            <FeatureSizing
-              sizingMode={sizingMode}
-              onSizingModeChange={setSizingMode}
-              storyPoints={storyPoints}
-              onStoryPointsChange={setStoryPoints}
-              velocity={velocity}
-              onVelocityChange={setVelocity}
-              sprintWeeks={sprintWeeks}
-              onSprintWeeksChange={setSprintWeeks}
-              directValue={directValue}
-              onDirectValueChange={setDirectValue}
-              directUnit={directUnit}
-              onDirectUnitChange={setDirectUnit}
-              devHours={devHours}
-            />
-            <AdvancedParameters
-              params={advancedParams}
-              onChange={setAdvancedParams}
-              isModified={isAdvancedModified}
-              onReset={resetAdvancedParams}
-              nbConsumingCodebases={nbConsumingCodebases}
-              onNbConsumingCodebasesChange={setNbConsumingCodebases}
-            />
-          </div>
-          {/* Output column: 45% */}
-          <div className="flex-[45]">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <TabsList>
-                  <TabsTrigger value="comparison">Comparison</TabsTrigger>
-                  <TabsTrigger value="standalone">Standalone</TabsTrigger>
-                </TabsList>
-                <TimeHorizon
-                  horizonYears={horizonYears}
-                  onHorizonChange={setHorizonYears}
-                />
-              </div>
-              <TabsContent value="comparison">
-                <ComparisonTab
-                  sharedCost={sharedCostOutput}
-                  duplicatedCost={duplicatedCostOutput}
-                  breakEven={breakEvenResult}
-                  horizonYears={horizonYears}
-                  standaloneTotalCost={costOutput?.totalStandaloneCost ?? 0}
-                  emptyReason={emptyReason}
-                />
-              </TabsContent>
-              <TabsContent value="standalone">
-                <CostOutput output={costOutput} emptyReason={emptyReason} />
-              </TabsContent>
-            </Tabs>
+      <AppHeader onReset={handleReset} view={view} onNavigate={navigateTo} />
+
+      {/* Calculator view — always mounted, hidden when on docs (D-07: zero state loss) */}
+      <div className={view === 'calculator' ? '' : 'hidden'}>
+        <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16">
+          <div className="flex gap-8 md:flex-row flex-col">
+            {/* Inputs column: 55% */}
+            <div className="flex-[55] space-y-6">
+              <TeamComposition
+                team={team}
+                onTeamChange={setTeam}
+                teamAvgRate={teamAvgRate}
+              />
+              <FeatureSizing
+                sizingMode={sizingMode}
+                onSizingModeChange={setSizingMode}
+                storyPoints={storyPoints}
+                onStoryPointsChange={setStoryPoints}
+                velocity={velocity}
+                onVelocityChange={setVelocity}
+                sprintWeeks={sprintWeeks}
+                onSprintWeeksChange={setSprintWeeks}
+                directValue={directValue}
+                onDirectValueChange={setDirectValue}
+                directUnit={directUnit}
+                onDirectUnitChange={setDirectUnit}
+                devHours={devHours}
+              />
+              <AdvancedParameters
+                params={advancedParams}
+                onChange={setAdvancedParams}
+                isModified={isAdvancedModified}
+                onReset={resetAdvancedParams}
+                nbConsumingCodebases={nbConsumingCodebases}
+                onNbConsumingCodebasesChange={setNbConsumingCodebases}
+              />
+            </div>
+            {/* Output column: 45% */}
+            <div className="flex-[45]">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <TabsList>
+                    <TabsTrigger value="comparison">Comparison</TabsTrigger>
+                    <TabsTrigger value="standalone">Standalone</TabsTrigger>
+                  </TabsList>
+                  <TimeHorizon
+                    horizonYears={horizonYears}
+                    onHorizonChange={setHorizonYears}
+                  />
+                </div>
+                <TabsContent value="comparison">
+                  <ComparisonTab
+                    sharedCost={sharedCostOutput}
+                    duplicatedCost={duplicatedCostOutput}
+                    breakEven={breakEvenResult}
+                    horizonYears={horizonYears}
+                    standaloneTotalCost={costOutput?.totalStandaloneCost ?? 0}
+                    emptyReason={emptyReason}
+                  />
+                </TabsContent>
+                <TabsContent value="standalone">
+                  <CostOutput output={costOutput} emptyReason={emptyReason} />
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Docs view — placeholder until Phase 10 */}
+      {view === 'docs' && (
+        <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16">
+          <p className="text-muted-foreground text-sm">Documentation coming soon.</p>
+        </div>
+      )}
+
       <AppFooter />
     </div>
   );
