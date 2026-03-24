@@ -190,3 +190,14 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 | 10. Doc Page Implementation | 0/? | Not started | - |
 | 11. Sidebar Polish | 0/? | Not started | - |
 | 12. Source File Headers | 0/? | Not started | - |
+
+## Backlog
+
+### Phase 999.1: Standalone Organizational Costs (BACKLOG)
+
+**Goal:** Enrich the Standalone cost model with organizational costs (support, versioning, onboarding, coordination) that currently only appear in Shared/Duplicated paths. A feature built by a single team still incurs these costs — the current Standalone mode underestimates by ~5× because it only counts dev + maintenance.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
