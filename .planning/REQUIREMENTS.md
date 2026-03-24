@@ -85,20 +85,20 @@ Requirements for Documentation milestone. Each maps to roadmap phases.
 
 - [x] **ROUTE-01**: User can navigate to the documentation page via a link in the AppHeader
 - [x] **ROUTE-02**: User can navigate back to the calculator via a link in the AppHeader from the docs page
-- [ ] **ROUTE-03**: User can share a URL that deep-links to a specific documentation section (e.g. `#/docs/section-id`)
+- [x] **ROUTE-03**: User can share a URL that deep-links to a specific documentation section (e.g. `#/docs/section-id`)
 - [x] **ROUTE-04**: User can use browser back/forward to switch between calculator and docs views
-- [ ] **ROUTE-05**: User's calculator inputs are preserved when switching to docs and back
+- [x] **ROUTE-05**: User's calculator inputs are preserved when switching to docs and back
 
 ### Documentation Rendering
 
-- [ ] **DOC-01**: User can read the full research document rendered as HTML on the docs page
-- [ ] **DOC-02**: User can see GFM tables rendered correctly (pipe tables from the research doc)
-- [ ] **DOC-03**: User can see properly styled prose (headings, paragraphs, lists, links) via Tailwind Typography
-- [ ] **DOC-04**: User can click a sidebar anchor link and land at the correct heading without it being hidden behind the fixed header
+- [x] **DOC-01**: User can read the full research document rendered as HTML on the docs page
+- [x] **DOC-02**: User can see GFM tables rendered correctly (pipe tables from the research doc)
+- [x] **DOC-03**: User can see properly styled prose (headings, paragraphs, lists, links) via Tailwind Typography
+- [x] **DOC-04**: User can click a sidebar anchor link and land at the correct heading without it being hidden behind the fixed header
 
 ### Sidebar Navigation
 
-- [ ] **NAV-01**: User can see a left sidebar listing all document sections as clickable anchor links
+- [x] **NAV-01**: User can see a left sidebar listing all document sections as clickable anchor links
 - [ ] **NAV-02**: User can see the currently visible section highlighted in the sidebar as they scroll
 - [ ] **NAV-03**: Sidebar auto-scrolls to keep the active section link visible when the document is long
 
@@ -183,14 +183,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HEAD-01 (v1.1) | Phase 8 | Pending |
 | ROUTE-01 | Phase 9 | Complete |
 | ROUTE-02 | Phase 9 | Complete |
-| ROUTE-03 | Phase 9 | Pending |
+| ROUTE-03 | Phase 9 | Complete |
 | ROUTE-04 | Phase 9 | Complete |
-| ROUTE-05 | Phase 9 | Pending |
-| DOC-01 | Phase 10 | Pending |
-| DOC-02 | Phase 10 | Pending |
-| DOC-03 | Phase 10 | Pending |
-| DOC-04 | Phase 10 | Pending |
-| NAV-01 | Phase 10 | Pending |
+| ROUTE-05 | Phase 9 | Complete |
+| DOC-01 | Phase 10 | Complete |
+| DOC-02 | Phase 10 | Complete |
+| DOC-03 | Phase 10 | Complete |
+| DOC-04 | Phase 10 | Complete |
+| NAV-01 | Phase 10 | Complete |
 | NAV-02 | Phase 11 | Pending |
 | NAV-03 | Phase 11 | Pending |
 | HEAD-01 (v1.2) | Phase 12 | Pending |
