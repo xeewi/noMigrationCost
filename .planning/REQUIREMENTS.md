@@ -62,6 +62,21 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 - [x] **SHARE-01**: User can share a scenario via URL (all inputs encoded in URL hash)
 - [x] **SHARE-02**: User opening a shared URL sees the exact same scenario with all inputs restored
 
+## v1.1 Requirements
+
+Requirements for Author Branding milestone. Each maps to roadmap phases.
+
+### Footer Banner
+
+- [ ] **FOOT-01**: User can see the author name (Guillaume Gautier / xeewi) in a fixed footer banner on every page
+- [ ] **FOOT-02**: User can click a GitHub icon/link in the footer to navigate to the author's GitHub profile
+- [ ] **FOOT-03**: User can click a Malt icon/link in the footer to navigate to the author's Malt profile
+- [ ] **FOOT-04**: User can click a LinkedIn icon/link in the footer to navigate to the author's LinkedIn profile
+
+### Code Headers
+
+- [ ] **HEAD-01**: Every source file contains a comment header with author name, creation date, and project identifier
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -140,4 +155,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — v1.0 React Rebuild roadmap created (Phases 4-6)*
+*Last updated: 2026-03-24 — v1.1 Author Branding requirements added*
