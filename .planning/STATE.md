@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: React Rebuild
-status: Roadmap ready
-stopped_at: Phase 9 context gathered
-last_updated: "2026-03-24T14:01:14.583Z"
-last_activity: 2026-03-24 — v1.2 roadmap created (Phases 9-12)
+status: Ready to execute
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-24T14:30:36.774Z"
 progress:
-  total_phases: 9
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_phases: 6
+  completed_phases: 5
+  total_plans: 14
+  completed_plans: 13
 ---
 
 # Project State
@@ -20,14 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** v1.2 Documentation — roadmap defined, ready to begin Phase 9
+**Current focus:** Phase 09 — routing-foundation
 
 ## Current Position
 
-Phase: Not started (roadmap approved)
-Plan: —
-Status: Roadmap ready
-Last activity: 2026-03-24 — v1.2 roadmap created (Phases 9-12)
+Phase: 09 (routing-foundation) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -51,6 +48,7 @@ Last activity: 2026-03-24 — v1.2 roadmap created (Phases 9-12)
 
 *Updated after each plan completion*
 | Phase 07 P01 | 3 | 2 tasks | 2 files |
+| Phase 09-routing-foundation P01 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -87,6 +85,8 @@ Recent decisions affecting current work:
 - [v1.2 Doc]: Markdown imported via Vite ?raw suffix as module-level constant — zero runtime fetch, avoids re-parse on every render
 - [v1.2 Doc]: components prop for ReactMarkdown defined at module level — prevents re-parse when parent re-renders
 - [v1.2 Sidebar]: IntersectionObserver scroll-spy uses Map<id, ratio> approach with rootMargin: '-10% 0px -80% 0px' — prevents flicker at section boundaries
+- [Phase 09-routing-foundation]: useHashRoute lazy initializer prevents flash on deep-link; deriveView uses hash.startsWith('/') as lossless namespace discriminator
+- [Phase 09-routing-foundation]: AppHeader nav uses <a> tags not <button> for correct navigation semantics; Reset All conditionalized to calculator view only per D-03
 
 ### Pending Todos
 
@@ -105,6 +105,6 @@ None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T14:01:14.580Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-routing-foundation/09-CONTEXT.md
+Last session: 2026-03-24T14:30:36.772Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: None

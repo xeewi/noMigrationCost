@@ -83,10 +83,10 @@ Requirements for Documentation milestone. Each maps to roadmap phases.
 
 ### Routing
 
-- [ ] **ROUTE-01**: User can navigate to the documentation page via a link in the AppHeader
-- [ ] **ROUTE-02**: User can navigate back to the calculator via a link in the AppHeader from the docs page
+- [x] **ROUTE-01**: User can navigate to the documentation page via a link in the AppHeader
+- [x] **ROUTE-02**: User can navigate back to the calculator via a link in the AppHeader from the docs page
 - [ ] **ROUTE-03**: User can share a URL that deep-links to a specific documentation section (e.g. `#/docs/section-id`)
-- [ ] **ROUTE-04**: User can use browser back/forward to switch between calculator and docs views
+- [x] **ROUTE-04**: User can use browser back/forward to switch between calculator and docs views
 - [ ] **ROUTE-05**: User's calculator inputs are preserved when switching to docs and back
 
 ### Documentation Rendering
@@ -181,10 +181,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOOT-03 | Phase 7 | Complete |
 | FOOT-04 | Phase 7 | Complete |
 | HEAD-01 (v1.1) | Phase 8 | Pending |
-| ROUTE-01 | Phase 9 | Pending |
-| ROUTE-02 | Phase 9 | Pending |
+| ROUTE-01 | Phase 9 | Complete |
+| ROUTE-02 | Phase 9 | Complete |
 | ROUTE-03 | Phase 9 | Pending |
-| ROUTE-04 | Phase 9 | Pending |
+| ROUTE-04 | Phase 9 | Complete |
 | ROUTE-05 | Phase 9 | Pending |
 | DOC-01 | Phase 10 | Pending |
 | DOC-02 | Phase 10 | Pending |
