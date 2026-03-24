@@ -20,6 +20,8 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - [x] User can share scenarios via URL with all inputs encoded in hash — Validated in Phase 6: URL Sharing
 - [x] User opening a shared URL sees all inputs restored to the shared scenario — Validated in Phase 6
 - [x] User can see author name in a fixed footer with links to GitHub, Malt, and LinkedIn profiles — Validated in Phase 7: Author Footer
+- [x] User can switch between calculator and documentation views via AppHeader links with hash-based routing — Validated in Phase 9: Routing Foundation
+- [x] Hash-based routing (#/docs) coexists with existing URL sharing (base64url hashes) without collision — Validated in Phase 9: Routing Foundation
 
 ### Active
 
@@ -96,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Milestone v1.2 started*
+*Last updated: 2026-03-24 — Phase 9 (Routing Foundation) complete*
