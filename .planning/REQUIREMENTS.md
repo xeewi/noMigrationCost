@@ -73,10 +73,6 @@ Requirements for Author Branding milestone. Each maps to roadmap phases.
 - [x] **FOOT-03**: User can click a Malt icon/link in the footer to navigate to the author's Malt profile
 - [x] **FOOT-04**: User can click a LinkedIn icon/link in the footer to navigate to the author's LinkedIn profile
 
-### Code Headers
-
-- [ ] **HEAD-01**: Every source file contains a comment header with author name, creation date, and project identifier
-
 ## v1.2 Requirements
 
 Requirements for Documentation milestone. Each maps to roadmap phases.
@@ -104,7 +100,7 @@ Requirements for Documentation milestone. Each maps to roadmap phases.
 
 ### Source File Headers
 
-- [ ] **HEAD-01** *(v1.2)*: Every source file contains a comment header with author name, creation date, and project identifier
+- [ ] **HEAD-01**: Every source file contains a comment header with author name, creation date, and project identifier
 
 ## v2 Requirements
 
@@ -180,28 +176,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOOT-02 | Phase 7 | Complete |
 | FOOT-03 | Phase 7 | Complete |
 | FOOT-04 | Phase 7 | Complete |
-| HEAD-01 (v1.1) | Phase 8 | Pending |
-| ROUTE-01 | Phase 9 | Complete |
-| ROUTE-02 | Phase 9 | Complete |
-| ROUTE-03 | Phase 9 | Complete |
-| ROUTE-04 | Phase 9 | Complete |
-| ROUTE-05 | Phase 9 | Complete |
-| DOC-01 | Phase 10 | Complete |
-| DOC-02 | Phase 10 | Complete |
-| DOC-03 | Phase 10 | Complete |
-| DOC-04 | Phase 10 | Complete |
-| NAV-01 | Phase 10 | Complete |
-| NAV-02 | Phase 11 | Pending |
-| NAV-03 | Phase 11 | Pending |
-| HEAD-01 (v1.2) | Phase 12 | Pending |
+| ROUTE-01 | Phase 8 | Complete |
+| ROUTE-02 | Phase 8 | Complete |
+| ROUTE-03 | Phase 8 | Complete |
+| ROUTE-04 | Phase 8 | Complete |
+| ROUTE-05 | Phase 8 | Complete |
+| DOC-01 | Phase 9 | Complete |
+| DOC-02 | Phase 9 | Complete |
+| DOC-03 | Phase 9 | Complete |
+| DOC-04 | Phase 9 | Complete |
+| NAV-01 | Phase 9 | Complete |
+| NAV-02 | Phase 10 | Pending |
+| NAV-03 | Phase 10 | Pending |
+| HEAD-01 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.0 requirements: 34 total
-- v1.1 requirements: 5 total
+- v1.1 requirements: 4 total
 - v1.2 requirements: 13 total (ROUTE-01–05, DOC-01–04, NAV-01–03, HEAD-01)
-- Mapped to phases: 52
+- Mapped to phases: 51
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-24 — v1.2 traceability added (Phases 9-12)*
+*Last updated: 2026-03-24 — Phase 8 (Source File Headers) removed, phases renumbered (9→8, 10→9, 11→10, 12→11)*
