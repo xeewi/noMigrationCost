@@ -19,6 +19,7 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - [x] Variables from the research doc (generalization factor, porting factor, divergence rate, etc.) are adjustable — Validated in Phase 5
 - [x] User can share scenarios via URL with all inputs encoded in hash — Validated in Phase 6: URL Sharing
 - [x] User opening a shared URL sees all inputs restored to the shared scenario — Validated in Phase 6
+- [x] User can see author name in a fixed footer with links to GitHub, Malt, and LinkedIn profiles — Validated in Phase 7: Author Footer
 
 ### Active
 
@@ -91,4 +92,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Milestone v1.1 started: Author Branding*
+*Last updated: 2026-03-24 — Phase 7 complete: Author Footer*
