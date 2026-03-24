@@ -1,3 +1,10 @@
+/**
+ * @file select.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 "use client"
 
 import * as React from "react"

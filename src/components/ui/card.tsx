@@ -1,3 +1,10 @@
+/**
+ * @file card.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
