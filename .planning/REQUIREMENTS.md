@@ -59,8 +59,8 @@ Requirements for v1.0 React Rebuild. Each maps to roadmap phases.
 
 ### Sharing
 
-- [ ] **SHARE-01**: User can share a scenario via URL (all inputs encoded in URL hash)
-- [ ] **SHARE-02**: User opening a shared URL sees the exact same scenario with all inputs restored
+- [x] **SHARE-01**: User can share a scenario via URL (all inputs encoded in URL hash)
+- [x] **SHARE-02**: User opening a shared URL sees the exact same scenario with all inputs restored
 
 ## v2 Requirements
 
@@ -130,8 +130,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VIZ-02 | Phase 5 | Complete |
 | VIZ-03 | Phase 5 | Complete |
 | VIZ-04 | Phase 5 | Complete |
-| SHARE-01 | Phase 6 | Pending |
-| SHARE-02 | Phase 6 | Pending |
+| SHARE-01 | Phase 6 | Complete |
+| SHARE-02 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 34 total
