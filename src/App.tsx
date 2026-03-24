@@ -227,16 +227,18 @@ function App() {
             />
           </div>
           {/* Output column: 45% */}
-          <div className="flex-[45] space-y-6">
-            <TimeHorizon
-              horizonYears={horizonYears}
-              onHorizonChange={setHorizonYears}
-            />
+          <div className="flex-[45]">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList>
-                <TabsTrigger value="comparison">Comparison</TabsTrigger>
-                <TabsTrigger value="standalone">Standalone</TabsTrigger>
-              </TabsList>
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <TabsList>
+                  <TabsTrigger value="comparison">Comparison</TabsTrigger>
+                  <TabsTrigger value="standalone">Standalone</TabsTrigger>
+                </TabsList>
+                <TimeHorizon
+                  horizonYears={horizonYears}
+                  onHorizonChange={setHorizonYears}
+                />
+              </div>
               <TabsContent value="comparison">
                 <ComparisonTab
                   sharedCost={sharedCostOutput}
