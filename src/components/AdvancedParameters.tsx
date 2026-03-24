@@ -1,3 +1,10 @@
+/**
+ * @file AdvancedParameters.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { useState, useEffect } from 'react';
 import { ChevronDown, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';

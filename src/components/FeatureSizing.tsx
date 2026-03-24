@@ -1,3 +1,10 @@
+/**
+ * @file FeatureSizing.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { cn } from '@/lib/utils';
 import {
   Card,

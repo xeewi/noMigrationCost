@@ -1,4 +1,11 @@
 /**
+ * @file formulas.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
+/**
  * Formula Engine — All cost calculation functions.
  *
  * All functions are PURE TypeScript — no React imports, no side effects.

@@ -1,3 +1,10 @@
+/**
+ * @file smoke.test.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { describe, it, expect } from 'vitest';
 import { SENIORITY_DEFAULTS, HOURS_PER_WEEK } from '@/engine/types';
 

@@ -1,3 +1,10 @@
+/**
+ * @file App.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { TeamComposition } from '@/components/TeamComposition';
 import { FeatureSizing } from '@/components/FeatureSizing';

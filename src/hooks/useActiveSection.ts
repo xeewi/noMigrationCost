@@ -1,3 +1,10 @@
+/**
+ * @file useActiveSection.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-24
+ * @project Feature Cost Calculator
+ */
+
 import { useEffect, useRef, useState } from 'react';
 
 /**

@@ -1,3 +1,10 @@
+/**
+ * @file ComparisonTab.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { BarChart2 } from 'lucide-react';
 import { CostChart } from '@/components/CostChart';
 import { EmptyState } from '@/components/EmptyState';
