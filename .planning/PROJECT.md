@@ -64,7 +64,7 @@ All planned milestones complete:
 **Known issues:**
 - Markdown reference links render as raw URLs on docs page (citation rendering)
 - Standalone cost model underestimates by ~5x (missing organizational costs — backlog item 998.1)
-- Story points input clearing bug (backlog item 998.2)
+- ~~Story points input clearing bug~~ — fixed in Phase 13 (2026-03-24)
 
 ## Context
 
@@ -109,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — after v1.2 Documentation milestone*
+*Last updated: 2026-03-24 — after Phase 13 story points input clearing bug fix*
