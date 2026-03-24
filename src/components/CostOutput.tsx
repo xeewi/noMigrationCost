@@ -90,7 +90,7 @@ export function CostOutput({ output, emptyReason = null }: CostOutputProps) {
                 <TableRow>
                   <TableCell className="font-semibold">Total</TableCell>
                   <TableCell className="text-right font-semibold">
-                    {Math.round(output.initialDevHours)}
+                    {Math.round(output.breakdown.reduce((sum, row) => sum + row.hours, 0))}
                   </TableCell>
                   <TableCell className="text-right font-semibold">
                     {formatEuro(output.totalStandaloneCost)}
