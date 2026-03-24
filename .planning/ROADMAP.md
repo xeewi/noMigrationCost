@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### v1.1 Author Branding
 
-- [ ] **Phase 7: Author Footer** - Fixed footer banner with author name and links to GitHub, Malt, and LinkedIn profiles
+- [x] **Phase 7: Author Footer** - Fixed footer banner with author name and links to GitHub, Malt, and LinkedIn profiles (completed 2026-03-24)
 - [ ] **Phase 8: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
 ## Phase Details
@@ -101,10 +101,10 @@ Plans:
   2. User can click a GitHub icon/link in the footer and land on the author's GitHub profile in a new tab
   3. User can click a Malt icon/link in the footer and land on the author's Malt profile in a new tab
   4. User can click a LinkedIn icon/link in the footer and land on the author's LinkedIn profile in a new tab
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 07-01-PLAN.md — AppFooter component with inline SVG brand icons and App.tsx integration
+- [x] 07-01-PLAN.md — AppFooter component with inline SVG brand icons and App.tsx integration
 
 **UI hint**: yes
 
@@ -127,5 +127,5 @@ Phases execute in numeric order: 7 → 8
 | 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete | 2026-03-23 |
 | 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete | 2026-03-23 |
 | 6. URL Sharing | 2/2 | Complete | 2026-03-24 |
-| 7. Author Footer | 0/1 | Planning complete | - |
+| 7. Author Footer | 1/1 | Complete   | 2026-03-24 |
 | 8. Source File Headers | 0/? | Not started | - |
