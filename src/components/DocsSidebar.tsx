@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 
 export interface HeadingEntry {
   id: string;    // "doc-{slug}" — matches rehype-slug output with prefix: 'doc-'
@@ -32,12 +32,20 @@ export function extractHeadings(markdown: string): HeadingEntry[] {
   return entries;
 }
 
-interface DocsSidebarProps {
+export interface DocsSidebarProps {
   markdown: string;
+  activeId: string;
 }
 
-export function DocsSidebar({ markdown }: DocsSidebarProps) {
+export function DocsSidebar({ markdown, activeId }: DocsSidebarProps) {
   const headings = useMemo(() => extractHeadings(markdown), [markdown]);
+  const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+
+  useEffect(() => {
+    if (!activeId) return;
+    const el = linkRefs.current.get(activeId);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [activeId]);
 
   return (
     <nav aria-label="Table of contents">
@@ -48,16 +56,20 @@ export function DocsSidebar({ markdown }: DocsSidebarProps) {
         <a
           key={entry.id}
           href={`#/docs/${entry.id}`}
+          ref={(node) => {
+            if (node) linkRefs.current.set(entry.id, node);
+            else linkRefs.current.delete(entry.id);
+          }}
           onClick={(e) => {
             e.preventDefault();
             window.location.hash = `/docs/${entry.id}`;
             document.getElementById(entry.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
-          className={
-            entry.level === 2
-              ? "block py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              : "block py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors pl-4"
-          }
+          className={[
+            "block py-1.5 text-sm transition-colors",
+            entry.id === activeId ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
+            entry.level === 3 ? "pl-4" : "",
+          ].join(" ")}
         >
           {entry.text}
         </a>

@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import researchMd from '../../docs/feature-cost-shared-vs-duplicated.md?raw';
-import { DocsSidebar } from './DocsSidebar';
+import { useActiveSection } from '../hooks/useActiveSection';
+import { DocsSidebar, extractHeadings } from './DocsSidebar';
 
 // Module-level constants — defined OUTSIDE the component to prevent re-parse on every render
 const REMARK_PLUGINS = [remarkGfm];
@@ -17,6 +18,12 @@ const COMPONENTS = {
 };
 
 export function DocsPage() {
+  const headingIds = useMemo(
+    () => extractHeadings(researchMd).map((h) => h.id),
+    []  // researchMd is module-level constant, stable reference
+  );
+  const activeId = useActiveSection(headingIds);
+
   // Deep-link scroll on mount — scrolls to section if URL contains a doc anchor
   useEffect(() => {
     const hash = window.location.hash;
@@ -37,7 +44,7 @@ export function DocsPage() {
     <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16 flex gap-8">
       <aside className="w-60 flex-shrink-0">
         <div className="sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto">
-          <DocsSidebar markdown={researchMd} />
+          <DocsSidebar markdown={researchMd} activeId={activeId} />
         </div>
       </aside>
       <main className="flex-1 min-w-0">
