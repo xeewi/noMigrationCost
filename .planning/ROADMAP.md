@@ -8,8 +8,8 @@ A React + Vite + TypeScript + shadcn/ui + Recharts dashboard that quantifies the
 
 - (abandoned) **Phases 1-3: Alpine+Pico CSS prototype** — abandoned on stack pivot 2026-03-23
 - **Phases 4-6: v1.0 React Rebuild** — complete
-- **Phases 7-8: v1.1 Author Branding** — in progress
-- **Phases 9-12: v1.2 Documentation** — planned
+- **Phase 7: v1.1 Author Branding** — complete
+- **Phases 8-11: v1.2 Documentation** — in progress
 
 ## Phases
 
@@ -37,14 +37,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### v1.1 Author Branding
 
 - [x] **Phase 7: Author Footer** - Fixed footer banner with author name and links to GitHub, Malt, and LinkedIn profiles (completed 2026-03-24)
-- [ ] **Phase 8: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
 ### v1.2 Documentation
 
-- [x] **Phase 9: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs (completed 2026-03-24)
-- [x] **Phase 10: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header (completed 2026-03-24)
-- [ ] **Phase 11: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible
-- [ ] **Phase 12: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
+- [x] **Phase 8: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs (completed 2026-03-24)
+- [x] **Phase 9: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header (completed 2026-03-24)
+- [ ] **Phase 10: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible
+- [ ] **Phase 11: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
 ## Phase Details
 
@@ -116,18 +115,9 @@ Plans:
 
 **UI hint**: yes
 
-### Phase 8: Source File Headers
-**Goal**: Every source file carries a consistent comment header that establishes authorship and project identity for the codebase
-**Depends on**: Nothing (independent of Phase 7)
-**Requirements**: HEAD-01
-**Success Criteria** (what must be TRUE):
-  1. Every TypeScript and TSX source file opens with a comment block containing the author name, creation date, and project identifier
-  2. The header format is consistent across all files (same fields, same comment style)
-**Plans**: TBD
-
-### Phase 9: Routing Foundation
+### Phase 8: Routing Foundation
 **Goal**: Users can switch between the calculator and documentation views via AppHeader links, with hash-based routing that safely coexists with existing URL sharing and browser navigation working correctly
-**Depends on**: Phase 8
+**Depends on**: Phase 7
 **Requirements**: ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, ROUTE-05
 **Success Criteria** (what must be TRUE):
   1. User can click a "Documentation" link in the AppHeader from the calculator and land on the docs page; user can click "Calculator" from the docs page and return to the calculator
@@ -138,14 +128,14 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [x] 09-01-PLAN.md — Create useHashRoute hook and update AppHeader with nav links and conditional Reset All
-- [x] 09-02-PLAN.md — Wire routing into App.tsx with hash-write guard, mount-but-hide, and docs placeholder
+- [x] 08-01-PLAN.md — Create useHashRoute hook and update AppHeader with nav links and conditional Reset All
+- [x] 08-02-PLAN.md — Wire routing into App.tsx with hash-write guard, mount-but-hide, and docs placeholder
 
 **UI hint**: yes
 
-### Phase 10: Doc Page Implementation
+### Phase 9: Doc Page Implementation
 **Goal**: Users can read the full research document rendered as formatted HTML on the docs page, with a working left sidebar for navigation and correct scroll behavior under the fixed header
-**Depends on**: Phase 9
+**Depends on**: Phase 8
 **Requirements**: DOC-01, DOC-02, DOC-03, DOC-04, NAV-01
 **Success Criteria** (what must be TRUE):
   1. User can read the complete research document on the docs page with proper heading hierarchy, paragraphs, lists, and links styled via Tailwind Typography
@@ -155,13 +145,13 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [x] 10-01-PLAN.md — Install markdown stack, create DocsPage and DocsSidebar components, wire into App.tsx
+- [x] 09-01-PLAN.md — Install markdown stack, create DocsPage and DocsSidebar components, wire into App.tsx
 
 **UI hint**: yes
 
-### Phase 11: Sidebar Polish
+### Phase 10: Sidebar Polish
 **Goal**: Users can see which documentation section they are currently reading highlighted in the sidebar, and the sidebar keeps the active link in view as they scroll through the document
-**Depends on**: Phase 10
+**Depends on**: Phase 9
 **Requirements**: NAV-02, NAV-03
 **Success Criteria** (what must be TRUE):
   1. User can see the currently visible section highlighted in the sidebar as they scroll through the document
@@ -169,9 +159,9 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 12: Source File Headers
+### Phase 11: Source File Headers
 **Goal**: Every source file (including all new v1.2 components) carries a consistent comment header that establishes authorship and project identity
-**Depends on**: Phase 11
+**Depends on**: Phase 10
 **Requirements**: HEAD-01
 **Success Criteria** (what must be TRUE):
   1. Every TypeScript and TSX source file opens with a comment block containing the author name, creation date, and project identifier
@@ -181,7 +171,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
+Phases execute in numeric order: 8 → 9 → 10 → 11
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -189,11 +179,10 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 | 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete | 2026-03-23 |
 | 6. URL Sharing | 2/2 | Complete | 2026-03-24 |
 | 7. Author Footer | 1/1 | Complete | 2026-03-24 |
-| 8. Source File Headers | 0/? | Not started | - |
-| 9. Routing Foundation | 2/2 | Complete   | 2026-03-24 |
-| 10. Doc Page Implementation | 1/1 | Complete    | 2026-03-24 |
-| 11. Sidebar Polish | 0/? | Not started | - |
-| 12. Source File Headers | 0/? | Not started | - |
+| 8. Routing Foundation | 2/2 | Complete | 2026-03-24 |
+| 9. Doc Page Implementation | 1/1 | Complete | 2026-03-24 |
+| 10. Sidebar Polish | 0/? | Not started | - |
+| 11. Source File Headers | 0/? | Not started | - |
 
 ## Backlog
 
