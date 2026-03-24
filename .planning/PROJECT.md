@@ -44,13 +44,17 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - Mobile-specific layout — desktop-first, responsive is a bonus
 - PDF export — screenshot or browser print is sufficient for v1
 
-## Current Milestone: v1.1 Author Branding
+## Current Milestone: v1.2 Documentation
 
-**Goal:** Establish clear authorship across the app and codebase — Guillaume Gautier (xeewi)
+**Goal:** Make the research document backing the calculator browsable directly on the site, with seamless navigation between calculator and documentation.
 
 **Target features:**
-- Fixed footer banner with links to GitHub, Malt, and LinkedIn profiles
-- Code comment headers with author name, creation date, and project info across source files
+- Doc page rendering the research Markdown as HTML within the app
+- Left sidebar navigation with anchor links to document sections
+- Header links to switch between calculator and doc views
+- Hash-based routing (#/docs) coexisting with existing URL sharing
+- Shared AppHeader and AppFooter across both views
+- Source file comment headers (carried from v1.1)
 
 ## Context
 
@@ -92,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Phase 7 complete: Author Footer*
+*Last updated: 2026-03-24 — Milestone v1.2 started*
