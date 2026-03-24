@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-interface HeadingEntry {
+export interface HeadingEntry {
   id: string;    // "doc-{slug}" — matches rehype-slug output with prefix: 'doc-'
   text: string;  // display text for sidebar link
   level: 2 | 3;  // h2 or h3 only
@@ -15,7 +15,7 @@ function toSlug(text: string): string {
     .replace(/^-|-$/g, '');
 }
 
-function extractHeadings(markdown: string): HeadingEntry[] {
+export function extractHeadings(markdown: string): HeadingEntry[] {
   const entries: HeadingEntry[] = [];
   const counts: Record<string, number> = {};
   for (const line of markdown.split('\n')) {
