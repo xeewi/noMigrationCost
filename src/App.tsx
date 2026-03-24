@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { TeamComposition } from '@/components/TeamComposition';
 import { FeatureSizing } from '@/components/FeatureSizing';
 import { TimeHorizon } from '@/components/TimeHorizon';
@@ -8,6 +8,11 @@ import { AdvancedParameters } from '@/components/AdvancedParameters';
 import { ComparisonTab } from '@/components/ComparisonTab';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
+import { AppHeader } from '@/components/AppHeader';
+import {
+  encodeAppState, decodeAppState, applyStateToSetters,
+  getDefaultTeam, getDefaultAdvancedParams,
+} from '@/lib/url-state';
 import {
   calcTeamAvgRate,
   calcDevHours,
@@ -51,6 +56,52 @@ function App() {
   const [nbConsumingCodebases, setNbConsumingCodebases] = useState<number>(
     ENGINE_DEFAULTS.nbConsumingCodebases,
   );
+
+  const [activeTab, setActiveTab] = useState<string>('comparison');
+
+  // Hash read on mount — restores state from URL hash (SHARE-02)
+  useEffect(() => {
+    const raw = window.location.hash.slice(1);
+    if (!raw) return;
+    const state = decodeAppState(raw);
+    if (!state) return; // malformed hash — stay at defaults
+    applyStateToSetters(state, {
+      setTeam, setSizingMode, setStoryPoints, setVelocity,
+      setSprintWeeks, setDirectValue, setDirectUnit,
+      setHorizonYears, setAdvancedParams, setNbConsumingCodebases,
+      setActiveTab,
+    });
+  }, []);
+
+  // Hash write on state change — live URL updates with 300ms debounce (D-01)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      window.location.hash = encodeAppState(
+        team, sizingMode, storyPoints, velocity, sprintWeeks,
+        directValue, directUnit, horizonYears, advancedParams,
+        nbConsumingCodebases, activeTab,
+      );
+    }, 300);
+    return () => clearTimeout(id);
+  }, [team, sizingMode, storyPoints, velocity, sprintWeeks,
+      directValue, directUnit, horizonYears, advancedParams,
+      nbConsumingCodebases, activeTab]);
+
+  // Reset handler — clears all inputs to defaults and clears hash (D-04)
+  const handleReset = useCallback(() => {
+    setTeam(getDefaultTeam());
+    setSizingMode('story-points');
+    setStoryPoints(0);
+    setVelocity(10);
+    setSprintWeeks(2);
+    setDirectValue(0);
+    setDirectUnit('hours');
+    setHorizonYears(5);
+    setAdvancedParams(getDefaultAdvancedParams());
+    setNbConsumingCodebases(ENGINE_DEFAULTS.nbConsumingCodebases);
+    setActiveTab('comparison');
+    // Hash will be updated by the state-change effect (encodes defaults — harmless per RESEARCH.md Pitfall 4)
+  }, []);
 
   // Derived state — all via useMemo, never useState
   const teamAvgRate = useMemo(() => calcTeamAvgRate(team), [team]);
@@ -141,6 +192,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <AppHeader onReset={handleReset} />
       <div className="max-w-[1280px] mx-auto px-6 py-8">
         <div className="flex gap-8 md:flex-row flex-col">
           {/* Inputs column: 55% */}
@@ -182,7 +234,7 @@ function App() {
           </div>
           {/* Output column: 45% */}
           <div className="flex-[45]">
-            <Tabs defaultValue="comparison">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList>
                 <TabsTrigger value="comparison">Comparison</TabsTrigger>
                 <TabsTrigger value="standalone">Standalone</TabsTrigger>

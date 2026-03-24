@@ -45,8 +45,8 @@ export function AppHeader({ onReset }: AppHeaderProps) {
             {copied ? 'Copied!' : 'Copy Link'}
           </Button>
           <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm">Reset All</Button>
+            <AlertDialogTrigger render={<Button variant="outline" size="sm" />}>
+              Reset All
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
