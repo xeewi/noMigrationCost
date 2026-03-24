@@ -78,10 +78,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can copy a URL from the app that encodes all current inputs in the URL hash
   2. User opening a shared URL sees all inputs restored to the shared scenario with results matching the original view
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 06-01-PLAN.md — URL state serialization module (encode/decode) and AppHeader component (Copy Link + Reset All)
+- [x] 06-01-PLAN.md — URL state serialization module (encode/decode) and AppHeader component (Copy Link + Reset All)
 - [ ] 06-02-PLAN.md — Wire hash effects, controlled tabs, reset handler, and AppHeader into App.tsx
 
 **UI hint**: yes
@@ -95,4 +95,4 @@ Phases execute in numeric order: 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete   | 2026-03-23 |
 | 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete   | 2026-03-23 |
-| 6. URL Sharing | 0/2 | Not started | - |
+| 6. URL Sharing | 1/2 | In Progress|  |
