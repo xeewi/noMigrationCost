@@ -17,6 +17,8 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - [x] Dashboard displays detailed tables with cost breakdowns by category (maintenance, coordination, bugs, sync) — Validated in Phase 5
 - [x] Break-even point is calculated and highlighted on the graph — Validated in Phase 5
 - [x] Variables from the research doc (generalization factor, porting factor, divergence rate, etc.) are adjustable — Validated in Phase 5
+- [x] User can share scenarios via URL with all inputs encoded in hash — Validated in Phase 6: URL Sharing
+- [x] User opening a shared URL sees all inputs restored to the shared scenario — Validated in Phase 6
 
 ### Active
 
@@ -95,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — Phase 5 complete: comparison view, chart, and advanced controls*
+*Last updated: 2026-03-24 — Phase 6 complete: URL sharing via hash encoding, all v1.0 phases delivered*
