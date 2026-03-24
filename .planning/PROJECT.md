@@ -43,19 +43,13 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - Mobile-specific layout — desktop-first, responsive is a bonus
 - PDF export — screenshot or browser print is sufficient for v1
 
-## Current Milestone: v1.0 React Rebuild
+## Current Milestone: v1.1 Author Branding
 
-**Goal:** Rebuild the full Feature Cost Calculator on React + shadcn/ui + Recharts, implementing all original requirements on the new stack
+**Goal:** Establish clear authorship across the app and codebase — Guillaume Gautier (xeewi)
 
 **Target features:**
-- Team composition with French salary defaults
-- Feature sizing (story points + direct hours)
-- Time horizon selection with cost projections
-- Standalone cost calculation with breakdown
-- Shared vs duplicated code comparison with break-even detection
-- Advanced adjustable formula constants with research citations
-- Temporal cost curve visualization (Recharts)
-- URL sharing for scenario replay
+- Fixed footer banner with links to GitHub, Malt, and LinkedIn profiles
+- Code comment headers with author name, creation date, and project info across source files
 
 ## Context
 
@@ -97,4 +91,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Phase 6 complete: URL sharing via hash encoding, all v1.0 phases delivered*
+*Last updated: 2026-03-24 — Milestone v1.1 started: Author Branding*
