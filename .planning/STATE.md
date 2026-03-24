@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Documentation
-status: Defining requirements
+status: Roadmap ready
 stopped_at: null
 last_updated: "2026-03-24T14:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** Defining requirements for v1.2 Documentation
+**Current focus:** v1.2 Documentation — roadmap defined, ready to begin Phase 9
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap approved)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-24 — Milestone v1.2 started
+Status: Roadmap ready
+Last activity: 2026-03-24 — v1.2 roadmap created (Phases 9-12)
 
 ## Performance Metrics
 
@@ -79,6 +79,13 @@ Recent decisions affecting current work:
 - [Phase 06]: AlertDialogTrigger uses base-ui render prop pattern not Radix asChild — base-ui Trigger does not support asChild prop
 - [Phase 07]: Inline SVG for all brand icons — lucide-react v1.0.1 removed brand icons; Bootstrap Icons MIT used for LinkedIn
 - [Phase 07]: Plain anchor tags for footer icon links — avoids tabIndex workaround vs Button wrapping
+- [v1.2 Routing]: Hash namespace discriminator: `/` prefix identifies route hashes; base64url alphabet (RFC 4648) never produces `/`, so namespaces are disjoint
+- [v1.2 Routing]: Hash-write guard required in App.tsx — debounced state-encode effect must not run when view === 'docs'
+- [v1.2 Routing]: rehype-slug configured with prefix: 'doc-' — prevents heading IDs from matching base64url state hashes
+- [v1.2 Doc]: react-markdown + remark-gfm + rehype-slug + @tailwindcss/typography — verified package versions: 10.1.0 / 4.0.1 / 6.0.0 / 0.5.19
+- [v1.2 Doc]: Markdown imported via Vite ?raw suffix as module-level constant — zero runtime fetch, avoids re-parse on every render
+- [v1.2 Doc]: components prop for ReactMarkdown defined at module level — prevents re-parse when parent re-renders
+- [v1.2 Sidebar]: IntersectionObserver scroll-spy uses Map<id, ratio> approach with rootMargin: '-10% 0px -80% 0px' — prevents flicker at section boundaries
 
 ### Pending Todos
 
@@ -93,10 +100,10 @@ None.
 
 ### Blockers/Concerns
 
-None for v1.1.
+None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T12:35:54.658Z
-Stopped at: Completed 07-01-PLAN.md — AppFooter component and App.tsx integration
+Last session: 2026-03-24T14:00:00.000Z
+Stopped at: v1.2 roadmap created — Phases 9-12 defined
 Resume file: None

@@ -9,6 +9,7 @@ A React + Vite + TypeScript + shadcn/ui + Recharts dashboard that quantifies the
 - (abandoned) **Phases 1-3: Alpine+Pico CSS prototype** — abandoned on stack pivot 2026-03-23
 - **Phases 4-6: v1.0 React Rebuild** — complete
 - **Phases 7-8: v1.1 Author Branding** — in progress
+- **Phases 9-12: v1.2 Documentation** — planned
 
 ## Phases
 
@@ -37,6 +38,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 7: Author Footer** - Fixed footer banner with author name and links to GitHub, Malt, and LinkedIn profiles (completed 2026-03-24)
 - [ ] **Phase 8: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
+
+### v1.2 Documentation
+
+- [ ] **Phase 9: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs
+- [ ] **Phase 10: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header
+- [ ] **Phase 11: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible
+- [ ] **Phase 12: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
 ## Phase Details
 
@@ -117,15 +125,63 @@ Plans:
   2. The header format is consistent across all files (same fields, same comment style)
 **Plans**: TBD
 
+### Phase 9: Routing Foundation
+**Goal**: Users can switch between the calculator and documentation views via AppHeader links, with hash-based routing that safely coexists with existing URL sharing and browser navigation working correctly
+**Depends on**: Phase 8
+**Requirements**: ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, ROUTE-05
+**Success Criteria** (what must be TRUE):
+  1. User can click a "Documentation" link in the AppHeader from the calculator and land on the docs page; user can click "Calculator" from the docs page and return to the calculator
+  2. User can use the browser back and forward buttons to switch between calculator and docs views
+  3. User's calculator inputs are intact after navigating to docs and back — no state is lost on round-trip
+  4. User can share a URL containing a docs section anchor (e.g. `#/docs/section-id`) and a recipient lands on the docs page at the correct section
+  5. Existing calculator share URLs (base64url-encoded hashes) continue to restore calculator state correctly with no collision
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 10: Doc Page Implementation
+**Goal**: Users can read the full research document rendered as formatted HTML on the docs page, with a working left sidebar for navigation and correct scroll behavior under the fixed header
+**Depends on**: Phase 9
+**Requirements**: DOC-01, DOC-02, DOC-03, DOC-04, NAV-01
+**Success Criteria** (what must be TRUE):
+  1. User can read the complete research document on the docs page with proper heading hierarchy, paragraphs, lists, and links styled via Tailwind Typography
+  2. User can see all pipe tables in the research document rendered as formatted HTML tables (not raw pipe syntax)
+  3. User can see a left sidebar listing all document sections as clickable anchor links that jump to the correct heading
+  4. User can click a sidebar anchor link and the target heading is fully visible — not hidden behind the fixed AppHeader
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 11: Sidebar Polish
+**Goal**: Users can see which documentation section they are currently reading highlighted in the sidebar, and the sidebar keeps the active link in view as they scroll through the document
+**Depends on**: Phase 10
+**Requirements**: NAV-02, NAV-03
+**Success Criteria** (what must be TRUE):
+  1. User can see the currently visible section highlighted in the sidebar as they scroll through the document
+  2. User can scroll to any section in a long document and the sidebar auto-scrolls to keep the active link visible without manual sidebar scrolling
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Source File Headers
+**Goal**: Every source file (including all new v1.2 components) carries a consistent comment header that establishes authorship and project identity
+**Depends on**: Phase 11
+**Requirements**: HEAD-01
+**Success Criteria** (what must be TRUE):
+  1. Every TypeScript and TSX source file opens with a comment block containing the author name, creation date, and project identifier
+  2. The header format is consistent across all files (same fields, same comment style)
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 7 → 8
+Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Scaffold, Engine, and Standalone Cost | 3/3 | Complete | 2026-03-23 |
 | 5. Comparison View, Chart, and Advanced Controls | 4/4 | Complete | 2026-03-23 |
 | 6. URL Sharing | 2/2 | Complete | 2026-03-24 |
-| 7. Author Footer | 1/1 | Complete   | 2026-03-24 |
+| 7. Author Footer | 1/1 | Complete | 2026-03-24 |
 | 8. Source File Headers | 0/? | Not started | - |
+| 9. Routing Foundation | 0/? | Not started | - |
+| 10. Doc Page Implementation | 0/? | Not started | - |
+| 11. Sidebar Polish | 0/? | Not started | - |
+| 12. Source File Headers | 0/? | Not started | - |
