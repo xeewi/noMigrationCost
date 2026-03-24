@@ -41,7 +41,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### v1.2 Documentation
 
-- [ ] **Phase 9: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs
+- [x] **Phase 9: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs (completed 2026-03-24)
 - [ ] **Phase 10: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header
 - [ ] **Phase 11: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible
 - [ ] **Phase 12: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
@@ -135,11 +135,11 @@ Plans:
   3. User's calculator inputs are intact after navigating to docs and back — no state is lost on round-trip
   4. User can share a URL containing a docs section anchor (e.g. `#/docs/section-id`) and a recipient lands on the docs page at the correct section
   5. Existing calculator share URLs (base64url-encoded hashes) continue to restore calculator state correctly with no collision
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 09-01-PLAN.md — Create useHashRoute hook and update AppHeader with nav links and conditional Reset All
-- [ ] 09-02-PLAN.md — Wire routing into App.tsx with hash-write guard, mount-but-hide, and docs placeholder
+- [x] 09-02-PLAN.md — Wire routing into App.tsx with hash-write guard, mount-but-hide, and docs placeholder
 
 **UI hint**: yes
 
@@ -186,7 +186,7 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 | 6. URL Sharing | 2/2 | Complete | 2026-03-24 |
 | 7. Author Footer | 1/1 | Complete | 2026-03-24 |
 | 8. Source File Headers | 0/? | Not started | - |
-| 9. Routing Foundation | 1/2 | In Progress|  |
+| 9. Routing Foundation | 2/2 | Complete   | 2026-03-24 |
 | 10. Doc Page Implementation | 0/? | Not started | - |
 | 11. Sidebar Polish | 0/? | Not started | - |
 | 12. Source File Headers | 0/? | Not started | - |

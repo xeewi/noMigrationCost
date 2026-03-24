@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: React Rebuild
-status: Ready to execute
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-03-24T14:30:36.774Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-24T14:34:03.171Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Plan: 2 of 2
 *Updated after each plan completion*
 | Phase 07 P01 | 3 | 2 tasks | 2 files |
 | Phase 09-routing-foundation P01 | 1 | 2 tasks | 2 files |
+| Phase 09-routing-foundation P02 | 5 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Recent decisions affecting current work:
 - [v1.2 Sidebar]: IntersectionObserver scroll-spy uses Map<id, ratio> approach with rootMargin: '-10% 0px -80% 0px' — prevents flicker at section boundaries
 - [Phase 09-routing-foundation]: useHashRoute lazy initializer prevents flash on deep-link; deriveView uses hash.startsWith('/') as lossless namespace discriminator
 - [Phase 09-routing-foundation]: AppHeader nav uses <a> tags not <button> for correct navigation semantics; Reset All conditionalized to calculator view only per D-03
+- [Phase 09-routing-foundation]: Mount-but-hide pattern for calculator — className toggle, not conditional render, for zero React state loss
+- [Phase 09-routing-foundation]: view added as first element in hash-write dep array so guard re-evaluates on view change
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T14:30:36.772Z
-Stopped at: Completed 09-01-PLAN.md
+Last session: 2026-03-24T14:34:03.169Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None
