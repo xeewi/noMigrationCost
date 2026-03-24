@@ -135,10 +135,10 @@ Plans:
   3. User's calculator inputs are intact after navigating to docs and back — no state is lost on round-trip
   4. User can share a URL containing a docs section anchor (e.g. `#/docs/section-id`) and a recipient lands on the docs page at the correct section
   5. Existing calculator share URLs (base64url-encoded hashes) continue to restore calculator state correctly with no collision
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 09-01-PLAN.md — Create useHashRoute hook and update AppHeader with nav links and conditional Reset All
+- [x] 09-01-PLAN.md — Create useHashRoute hook and update AppHeader with nav links and conditional Reset All
 - [ ] 09-02-PLAN.md — Wire routing into App.tsx with hash-write guard, mount-but-hide, and docs placeholder
 
 **UI hint**: yes
@@ -186,7 +186,7 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 | 6. URL Sharing | 2/2 | Complete | 2026-03-24 |
 | 7. Author Footer | 1/1 | Complete | 2026-03-24 |
 | 8. Source File Headers | 0/? | Not started | - |
-| 9. Routing Foundation | 0/2 | Planned | - |
+| 9. Routing Foundation | 1/2 | In Progress|  |
 | 10. Doc Page Implementation | 0/? | Not started | - |
 | 11. Sidebar Polish | 0/? | Not started | - |
 | 12. Source File Headers | 0/? | Not started | - |
