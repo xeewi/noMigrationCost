@@ -22,9 +22,9 @@ export function ConsumingTeams({ value, onChange }: ConsumingTeamsProps) {
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
     const parsed = parseInt(e.target.value, 10);
     if (isNaN(parsed)) {
-      onChange(2);
+      onChange(1);
     } else {
-      onChange(Math.max(2, Math.min(10, parsed)));
+      onChange(Math.max(1, Math.min(10, parsed)));
     }
   }
 
@@ -40,7 +40,7 @@ export function ConsumingTeams({ value, onChange }: ConsumingTeamsProps) {
           </label>
           <Input
             type="number"
-            min={2}
+            min={1}
             max={10}
             step={1}
             value={value}
