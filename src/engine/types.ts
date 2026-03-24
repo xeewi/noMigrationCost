@@ -98,6 +98,6 @@ export const ENGINE_DEFAULTS = {
   maintenanceRateShared: 0.18,
   maintenanceRateDuplicated: 0.22,
   bugDuplicationFactor: 2.0,
-  nbConsumingCodebases: 2,
-  defaultHorizonYears: 5,
+  nbConsumingCodebases: 1,
+  defaultHorizonYears: 3,
 } as const;
