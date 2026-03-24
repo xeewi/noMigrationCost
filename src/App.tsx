@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
 import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
+import { DocsPage } from '@/components/DocsPage';
 import { useHashRoute } from '@/hooks/useHashRoute';
 import {
   encodeAppState, decodeAppState, applyStateToSetters,
@@ -265,12 +266,8 @@ function App() {
         </div>
       </div>
 
-      {/* Docs view — placeholder until Phase 10 */}
-      {view === 'docs' && (
-        <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16">
-          <p className="text-muted-foreground text-sm">Documentation coming soon.</p>
-        </div>
-      )}
+      {/* Docs view — full research document with sidebar navigation */}
+      {view === 'docs' && <DocsPage />}
 
       <AppFooter />
     </div>
