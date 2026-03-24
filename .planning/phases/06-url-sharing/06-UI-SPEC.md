@@ -48,6 +48,7 @@ Declared values (multiples of 4). Existing layout uses Tailwind spacing utilitie
 Exceptions:
 - Copy Link button and Reset All button minimum touch target: 36px height (shadcn Button default h-9 = 36px — adequate for desktop presentation tool; no mobile exception needed per REQUIREMENTS.md out-of-scope)
 - Header padding matches existing page container: `px-6 py-8` inherited from `max-w-[1280px] mx-auto px-6 py-8` wrapper in App.tsx
+- AppHeader vertical padding: `py-3` (12px) — compact header height; intentionally tighter than page container `py-8` to keep the header subordinate to calculator content
 
 Source: Existing App.tsx layout patterns; REQUIREMENTS.md (mobile layout out of scope).
 
@@ -60,13 +61,13 @@ Extracted from codebase scan of `src/components/*.tsx`. This phase introduces no
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px (text-sm) | 400 (font-normal) | 1.5 | Helper text, descriptions, muted labels |
-| Label | 14px (text-sm) | 500 (font-medium) | 1.5 | Form labels, table cells, button text |
-| Heading | 20px (text-xl) | 600 (font-semibold) | 1.2 | Card titles (consistent with all existing cards) |
+| Label | 14px (text-sm) | 400 (font-normal) | 1.5 | Form labels, table cells, button text |
+| Heading | 20px (text-xl) | 600 (font-semibold) | 1.2 | Card titles, app title in AppHeader |
 | Display | 30px (text-3xl) | 600 (font-semibold) | 1.0 | Large cost figures in CostOutput (existing pattern) |
 
 Phase 6 new elements:
-- App title in header: 20px / font-semibold (text-xl font-semibold) — matches card title weight so it feels integrated, not louder
-- Button labels (Copy Link, Reset All): 14px / font-medium — Shadcn Button default
+- App title in header: 20px / font-semibold (text-xl font-semibold) — matches card title scale; appropriate for a page-level title without dominating the compact header
+- Button labels (Copy Link, Reset All): 14px / font-normal — Label role (context provides sufficient hierarchy without weight emphasis)
 
 Source: grep of src/components/*.tsx for existing text-* and font-* classes.
 
@@ -120,14 +121,14 @@ The header is intentionally lightweight — it must not compete with the calcula
 
 **Layout:** Full-width bar above the two-column layout. Uses the same `max-w-[1280px] mx-auto px-6` container as the page body. No background color change — stays `bg-background` (same as page). A bottom border (`border-b border-border`) provides visual separation without adding visual weight.
 
-**Height:** `py-3` (12px top/bottom padding) — compact; taller than a toolbar but shorter than a navigation bar.
+**Height:** `py-3` (12px top/bottom padding) — compact; tighter than the page container to keep the header subordinate. See Spacing Scale exceptions.
 
 **Structure (flex, space-between):**
 ```
 [App title — left]    [Copy Link button | Reset All button — right]
 ```
 
-**App title:** "Feature Cost Calculator" — text-base (16px) font-semibold text-foreground. Not text-xl (that would match card titles and feel like a section heading, not a page title at this compact height).
+**App title:** "Feature Cost Calculator" — text-xl (20px) font-semibold text-foreground. Matches card title scale; keeps the title readable at the compact header height without feeling like a section heading.
 
 **Copy Link button:**
 - Default state: `variant="default"` — primary-filled button with Link icon (lucide `Link` icon, h-4 w-4) and label "Copy Link"
@@ -155,7 +156,7 @@ Triggered by the Reset All button in AppHeader. Uses shadcn/ui AlertDialog (to b
 | Dialog title | "Reset all inputs?" | Concise question format — matches shadcn AlertDialog convention |
 | Dialog description | "This will clear your entire scenario. This action cannot be undone." | Two sentences: what happens + consequence |
 | Cancel button | "Cancel" | AlertDialogCancel — outline/ghost; dismisses, no action taken |
-| Confirm button | "Reset" | AlertDialogAction — renders as destructive; executes reset |
+| Confirm button | "Reset All" | AlertDialogAction — renders as destructive; executes reset; verb + noun makes it self-contained |
 
 The confirm button should use destructive styling. Apply `className="bg-destructive text-destructive-foreground hover:bg-destructive/90"` to `AlertDialogAction` to match the `--destructive` color token.
 
@@ -174,7 +175,7 @@ Source: CONTEXT.md D-05; RESEARCH.md Pattern 5; src/index.css --destructive toke
 | AlertDialog title | "Reset all inputs?" | Derived from D-05 + AlertDialog convention |
 | AlertDialog description | "This will clear your entire scenario. This action cannot be undone." | Derived from D-05 — must convey irreversibility |
 | AlertDialog cancel | "Cancel" | Standard dismissal label |
-| AlertDialog confirm | "Reset" | Confirms the destructive action |
+| AlertDialog confirm | "Reset All" | Verb + noun — self-contained, consistent with Reset All button label |
 | Empty state heading | N/A | Phase 6 adds no new empty states; existing calculator empty states from Phases 4-5 unchanged |
 | Error state (malformed URL) | Silent fallback to defaults — no user-visible error message | RESEARCH.md Pattern 3: malformed hash → graceful fallback; no error UI needed |
 | Clipboard error (HTTPS failure) | Silent degradation — "Copied!" feedback is suppressed; no error toast | RESEARCH.md Pitfall 5; no toast component installed |
@@ -182,6 +183,7 @@ Source: CONTEXT.md D-05; RESEARCH.md Pattern 5; src/index.css --destructive toke
 Copywriting notes:
 - "Copied!" uses exclamation for positive micro-feedback. One word only — no icon-only state.
 - "Reset All" uses title case to match existing button convention in the codebase (e.g., "Advanced Parameters" labels).
+- AlertDialog confirm "Reset All" matches the trigger button label exactly — no ambiguity about what will be reset.
 - AlertDialog description avoids technical language ("state", "hash", "URL parameters") — plain language only.
 
 Source: CONTEXT.md Decisions; RESEARCH.md Pitfalls 4 and 5.
@@ -199,9 +201,9 @@ Source: CONTEXT.md Decisions; RESEARCH.md Pitfalls 4 and 5.
 | Reset All button | Default | variant="outline" |
 | Reset All button | Hover | shadcn Button outline hover — background: muted |
 | AlertDialog | Closed | Not rendered |
-| AlertDialog | Open | Overlay + modal with title/description/Cancel/Reset |
+| AlertDialog | Open | Overlay + modal with title/description/Cancel/Reset All |
 | AlertDialog Cancel | Click | Dialog closes, no state change |
-| AlertDialog Reset | Click | Dialog closes, all state setters called with defaults, hash cleared |
+| AlertDialog Reset All | Click | Dialog closes, all state setters called with defaults, hash cleared |
 
 URL hash behavior (no visible UI state):
 - Hash updates 300ms after any input change (debounced) — user sees browser URL bar update silently
