@@ -22,6 +22,10 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - [x] User can see author name in a fixed footer with links to GitHub, Malt, and LinkedIn profiles — Validated in Phase 7: Author Footer
 - [x] User can switch between calculator and documentation views via AppHeader links with hash-based routing — Validated in Phase 9: Routing Foundation
 - [x] Hash-based routing (#/docs) coexists with existing URL sharing (base64url hashes) without collision — Validated in Phase 9: Routing Foundation
+- [x] User can read the full research document rendered as formatted HTML on the docs page — Validated in Phase 10: Doc Page Implementation
+- [x] User can see a left sidebar listing all document sections as clickable anchor links — Validated in Phase 10: Doc Page Implementation
+- [x] User can click a sidebar anchor link and scroll to the correct heading under the sticky header — Validated in Phase 10: Doc Page Implementation
+- [x] User arriving via deep-link URL scrolls to the correct section on mount — Validated in Phase 10: Doc Page Implementation
 
 ### Active
 
@@ -98,4 +102,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Phase 9 (Routing Foundation) complete*
+*Last updated: 2026-03-24 — Phase 10 (Doc Page Implementation) complete*
