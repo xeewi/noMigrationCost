@@ -104,7 +104,7 @@ Requirements for Documentation milestone. Each maps to roadmap phases.
 
 ### Source File Headers
 
-- [ ] **HEAD-01**: Every source file contains a comment header with author name, creation date, and project identifier
+- [ ] **HEAD-01** *(v1.2)*: Every source file contains a comment header with author name, creation date, and project identifier
 
 ## v2 Requirements
 
@@ -180,14 +180,28 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOOT-02 | Phase 7 | Complete |
 | FOOT-03 | Phase 7 | Complete |
 | FOOT-04 | Phase 7 | Complete |
-| HEAD-01 | Phase 8 | Pending |
+| HEAD-01 (v1.1) | Phase 8 | Pending |
+| ROUTE-01 | Phase 9 | Pending |
+| ROUTE-02 | Phase 9 | Pending |
+| ROUTE-03 | Phase 9 | Pending |
+| ROUTE-04 | Phase 9 | Pending |
+| ROUTE-05 | Phase 9 | Pending |
+| DOC-01 | Phase 10 | Pending |
+| DOC-02 | Phase 10 | Pending |
+| DOC-03 | Phase 10 | Pending |
+| DOC-04 | Phase 10 | Pending |
+| NAV-01 | Phase 10 | Pending |
+| NAV-02 | Phase 11 | Pending |
+| NAV-03 | Phase 11 | Pending |
+| HEAD-01 (v1.2) | Phase 12 | Pending |
 
 **Coverage:**
 - v1.0 requirements: 34 total
 - v1.1 requirements: 5 total
-- Mapped to phases: 39
+- v1.2 requirements: 13 total (ROUTE-01–05, DOC-01–04, NAV-01–03, HEAD-01)
+- Mapped to phases: 52
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-24 — v1.2 requirements added (Routing, Documentation Rendering, Sidebar Navigation, Source File Headers)*
+*Last updated: 2026-03-24 — v1.2 traceability added (Phases 9-12)*
