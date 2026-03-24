@@ -42,7 +42,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### v1.2 Documentation
 
 - [x] **Phase 9: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs (completed 2026-03-24)
-- [ ] **Phase 10: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header
+- [x] **Phase 10: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header (completed 2026-03-24)
 - [ ] **Phase 11: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible
 - [ ] **Phase 12: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
@@ -152,10 +152,10 @@ Plans:
   2. User can see all pipe tables in the research document rendered as formatted HTML tables (not raw pipe syntax)
   3. User can see a left sidebar listing all document sections as clickable anchor links that jump to the correct heading
   4. User can click a sidebar anchor link and the target heading is fully visible — not hidden behind the fixed AppHeader
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md — Install markdown stack, create DocsPage and DocsSidebar components, wire into App.tsx
+- [x] 10-01-PLAN.md — Install markdown stack, create DocsPage and DocsSidebar components, wire into App.tsx
 
 **UI hint**: yes
 
@@ -191,7 +191,7 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 | 7. Author Footer | 1/1 | Complete | 2026-03-24 |
 | 8. Source File Headers | 0/? | Not started | - |
 | 9. Routing Foundation | 2/2 | Complete   | 2026-03-24 |
-| 10. Doc Page Implementation | 0/1 | Not started | - |
+| 10. Doc Page Implementation | 1/1 | Complete   | 2026-03-24 |
 | 11. Sidebar Polish | 0/? | Not started | - |
 | 12. Source File Headers | 0/? | Not started | - |
 
