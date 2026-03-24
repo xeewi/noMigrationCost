@@ -95,8 +95,8 @@ Requirements for Documentation milestone. Each maps to roadmap phases.
 ### Sidebar Navigation
 
 - [x] **NAV-01**: User can see a left sidebar listing all document sections as clickable anchor links
-- [ ] **NAV-02**: User can see the currently visible section highlighted in the sidebar as they scroll
-- [ ] **NAV-03**: Sidebar auto-scrolls to keep the active section link visible when the document is long
+- [x] **NAV-02**: User can see the currently visible section highlighted in the sidebar as they scroll
+- [x] **NAV-03**: Sidebar auto-scrolls to keep the active section link visible when the document is long
 
 ### Source File Headers
 
@@ -186,8 +186,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-03 | Phase 9 | Complete |
 | DOC-04 | Phase 9 | Complete |
 | NAV-01 | Phase 9 | Complete |
-| NAV-02 | Phase 10 | Pending |
-| NAV-03 | Phase 10 | Pending |
+| NAV-02 | Phase 10 | Complete |
+| NAV-03 | Phase 10 | Complete |
 | HEAD-01 | Phase 11 | Pending |
 
 **Coverage:**

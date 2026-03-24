@@ -42,7 +42,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 8: Routing Foundation** - Hash-based view routing that safely coexists with existing URL sharing, with AppHeader nav links for switching between calculator and docs (completed 2026-03-24)
 - [x] **Phase 9: Doc Page Implementation** - Full research document rendered as HTML with prose typography, GFM tables, sidebar anchor navigation, and correct scroll offsets under the fixed header (completed 2026-03-24)
-- [ ] **Phase 10: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible
+- [x] **Phase 10: Sidebar Polish** - Active section highlighting via IntersectionObserver scroll-spy and sidebar auto-scroll to keep the active link visible (completed 2026-03-24)
 - [ ] **Phase 11: Source File Headers** - Comment headers with author name, creation date, and project identifier added to every source file
 
 ## Phase Details
@@ -156,10 +156,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can see the currently visible section highlighted in the sidebar as they scroll through the document
   2. User can scroll to any section in a long document and the sidebar auto-scrolls to keep the active link visible without manual sidebar scrolling
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md — useActiveSection hook, sidebar highlight + auto-scroll wiring
+- [x] 10-01-PLAN.md — useActiveSection hook, sidebar highlight + auto-scroll wiring
 
 **UI hint**: yes
 
@@ -185,7 +185,7 @@ Phases execute in numeric order: 8 → 9 → 10 → 11
 | 7. Author Footer | 1/1 | Complete | 2026-03-24 |
 | 8. Routing Foundation | 2/2 | Complete | 2026-03-24 |
 | 9. Doc Page Implementation | 1/1 | Complete | 2026-03-24 |
-| 10. Sidebar Polish | 0/1 | Not started | - |
+| 10. Sidebar Polish | 1/1 | Complete   | 2026-03-24 |
 | 11. Source File Headers | 0/? | Not started | - |
 
 ## Backlog
