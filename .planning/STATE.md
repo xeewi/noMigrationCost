@@ -82,6 +82,12 @@ Recent decisions affecting current work:
 
 None.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260324-jpj | Move Consuming Teams into Advanced Parameters panel | 2026-03-24 | 3d8a91e | [260324-jpj-move-consuming-teams-into-advanced-param](./quick/260324-jpj-move-consuming-teams-into-advanced-param/) |
+
 ### Blockers/Concerns
 
 None for v1.1.
