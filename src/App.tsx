@@ -9,6 +9,7 @@ import { ComparisonTab } from '@/components/ComparisonTab';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
 import { AppHeader } from '@/components/AppHeader';
+import { AppFooter } from '@/components/AppFooter';
 import {
   encodeAppState, decodeAppState, applyStateToSetters,
   getDefaultTeam, getDefaultAdvancedParams,
@@ -193,7 +194,7 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader onReset={handleReset} />
-      <div className="max-w-[1280px] mx-auto px-6 py-8">
+      <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16">
         <div className="flex gap-8 md:flex-row flex-col">
           {/* Inputs column: 55% */}
           <div className="flex-[55] space-y-6">
@@ -256,6 +257,7 @@ function App() {
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }
