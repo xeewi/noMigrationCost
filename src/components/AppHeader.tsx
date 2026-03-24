@@ -59,7 +59,7 @@ export function AppHeader({ onReset }: AppHeaderProps) {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={onReset}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="bg-destructive text-white hover:bg-destructive/90"
                 >
                   Reset All
                 </AlertDialogAction>

@@ -84,7 +84,7 @@ export function CostChart({
         />
         <YAxis tickFormatter={formatEuroAbbrev} width={60} />
         <Tooltip content={<CustomTooltip />} />
-        <Legend verticalAlign="top" align="right" />
+        <Legend verticalAlign="top" align="right" wrapperStyle={{ paddingBottom: 16 }} />
         {breakEven.exists && breakEven.months !== null && (
           <ReferenceLine
             x={Math.round(breakEven.months)}

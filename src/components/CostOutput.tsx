@@ -1,4 +1,6 @@
+import { Calculator } from 'lucide-react';
 import { formatEuro } from '@/lib/utils';
+import { EmptyState } from '@/components/EmptyState';
 import {
   Card,
   CardContent,
@@ -24,25 +26,26 @@ interface CostOutputProps {
 }
 
 export function CostOutput({ output, emptyReason = null }: CostOutputProps) {
+  if (output === null) {
+    const description = emptyReason === 'zero-hours'
+      ? 'Enter a feature size to see cost estimates. Set story points or direct hours above.'
+      : 'Add at least one team member to see cost estimates. Set headcount to 1 or more for any seniority level.';
+    return (
+      <EmptyState
+        icon={Calculator}
+        title="Configure your team and feature size to estimate costs"
+        description={description}
+      />
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-xl font-semibold">Standalone Feature Cost</CardTitle>
       </CardHeader>
       <CardContent>
-        {output === null ? (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {emptyReason === 'zero-team'
-                ? 'Add at least one team member to see cost estimates. Set headcount to 1 or more for any seniority level.'
-                : emptyReason === 'zero-hours'
-                ? 'Enter a feature size to see cost estimates. Set story points or direct hours above.'
-                : 'Add at least one team member to see cost estimates. Set headcount to 1 or more for any seniority level.'}
-            </p>
-            <p className="text-3xl font-semibold text-foreground">&mdash;</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
+        <div className="space-y-4">
             {/* Summary */}
             <div className="space-y-1">
               <p className="text-sm font-semibold text-muted-foreground">
@@ -99,7 +102,6 @@ export function CostOutput({ output, emptyReason = null }: CostOutputProps) {
               </TableFooter>
             </Table>
           </div>
-        )}
       </CardContent>
     </Card>
   );
