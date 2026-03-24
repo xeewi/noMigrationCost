@@ -138,10 +138,14 @@ describe('calcStandaloneCost', () => {
     expect(result.totalMaintenanceCost).toBeCloseTo(18252, 0);
   });
 
-  it('calculates totalStandaloneCost = initialDevCost + totalMaintenanceCost', () => {
-    // 33800 + 18252 = 52052
+  it('calculates totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts (nbConsumingCodebases=2)', () => {
+    // initialDevCost=33800, totalMaintenance=18252, orgCosts=(2340+25350+20280+12900)*3=182430 => WRONG
+    // Org costs: versioning=2340, support=25350, coordination=20280, onboarding=12900 (annual)
+    // totalOrgCosts = (2340 + 25350 + 20280 + 12900) * 3 = 182430
+    // total = 33800 + 18252 + 182430 = 234482 — let formula compute, check per-component tests
+    // With nbConsumingCodebases=2: total = 33800 + (6084 + 2340 + 25350 + 20280 + 12900) * 3 = 234472
     const result = calcStandaloneCost(baseInputs);
-    expect(result.totalStandaloneCost).toBeCloseTo(52052, 0);
+    expect(result.totalStandaloneCost).toBeCloseTo(234472, 0);
   });
 
   it('returns correct initialDevHours', () => {
@@ -154,17 +158,72 @@ describe('calcStandaloneCost', () => {
     expect(result.teamAvgHourlyRate).toBe(65);
   });
 
-  it('returns breakdown with 2 rows: Initial Development and Annual Maintenance', () => {
+  it('returns breakdown with 6 rows', () => {
     const result = calcStandaloneCost(baseInputs);
-    expect(result.breakdown).toHaveLength(2);
+    expect(result.breakdown).toHaveLength(6);
     expect(result.breakdown[0].category).toBe('Initial Development');
     expect(result.breakdown[1].category).toContain('Annual Maintenance');
+    expect(result.breakdown[2].category).toBe('Versioning');
+    expect(result.breakdown[3].category).toBe('Consumer Support');
+    expect(result.breakdown[4].category).toBe('Coordination');
+    expect(result.breakdown[5].category).toBe('Onboarding');
   });
 
   it('breakdown percentages sum to 100', () => {
     const result = calcStandaloneCost(baseInputs);
     const total = result.breakdown.reduce((sum, row) => sum + row.percentage, 0);
     expect(total).toBeCloseTo(100, 1);
+  });
+
+  it('calculates annualVersioningCost = RELEASES * HOURS * rate', () => {
+    // 12 * 3 * 65 = 2340
+    const result = calcStandaloneCost(baseInputs);
+    expect(result.annualVersioningCost).toBeCloseTo(2340, 0);
+  });
+
+  it('calculates annualSupportCost = HOURS_PER_WEEK * WEEKS * rate', () => {
+    // 7.5 * 52 * 65 = 25350
+    const result = calcStandaloneCost(baseInputs);
+    expect(result.annualSupportCost).toBeCloseTo(25350, 0);
+  });
+
+  it('calculates annualCoordinationCost = nbTeams * HOURS * WEEKS * rate', () => {
+    // 2 * 3 * 52 * 65 = 20280
+    const result = calcStandaloneCost(baseInputs);
+    expect(result.annualCoordinationCost).toBeCloseTo(20280, 0);
+  });
+
+  it('coordination is 0 when nbConsumingCodebases = 0', () => {
+    const result = calcStandaloneCost({ ...baseInputs, nbConsumingCodebases: 0 });
+    expect(result.annualCoordinationCost).toBe(0);
+  });
+
+  it('calculates annualOnboardingCost = NEW_DEVS * (training + mentoring)', () => {
+    // midRate = 65 * 50/65 = 50
+    // 3 * (60 * 50 + 20 * 65) = 3 * (3000 + 1300) = 3 * 4300 = 12900
+    const result = calcStandaloneCost(baseInputs);
+    expect(result.annualOnboardingCost).toBeCloseTo(12900, 0);
+  });
+
+  it('totalStandaloneCost with 0 consuming codebases = 173822', () => {
+    // initialDevCost = 33800
+    // totalMaintenance = 6084 * 3 = 18252
+    // versioning: 2340 * 3 = 7020, support: 25350 * 3 = 76050, coordination: 0, onboarding: 12900 * 3 = 38700
+    // total = 33800 + 18252 + 7020 + 76050 + 0 + 38700 = 173822
+    const result = calcStandaloneCost({ ...baseInputs, nbConsumingCodebases: 0 });
+    expect(result.totalStandaloneCost).toBeCloseTo(173822, 0);
+  });
+
+  it('breakdown rows have hours derived from formula constants', () => {
+    // Versioning hours: 12 * 3 * 3 = 108 (releases * hours_per_release * horizonYears)
+    // Support hours: 7.5 * 52 * 3 = 1170
+    // Coordination hours: 2 * 3 * 52 * 3 = 936 (baseInputs has nbConsumingCodebases=2)
+    // Onboarding hours: 3 * (60 + 20) * 3 = 720
+    const result = calcStandaloneCost(baseInputs);
+    expect(result.breakdown[2].hours).toBeCloseTo(108, 0);   // Versioning
+    expect(result.breakdown[3].hours).toBeCloseTo(1170, 0);  // Consumer Support
+    expect(result.breakdown[4].hours).toBeCloseTo(936, 0);   // Coordination
+    expect(result.breakdown[5].hours).toBeCloseTo(720, 0);   // Onboarding
   });
 });
 
