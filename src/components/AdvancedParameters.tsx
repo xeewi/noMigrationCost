@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 
 export interface AdvancedParamsState {
   generalizationFactor: number;
@@ -30,6 +31,8 @@ interface AdvancedParametersProps {
   onChange: (params: AdvancedParamsState) => void;
   isModified: boolean;
   onReset: () => void;
+  nbConsumingCodebases: number;
+  onNbConsumingCodebasesChange: (value: number) => void;
 }
 
 interface ParamConfig {
@@ -183,11 +186,29 @@ export function AdvancedParameters({
   onChange,
   isModified,
   onReset,
+  nbConsumingCodebases,
+  onNbConsumingCodebasesChange,
 }: AdvancedParametersProps) {
   const [open, setOpen] = useState(false);
 
   function handleParamChange(key: keyof AdvancedParamsState, value: number) {
     onChange({ ...params, [key]: value });
+  }
+
+  function handleConsumingTeamsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const parsed = parseInt(e.target.value, 10);
+    if (!isNaN(parsed)) {
+      onNbConsumingCodebasesChange(parsed);
+    }
+  }
+
+  function handleConsumingTeamsBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const parsed = parseInt(e.target.value, 10);
+    if (isNaN(parsed)) {
+      onNbConsumingCodebasesChange(1);
+    } else {
+      onNbConsumingCodebasesChange(Math.max(1, Math.min(10, parsed)));
+    }
   }
 
   return (
@@ -213,6 +234,25 @@ export function AdvancedParameters({
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-card px-4 py-4">
         <div className="space-y-5">
+          <div className="space-y-2">
+            <label className="text-sm font-normal text-foreground">
+              Number of consuming teams
+            </label>
+            <Input
+              type="number"
+              min={1}
+              max={10}
+              step={1}
+              value={nbConsumingCodebases}
+              onChange={handleConsumingTeamsChange}
+              onBlur={handleConsumingTeamsBlur}
+              className="w-24"
+            />
+            <p className="text-xs text-muted-foreground">
+              Teams sharing the same codebase
+            </p>
+          </div>
+          <Separator />
           {PARAM_CONFIGS.map((config) => (
             <ParamRow
               key={config.key}

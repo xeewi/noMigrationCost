@@ -3,7 +3,6 @@ import { TeamComposition } from '@/components/TeamComposition';
 import { FeatureSizing } from '@/components/FeatureSizing';
 import { TimeHorizon } from '@/components/TimeHorizon';
 import { CostOutput } from '@/components/CostOutput';
-import { ConsumingTeams } from '@/components/ConsumingTeams';
 import { AdvancedParameters } from '@/components/AdvancedParameters';
 import { ComparisonTab } from '@/components/ComparisonTab';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -222,15 +221,13 @@ function App() {
               horizonYears={horizonYears}
               onHorizonChange={setHorizonYears}
             />
-            <ConsumingTeams
-              value={nbConsumingCodebases}
-              onChange={setNbConsumingCodebases}
-            />
             <AdvancedParameters
               params={advancedParams}
               onChange={setAdvancedParams}
               isModified={isAdvancedModified}
               onReset={resetAdvancedParams}
+              nbConsumingCodebases={nbConsumingCodebases}
+              onNbConsumingCodebasesChange={setNbConsumingCodebases}
             />
           </div>
           {/* Output column: 45% */}
