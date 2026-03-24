@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 12-01-PLAN.md — calcStandaloneCost extended with org costs
-last_updated: "2026-03-24T21:34:31.016Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 12-02-PLAN.md — footer hours fix and standalone cost docs
+last_updated: "2026-03-24T21:43:11.433Z"
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Plan: 2 of 2
 | Phase 10-sidebar-polish P01 | 2 | 2 tasks | 3 files |
 | Phase 11-source-file-headers P01 | 4 | 2 tasks | 36 files |
 | Phase 12-standalone-organizational-costs P01 | 16 | 1 tasks | 3 files |
+| Phase 12-standalone-organizational-costs P02 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Recent decisions affecting current work:
 - [Phase 10-sidebar-polish]: Lazy useState initializer (ids[0] ?? '') highlights first heading on initial page load without scroll
 - [Phase 11]: JSDoc 5-line block headers with @file/@author/@created/@project applied to all 36 src files
 - [Phase 12-standalone-organizational-costs]: Plan arithmetic typo corrected: totalStandaloneCost with nbConsumingCodebases=2 is 234662 not 234472; reference value 173822 (nbConsumingCodebases=0) is correct
+- [Phase 12-02]: Footer hours total computed from breakdown.reduce sum — not initialDevHours — so all org cost rows are included
+- [Phase 12-02]: Documentation section 7.1.1 added for standalone org cost model with 173,822 EUR reference total
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T21:34:31.013Z
-Stopped at: Completed 12-01-PLAN.md — calcStandaloneCost extended with org costs
+Last session: 2026-03-24T21:43:11.431Z
+Stopped at: Completed 12-02-PLAN.md — footer hours fix and standalone cost docs
 Resume file: None
