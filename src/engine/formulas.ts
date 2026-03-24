@@ -129,13 +129,17 @@ export function calcDevHours(sizing: SizingInputs): number {
 }
 
 /**
- * Calculates the total standalone cost of a feature.
+ * Calculates the total standalone cost of a feature, including organizational costs.
  *
  * Formulas (§7.1 standalone variant):
  *   initialDevCost = devHours × teamAvgHourlyRate × generalizationFactor
  *   annualMaintenanceCost = initialDevCost × maintenanceRate
  *   totalMaintenanceCost = annualMaintenanceCost × horizonYears
- *   totalStandaloneCost = initialDevCost + totalMaintenanceCost
+ *   annualVersioningCost = VERSIONING_RELEASES_PER_YEAR × VERSIONING_HOURS_PER_RELEASE × rate
+ *   annualSupportCost = SUPPORT_HOURS_PER_WEEK × WEEKS_PER_YEAR × rate
+ *   annualCoordinationCost = nbConsumingCodebases × COORDINATION_HOURS_PER_WEEK_PER_TEAM × WEEKS_PER_YEAR × rate
+ *   annualOnboardingCost = NEW_DEVS_PER_YEAR × (ONBOARDING_TRAINING_HOURS × midRate + ONBOARDING_MENTORING_HOURS × rate)
+ *   totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts
  */
 export function calcStandaloneCost(inputs: EngineInputs): StandaloneOutputs {
   const {
@@ -144,12 +148,26 @@ export function calcStandaloneCost(inputs: EngineInputs): StandaloneOutputs {
     horizonYears,
     maintenanceRate,
     generalizationFactor,
+    nbConsumingCodebases,
   } = inputs;
 
-  const initialDevCost = devHours * teamAvgHourlyRate * generalizationFactor;
+  const rate = teamAvgHourlyRate;
+
+  const initialDevCost = devHours * rate * generalizationFactor;
   const annualMaintenanceCost = initialDevCost * maintenanceRate;
   const totalMaintenanceCost = annualMaintenanceCost * horizonYears;
-  const totalStandaloneCost = initialDevCost + totalMaintenanceCost;
+
+  // Organizational cost computations (mirror calcSharedCost pattern)
+  const annualVersioningCost = VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * rate;
+  const annualSupportCost = SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * rate;
+  const annualCoordinationCost = nbConsumingCodebases * COORDINATION_HOURS_PER_WEEK_PER_TEAM * WEEKS_PER_YEAR * rate;
+  const midRate = rate * ONBOARDING_TRAINING_RATE_FACTOR;
+  const annualOnboardingCost = NEW_DEVS_PER_YEAR * (ONBOARDING_TRAINING_HOURS * midRate + ONBOARDING_MENTORING_HOURS * rate);
+  const annualOrgCosts = annualVersioningCost + annualSupportCost + annualCoordinationCost + annualOnboardingCost;
+  const totalOrgCosts = annualOrgCosts * horizonYears;
+
+  // Compute total BEFORE percentages (avoids circular dependency)
+  const totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts;
 
   const breakdown = [
     {
@@ -164,6 +182,30 @@ export function calcStandaloneCost(inputs: EngineInputs): StandaloneOutputs {
       cost: totalMaintenanceCost,
       percentage: (totalMaintenanceCost / totalStandaloneCost) * 100,
     },
+    {
+      category: 'Versioning',
+      hours: VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * horizonYears,
+      cost: annualVersioningCost * horizonYears,
+      percentage: (annualVersioningCost * horizonYears / totalStandaloneCost) * 100,
+    },
+    {
+      category: 'Consumer Support',
+      hours: SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * horizonYears,
+      cost: annualSupportCost * horizonYears,
+      percentage: (annualSupportCost * horizonYears / totalStandaloneCost) * 100,
+    },
+    {
+      category: 'Coordination',
+      hours: nbConsumingCodebases * COORDINATION_HOURS_PER_WEEK_PER_TEAM * WEEKS_PER_YEAR * horizonYears,
+      cost: annualCoordinationCost * horizonYears,
+      percentage: (annualCoordinationCost * horizonYears / totalStandaloneCost) * 100,
+    },
+    {
+      category: 'Onboarding',
+      hours: NEW_DEVS_PER_YEAR * (ONBOARDING_TRAINING_HOURS + ONBOARDING_MENTORING_HOURS) * horizonYears,
+      cost: annualOnboardingCost * horizonYears,
+      percentage: (annualOnboardingCost * horizonYears / totalStandaloneCost) * 100,
+    },
   ];
 
   return {
@@ -173,6 +215,10 @@ export function calcStandaloneCost(inputs: EngineInputs): StandaloneOutputs {
     annualMaintenanceCost,
     totalMaintenanceCost,
     totalStandaloneCost,
+    annualVersioningCost,
+    annualSupportCost,
+    annualCoordinationCost,
+    annualOnboardingCost,
     breakdown,
   };
 }

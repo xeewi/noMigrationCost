@@ -139,13 +139,13 @@ describe('calcStandaloneCost', () => {
   });
 
   it('calculates totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts (nbConsumingCodebases=2)', () => {
-    // initialDevCost=33800, totalMaintenance=18252, orgCosts=(2340+25350+20280+12900)*3=182430 => WRONG
-    // Org costs: versioning=2340, support=25350, coordination=20280, onboarding=12900 (annual)
-    // totalOrgCosts = (2340 + 25350 + 20280 + 12900) * 3 = 182430
-    // total = 33800 + 18252 + 182430 = 234482 — let formula compute, check per-component tests
-    // With nbConsumingCodebases=2: total = 33800 + (6084 + 2340 + 25350 + 20280 + 12900) * 3 = 234472
+    // initialDevCost = 400 * 65 * 1.3 = 33800
+    // totalMaintenance = 33800 * 0.18 * 3 = 18252
+    // annualOrgCosts = versioning(2340) + support(25350) + coordination(20280) + onboarding(12900) = 60870
+    // totalOrgCosts = 60870 * 3 = 182610
+    // total = 33800 + 18252 + 182610 = 234662
     const result = calcStandaloneCost(baseInputs);
-    expect(result.totalStandaloneCost).toBeCloseTo(234472, 0);
+    expect(result.totalStandaloneCost).toBeCloseTo(234662, 0);
   });
 
   it('returns correct initialDevHours', () => {
