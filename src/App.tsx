@@ -217,10 +217,6 @@ function App() {
               onDirectUnitChange={setDirectUnit}
               devHours={devHours}
             />
-            <TimeHorizon
-              horizonYears={horizonYears}
-              onHorizonChange={setHorizonYears}
-            />
             <AdvancedParameters
               params={advancedParams}
               onChange={setAdvancedParams}
@@ -231,7 +227,11 @@ function App() {
             />
           </div>
           {/* Output column: 45% */}
-          <div className="flex-[45]">
+          <div className="flex-[45] space-y-6">
+            <TimeHorizon
+              horizonYears={horizonYears}
+              onHorizonChange={setHorizonYears}
+            />
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList>
                 <TabsTrigger value="comparison">Comparison</TabsTrigger>

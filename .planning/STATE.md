@@ -87,6 +87,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260324-jpj | Move Consuming Teams into Advanced Parameters panel | 2026-03-24 | 3d8a91e | [260324-jpj-move-consuming-teams-into-advanced-param](./quick/260324-jpj-move-consuming-teams-into-advanced-param/) |
+| 260324-jxg | Move Time Horizon near chart (output column) | 2026-03-24 | TBD | [260324-jxg-move-consuming-teams-to-top-of-advanced-](./quick/260324-jxg-move-consuming-teams-to-top-of-advanced-/) |
 
 ### Blockers/Concerns
 
