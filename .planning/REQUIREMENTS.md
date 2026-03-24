@@ -68,10 +68,10 @@ Requirements for Author Branding milestone. Each maps to roadmap phases.
 
 ### Footer Banner
 
-- [ ] **FOOT-01**: User can see the author name (Guillaume Gautier / xeewi) in a fixed footer banner on every page
-- [ ] **FOOT-02**: User can click a GitHub icon/link in the footer to navigate to the author's GitHub profile
-- [ ] **FOOT-03**: User can click a Malt icon/link in the footer to navigate to the author's Malt profile
-- [ ] **FOOT-04**: User can click a LinkedIn icon/link in the footer to navigate to the author's LinkedIn profile
+- [x] **FOOT-01**: User can see the author name (Guillaume Gautier / xeewi) in a fixed footer banner on every page
+- [x] **FOOT-02**: User can click a GitHub icon/link in the footer to navigate to the author's GitHub profile
+- [x] **FOOT-03**: User can click a Malt icon/link in the footer to navigate to the author's Malt profile
+- [x] **FOOT-04**: User can click a LinkedIn icon/link in the footer to navigate to the author's LinkedIn profile
 
 ### Code Headers
 
@@ -147,10 +147,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VIZ-04 | Phase 5 | Complete |
 | SHARE-01 | Phase 6 | Complete |
 | SHARE-02 | Phase 6 | Complete |
-| FOOT-01 | Phase 7 | Pending |
-| FOOT-02 | Phase 7 | Pending |
-| FOOT-03 | Phase 7 | Pending |
-| FOOT-04 | Phase 7 | Pending |
+| FOOT-01 | Phase 7 | Complete |
+| FOOT-02 | Phase 7 | Complete |
+| FOOT-03 | Phase 7 | Complete |
+| FOOT-04 | Phase 7 | Complete |
 | HEAD-01 | Phase 8 | Pending |
 
 **Coverage:**
