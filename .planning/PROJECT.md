@@ -28,6 +28,7 @@ Make the hidden long-term costs of code duplication visible and quantifiable, so
 - [x] User arriving via deep-link URL scrolls to the correct section on mount — Validated in Phase 10: Doc Page Implementation
 - [x] User can see the currently visible section highlighted in the sidebar as they scroll — Validated in Phase 10: Sidebar Polish
 - [x] Sidebar auto-scrolls to keep the active section link visible when the document is long — Validated in Phase 10: Sidebar Polish
+- [x] Every source file carries a consistent comment header with author name, creation date, and project identifier — Validated in Phase 11: Source File Headers
 
 ### Active
 
@@ -104,4 +105,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Phase 10 (Sidebar Polish) complete*
+*Last updated: 2026-03-24 — Phase 11 (Source File Headers) complete*
