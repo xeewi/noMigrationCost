@@ -1,3 +1,10 @@
+/**
+ * @file collapsible.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible"
 
 function Collapsible({ ...props }: CollapsiblePrimitive.Root.Props) {
