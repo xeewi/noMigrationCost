@@ -36,7 +36,7 @@ export function AppHeader({ onReset, view, onNavigate }: AppHeaderProps) {
   }
 
   return (
-    <header className="border-b border-border">
+    <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="max-w-[1280px] mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-semibold text-foreground">Feature Cost Calculator</h1>
@@ -70,16 +70,6 @@ export function AppHeader({ onReset, view, onNavigate }: AppHeaderProps) {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          {/* Copy Link button — always visible per D-04 */}
-          <Button variant="default" size="sm" onClick={handleCopyLink}>
-            {copied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Link className="h-4 w-4" />
-            )}
-            {copied ? 'Copied!' : 'Copy Link'}
-          </Button>
-
           {/* Reset All — only on calculator view per D-03 */}
           {view === 'calculator' && (
             <AlertDialog>
@@ -105,6 +95,15 @@ export function AppHeader({ onReset, view, onNavigate }: AppHeaderProps) {
               </AlertDialogContent>
             </AlertDialog>
           )}
+          {/* Copy Link button — always visible per D-04 */}
+          <Button variant="default" size="sm" onClick={handleCopyLink}>
+            {copied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Link className="h-4 w-4" />
+            )}
+            {copied ? 'Copied!' : 'Copy Link'}
+          </Button>
         </div>
       </div>
     </header>
