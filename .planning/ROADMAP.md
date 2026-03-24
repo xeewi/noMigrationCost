@@ -68,10 +68,10 @@ Plans:
 
 **Goal:** Fix the Team Velocity story points input so the user can fully clear the field and type a new value (e.g. 42) directly. Currently the "1" cannot be erased, forcing awkward editing instead of a clean retype.
 **Requirements:** VEL-FIX
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 13-01-PLAN.md — Fix velocity input empty-state handling
+- [x] 13-01-PLAN.md — Fix velocity input empty-state handling
 
 ## Progress
 
@@ -86,7 +86,7 @@ Plans:
 | 10. Sidebar Polish | v1.2 | 1/1 | Complete | 2026-03-24 |
 | 11. Source File Headers | v1.2 | 1/1 | Complete | 2026-03-24 |
 | 12. Standalone Organizational Costs | — | 2/2 | Complete    | 2026-03-24 |
-| 13. Story Points Input Clearing Bug | — | 0/1 | In Progress | — |
+| 13. Story Points Input Clearing Bug | — | 1/1 | Complete   | 2026-03-24 |
 
 ## Backlog
 

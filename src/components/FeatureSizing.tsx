@@ -107,11 +107,12 @@ export function FeatureSizing({
               <Input
                 id="velocity-input"
                 type="number"
-                min={1}
-                value={velocity}
+                min={0}
+                value={velocity === 0 ? '' : velocity}
+                placeholder="1"
                 onChange={(e) => {
                   const v = parseInt(e.target.value, 10);
-                  onVelocityChange(isNaN(v) || v < 1 ? 1 : v);
+                  onVelocityChange(isNaN(v) || v < 0 ? 0 : v);
                 }}
               />
             </div>
