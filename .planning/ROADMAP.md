@@ -186,7 +186,7 @@ Phases execute in numeric order: 8 → 9 → 10 → 11
 
 ## Backlog
 
-### Phase 999.1: Standalone Organizational Costs (BACKLOG)
+### Phase 998.1: Standalone Organizational Costs (BACKLOG)
 
 **Goal:** Enrich the Standalone cost model with organizational costs (support, versioning, onboarding, coordination) that currently only appear in Shared/Duplicated paths. A feature built by a single team still incurs these costs — the current Standalone mode underestimates by ~5× because it only counts dev + maintenance.
 **Requirements:** TBD
@@ -195,7 +195,7 @@ Phases execute in numeric order: 8 → 9 → 10 → 11
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
 
-### Phase 999.2: Story Points Input Clearing Bug (BACKLOG)
+### Phase 998.2: Story Points Input Clearing Bug (BACKLOG)
 
 **Goal:** Fix the Team Velocity story points input so the user can fully clear the field and type a new value (e.g. 42) directly. Currently the "1" cannot be erased, forcing awkward editing instead of a clean retype.
 **Requirements:** TBD
