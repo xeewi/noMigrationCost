@@ -205,3 +205,12 @@ Phases execute in numeric order: 7 → 8 → 9 → 10 → 11 → 12
 
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
+
+### Phase 999.2: Story Points Input Clearing Bug (BACKLOG)
+
+**Goal:** Fix the Team Velocity story points input so the user can fully clear the field and type a new value (e.g. 42) directly. Currently the "1" cannot be erased, forcing awkward editing instead of a clean retype.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
