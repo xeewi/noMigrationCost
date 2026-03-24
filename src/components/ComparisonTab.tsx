@@ -1,5 +1,6 @@
 import { BarChart2 } from 'lucide-react';
 import { CostChart } from '@/components/CostChart';
+import { EmptyState } from '@/components/EmptyState';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -43,20 +44,11 @@ export function ComparisonTab({
   // Empty state — show when inputs are missing
   if (emptyReason !== null || sharedCost === null || duplicatedCost === null || breakEven === null) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12 gap-4 text-center">
-          <BarChart2 className="w-12 h-12 text-muted-foreground" />
-          <div className="space-y-2">
-            <p className="text-xl font-semibold">
-              Configure your team and feature size to compare approaches
-            </p>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              Add at least one team member and set a feature size to see the shared vs duplicated
-              cost comparison.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <EmptyState
+        icon={BarChart2}
+        title="Configure your team and feature size to compare approaches"
+        description="Add at least one team member and set a feature size to see the shared vs duplicated cost comparison."
+      />
     );
   }
 
