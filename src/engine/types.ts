@@ -1,3 +1,10 @@
+/**
+ * @file types.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 export type SeniorityLevel = 'Junior' | 'Mid' | 'Senior' | 'Lead';
 
 export interface SeniorityRow {

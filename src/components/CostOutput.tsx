@@ -1,3 +1,10 @@
+/**
+ * @file CostOutput.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { Calculator } from 'lucide-react';
 import { formatEuro } from '@/lib/utils';
 import { EmptyState } from '@/components/EmptyState';

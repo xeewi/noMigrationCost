@@ -1,3 +1,10 @@
+/**
+ * @file AppFooter.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-24
+ * @project Feature Cost Calculator
+ */
+
 function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -46,9 +53,14 @@ export function AppFooter() {
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background">
       <div className="max-w-[1280px] mx-auto px-6 py-3 flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">
+        <a
+          href="https://www.linkedin.com/in/gautierg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
           Made by Guillaume Gautier (xeewi)
-        </span>
+        </a>
         <div className="flex items-center gap-1">
           <a
             href="https://github.com/xeewi"
@@ -69,7 +81,7 @@ export function AppFooter() {
             <MaltIcon className="h-4 w-4" />
           </a>
           <a
-            href="https://www.linkedin.com/in/xeewi"
+            href="https://www.linkedin.com/in/gautierg"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn profile"

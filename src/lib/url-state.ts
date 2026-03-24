@@ -1,3 +1,10 @@
+/**
+ * @file url-state.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-24
+ * @project Feature Cost Calculator
+ */
+
 import type { SeniorityRow, SeniorityLevel, SizingMode, DirectHoursUnit } from '@/engine/types';
 import { SENIORITY_DEFAULTS, ENGINE_DEFAULTS } from '@/engine/types';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';

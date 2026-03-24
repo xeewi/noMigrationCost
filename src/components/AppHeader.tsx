@@ -1,3 +1,10 @@
+/**
+ * @file AppHeader.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-24
+ * @project Feature Cost Calculator
+ */
+
 import { useState } from 'react';
 import { Link, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';

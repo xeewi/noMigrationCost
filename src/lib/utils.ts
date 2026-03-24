@@ -1,3 +1,10 @@
+/**
+ * @file utils.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-23
+ * @project Feature Cost Calculator
+ */
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { YearCost } from '@/engine/types'

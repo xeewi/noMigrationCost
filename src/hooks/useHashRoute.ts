@@ -1,3 +1,10 @@
+/**
+ * @file useHashRoute.ts
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-24
+ * @project Feature Cost Calculator
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 
 export type View = 'calculator' | 'docs';

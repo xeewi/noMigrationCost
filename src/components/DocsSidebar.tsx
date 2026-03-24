@@ -1,3 +1,10 @@
+/**
+ * @file DocsSidebar.tsx
+ * @author Guillaume Gautier (xeewi)
+ * @created 2026-03-24
+ * @project Feature Cost Calculator
+ */
+
 import { useMemo, useEffect, useRef } from 'react';
 
 export interface HeadingEntry {
