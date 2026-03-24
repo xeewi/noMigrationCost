@@ -1,116 +1,161 @@
 # Stack Research
 
-**Domain:** Standalone interactive HTML/JS cost calculator dashboard
-**Researched:** 2026-03-23
-**Confidence:** HIGH (core choices), MEDIUM (version pins may drift — verify before pinning)
+**Domain:** React + Vite + TypeScript + shadcn/ui dashboard — Markdown documentation rendering milestone
+**Researched:** 2026-03-24
+**Confidence:** HIGH (all versions verified against npm registry)
 
-## Recommended Stack
+---
+
+> **Note on scope:** The base stack (React 19, Vite, TypeScript, shadcn/ui, Tailwind CSS 4, Recharts) is already installed and validated. This document covers ONLY the additions required for the v1.2 Documentation milestone: Markdown parsing/rendering, sidebar navigation, and hash-based anchor routing.
+
+---
+
+## New Additions Required
 
 ### Core Technologies
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| Vanilla HTML/CSS/JS | Browser-native | Application shell | No build step, no toolchain, zero deployment friction — a file double-click opens it. The constraint is the feature. |
-| Alpine.js | 3.15.8 | Reactive UI (form inputs, sliders, computed values, show/hide) | HTML-attribute-driven reactivity with zero build step, 7.1 KB gzipped, loads via CDN. Handles `x-data`, `x-model`, `x-show`, and `$store` for global state — covers 100% of what a calculator dashboard needs without introducing JSX or a component model. Matures well: v3 stable since 2021, v3.15.8 released Feb 2025. |
-| Chart.js | 4.5.1 | Line/area charts — cumulative cost curves, break-even visualization | Canvas-based (fast, no SVG DOM thrash), 60 KB minified + gzipped, CDN-loadable in one `<script>` tag, outstanding animation defaults for temporal curves. Simpler API than ECharts for the two chart types this project needs (line + area). v4.5.1 released Oct 2024. |
-| Pico CSS | 2.1.1 | Base styling — forms, tables, sliders, layout | Styles semantic HTML tags directly (no classes needed for `<table>`, `<input>`, `<button>`, `<select>`). Single CDN link, ~8 KB gzipped. Provides a professional, readable default that works for presentations without writing a CSS reset. v2.1.1 released March 2025. |
+| react-markdown | 10.1.0 | Render a Markdown string as React elements | Purpose-built for React — outputs React components, not `dangerouslySetInnerHTML`. Supports remark and rehype plugin pipelines. ESM-only, works natively in Vite. The dominant Markdown-in-React solution (14M weekly downloads). |
+| remark-gfm | 4.0.1 | GitHub Flavored Markdown support | The research doc uses GFM features: tables, strikethrough, task lists, autolinked URLs. Without this plugin, tables render as raw text. Fully typed TypeScript. |
+| rehype-slug | 6.0.0 | Add `id` attributes to all headings | Required for anchor navigation. Turns `## Section Title` into `<h2 id="section-title">`. Uses github-slugger — matches GitHub's behavior, predictable slug output. |
+| @tailwindcss/typography | 0.5.19 | Style rendered Markdown HTML with `prose` class | react-markdown outputs unstyled HTML elements. The `prose` class applies readable defaults (heading sizes, list margins, table borders, code blocks) in one className. Version 0.5.19 explicitly supports Tailwind CSS v4 via `@plugin` directive in CSS. |
 
 ### Supporting Libraries
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| chart.js date adapter (chartjs-adapter-date-fns) | N/A | Time-axis formatting | Only needed if x-axis is real dates. For this project, x-axis is integer years (1–10), so no adapter is needed. Skip this entirely. |
-| tofsjonas/sortable | Latest (CDN) | Sortable HTML tables | Use if the cost breakdown table needs column-sort. Add `class="sortable"` to the `<table>` tag. Zero config, no dependencies, 1 KB. Only add if sortable columns are needed — for v1, static tables are fine. |
+| rehype-autolink-headings | 7.1.0 | Inject anchor link icons into headings | Use alongside rehype-slug to make headings self-linkable. Needed if users should be able to copy a deep link to a specific section. Optional for v1.2 — sidebar links to `#slug` work without it. |
 
-### Development Tools
+### No Additional Routing Library Needed
 
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| Browser DevTools | Debugging, layout inspection | Only tool needed — no bundler, no sourcemaps required |
-| VS Code Live Server extension | Local dev server with hot reload | Optional. The file can be opened directly with `file://`, but a local server avoids CORS issues if data files are ever split out. Not required for v1 single-file approach. |
-| Browser print / screenshot | "Export" for presentations | Declared sufficient in PROJECT.md — no PDF library needed |
+Hash-based routing (`#/docs`, `#/docs#section-id`) can be implemented with `window.location.hash` and a `hashchange` event listener. The existing URL sharing (Phase 6) already encodes full app state in the hash. Adding React Router or a dedicated router for two views would add unnecessary dependency overhead and require reworking the existing hash-sharing mechanism.
 
-## CDN Load Order
+### No Additional Dev Dependencies Needed
 
-```html
-<!-- 1. Base styles -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css">
+react-markdown ships TypeScript types. A single `/// <reference types="vite/client" />` in `vite-env.d.ts` (already present from Vite scaffold) provides the `?raw` import type. No extra `@types/*` packages required.
 
-<!-- 2. Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+## Installation
 
-<!-- 3. Alpine.js — must be LAST, defer attribute required -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js"></script>
+```bash
+# Core — render Markdown as React components with GFM and heading IDs
+npm install react-markdown remark-gfm rehype-slug @tailwindcss/typography
+
+# Optional — make headings self-linkable (defer to v1.3 if not in v1.2 scope)
+npm install rehype-autolink-headings
 ```
 
-Alpine.js must load last (or `defer`) because it initializes on `DOMContentLoaded` and will pick up `x-data` attributes already present in the HTML. Loading Chart.js before Alpine ensures chart instances can be created inside Alpine component `init()` hooks.
+## Vite Configuration for Markdown Import
+
+Vite's built-in `?raw` suffix imports any file as a raw string — no plugin required.
+
+```typescript
+// In your Doc component
+import docContent from '../../docs/feature-cost-shared-vs-duplicated.md?raw'
+```
+
+Add a TypeScript declaration if the editor complains (paste into `src/vite-env.d.ts`):
+
+```typescript
+/// <reference types="vite/client" />
+// ?raw imports are covered by vite/client, but if the linter flags *.md add:
+declare module '*.md?raw' {
+  const content: string
+  export default content
+}
+```
+
+## Tailwind CSS v4 Typography Setup
+
+In Tailwind v4, plugins are registered in CSS, not `tailwind.config.js`:
+
+```css
+/* src/index.css */
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+```
+
+Then wrap the rendered Markdown:
+
+```tsx
+<article className="prose prose-slate dark:prose-invert max-w-none">
+  <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug]}>
+    {docContent}
+  </Markdown>
+</article>
+```
+
+`max-w-none` removes the prose plugin's default `65ch` max-width so the content fills the layout column width. `prose-slate` matches shadcn/ui's default color palette.
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| Alpine.js | VanJS (1 KB) | If the UI is entirely JS-generated with no HTML templates — VanJS builds the DOM programmatically. Alpine is better here because the HTML structure is static with reactive slots, not a fully generated DOM. |
-| Alpine.js | Pure Proxy + EventTarget | If you want zero CDN dependencies and are comfortable writing 50–100 lines of reactive plumbing. Viable for a senior JS dev. Alpine removes that boilerplate for free at 7 KB. |
-| Alpine.js | Vue 3 (CDN build) | Vue 3 has a CDN build (no build step). Use it if the UI needs virtual-DOM-level component isolation or you are already a Vue team. Overkill for this project. |
-| Chart.js | Apache ECharts 6.0.0 | ECharts 6 (released July 2025) is more powerful but the full bundle is ~900 KB minified (vs ~60 KB for Chart.js). For two chart types — line and area — Chart.js is the correct tool. ECharts is the right call for dashboards needing 10+ chart types, 3D, or map overlays. |
-| Chart.js | Plotly.js | Plotly's CDN bundle is 3+ MB. Enormous for a project that needs two line charts. |
-| Pico CSS | Bootstrap 5 | Bootstrap provides more component variety but requires more class markup and delivers ~150 KB of CSS. Pico's semantic approach means the HTML stays clean and readable without utility classes. Use Bootstrap if the team already knows it and wants richer components (modals, dropdowns). |
-| Pico CSS | Tailwind (CDN Play CDN) | Tailwind's Play CDN is ~150 KB at runtime and builds a custom CSS blob. Incompatible with "open a file and it works" reliability. Avoid. |
+| react-markdown | marked + dangerouslySetInnerHTML | When the Markdown source is fully trusted and performance of rendering very large docs is a concern. For a research doc of normal size, react-markdown's overhead is negligible. marked does not integrate with React's component model, making custom rendering (e.g., wrapping code blocks in shadcn components) much harder. |
+| react-markdown | MDX (vite-plugin-mdx) | When Markdown files need to contain live React components. Overkill here — the research doc is static prose with tables. MDX adds a compilation step and changes the authoring format. |
+| rehype-slug | Manual id assignment | Manual ids require editing the source Markdown file. rehype-slug derives ids automatically from heading text — zero maintenance. |
+| @tailwindcss/typography | Custom CSS | Writing typography CSS from scratch (heading hierarchy, list spacing, code block padding) is 150–300 lines. The prose plugin handles it correctly in ~1 className. |
+| window.location.hash (custom) | React Router HashRouter | React Router adds 50 KB and requires refactoring the existing hash-based URL sharing (Phase 6). For two views (calculator / docs), the native hash API is the correct scope. |
+| window.location.hash (custom) | Wouter (2.3 KB) | Wouter is a good lightweight option if routing grows to 5+ routes. For two views, even Wouter is overhead. |
 
 ## What NOT to Use
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| React / Vue / Svelte (npm-only builds) | All require a build step to use in production. CDN builds of React are available but are development-mode only and 40–140 KB. The mental model adds framework complexity to a problem that is purely "bind inputs to formulas and draw charts." | Alpine.js |
-| jQuery | Adds 30–90 KB for DOM selection utilities that are fully covered by `document.querySelector` and `querySelectorAll` in 2025. Alpine already provides event binding and state. | Native DOM APIs + Alpine.js |
-| D3.js | D3 is a data transformation + SVG rendering primitives library — not a charting library. Using D3 to draw cumulative cost curves from scratch means writing a chart library. Correct for custom novel visualizations; wrong for standard line charts. | Chart.js |
-| Highcharts | Commercial license required for most uses ($0 only for personal/non-commercial). This dashboard is described for internal business use — that triggers a paid license. | Chart.js (MIT) or ECharts (Apache 2.0) |
-| Tailwind Play CDN | Works in development but is explicitly marked "not for production" in the Tailwind docs. Generates CSS at runtime by scanning the DOM, which is slow and fragile for a standalone file. | Pico CSS |
-| ECharts full bundle via CDN for only 2 chart types | The full ECharts bundle is ~900 KB minified. Even tree-shaking requires a build step. For 2 chart types in a no-build context, this cost is unjustifiable. | Chart.js |
+| `dangerouslySetInnerHTML` with marked/markdown-it | Bypasses React's XSS sanitization. react-markdown renders React nodes, never raw HTML strings. The research doc may eventually accept user-contributed content, and the safe default avoids a security regression. | react-markdown |
+| vite-plugin-markdown | Extra plugin complexity — Vite's native `?raw` suffix already handles importing a `.md` file as a string. The plugin adds transformation modes (HTML, ToC, etc.) not needed when react-markdown handles rendering. | Vite `?raw` suffix import |
+| React Router / Next.js router | Adds significant bundle weight and requires rearchitecting the hash-sharing mechanism from Phase 6. The project is a static SPA with two views, not a multi-page application. | Native `window.location.hash` |
+| remark-react (deprecated) | The `remark-react` package is deprecated. Its successor is react-markdown, which wraps the full remark/rehype pipeline. | react-markdown 10 |
 
-## Stack Patterns by Variant
+## Stack Patterns for This Milestone
 
-**If the project stays single-file:**
-- Inline all `<style>` overrides in a `<style>` block after Pico CSS link
-- Put all Alpine component logic in `<script>` blocks at the bottom of `<body>`
-- Chart.js instances live inside Alpine `init()` callbacks using `$el.querySelector('canvas')`
+**Sidebar navigation (no library needed):**
+- Extract heading nodes from the rendered AST using a custom rehype plugin, or parse headings from the raw Markdown string with a simple regex before rendering
+- Build a `<nav>` with `<a href="#slug">` anchor links
+- On click: `window.location.hash = '#' + slug` (no scroll fighting — browser handles it)
 
-**If the project splits into multiple files:**
-- `index.html` — markup only
-- `app.js` — Alpine component definitions and chart setup
-- `data.js` — salary constants, COCOMO factors, default values from research doc
-- `styles.css` — overrides on top of Pico CSS
+**Coexisting hash routing and section anchors:**
+- Reserve `#/docs` for the view route (forward-slash prefix distinguishes it from section slugs)
+- Reserve bare `#section-title` for in-page anchors within the doc view
+- In `hashchange` handler: if `hash.startsWith('#/')`, it's a route change; otherwise it's a scroll-to-anchor
 
-**If break-even annotation on the chart needs to be prominent:**
-- Use Chart.js `annotation` plugin (`chartjs-plugin-annotation@3.x`) — CDN-loadable, adds vertical line + label at the break-even year
-- CDN: `https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js`
+**Sidebar scroll-spy (optional, v1.3):**
+- Use `IntersectionObserver` on heading elements to highlight the active sidebar entry as the user scrolls
+- No library needed — native browser API
 
 ## Version Compatibility
 
 | Package | Compatible With | Notes |
 |---------|-----------------|-------|
-| Alpine.js 3.15.8 | Any modern browser (Chrome 87+, Firefox 78+, Safari 14+) | No IE11 support — acceptable for internal tooling |
-| Chart.js 4.5.1 | Any modern browser with Canvas API | No IE11. Canvas is universally supported in modern browsers. |
-| Pico CSS 2.1.1 | Any modern browser | v2 dropped IE support in favor of CSS custom properties for theming |
-| chartjs-plugin-annotation 3.x | Chart.js 4.x only | Do not mix with Chart.js 3.x |
+| react-markdown@10.1.0 | React 19, ESM (Vite 6), TypeScript 5.x | ESM-only — Vite's ESM-first architecture makes this a non-issue |
+| remark-gfm@4.0.1 | react-markdown@10, Node 16+ | Must match react-markdown's unified version — using the same major works cleanly |
+| rehype-slug@6.0.0 | react-markdown@10, rehype ecosystem | Part of the same unified/rehype monorepo — compatible by design |
+| rehype-autolink-headings@7.1.0 | rehype-slug@6 (must run after) | Plugin order matters: rehype-slug first, then rehype-autolink-headings |
+| @tailwindcss/typography@0.5.19 | Tailwind CSS v4.x | v0.5.15+ added v4 support; v0.5.19 is the latest stable as of 2026-03-24 |
 
 ## Sources
 
-- Alpine.js GitHub releases — v3.15.8 confirmed stable, released Feb 2, 2025 — HIGH confidence
-  https://github.com/alpinejs/alpine/releases
-- Alpine.js official installation docs — CDN URL and defer requirement confirmed — HIGH confidence
-  https://alpinejs.dev/essentials/installation
-- Chart.js GitHub releases — v4.5.1 confirmed latest stable, released Oct 13, 2024 — HIGH confidence
-  https://github.com/chartjs/Chart.js/releases
-- Apache ECharts — v6.0.0 released July 30, 2025, stable — MEDIUM confidence (new major, migration required from v5)
-  https://echarts.apache.org/handbook/en/get-started/
-- Pico CSS GitHub releases — v2.1.1 confirmed latest, released March 15, 2025 — HIGH confidence
-  https://github.com/picocss/pico/releases
-- jsDelivr ECharts package — version 6.0.0 listed as latest — MEDIUM confidence
-  https://www.jsdelivr.com/package/npm/echarts
-- WebSearch: "vanilla JS reactive UI without framework no build step 2025" — multiple sources confirming Alpine.js as standard for no-build reactive UIs — MEDIUM confidence
-- WebSearch: "Chart.js vs ECharts CDN 2025" — multiple sources confirming Chart.js as the lighter, simpler choice for standard line/area charts — MEDIUM confidence
+- npm registry — react-markdown@10.1.0 confirmed latest — HIGH confidence
+  (verified via `npm info react-markdown version`)
+- npm registry — remark-gfm@4.0.1 confirmed latest — HIGH confidence
+  (verified via `npm info remark-gfm version`)
+- npm registry — rehype-slug@6.0.0 confirmed latest — HIGH confidence
+  (verified via `npm info rehype-slug version`)
+- npm registry — rehype-autolink-headings@7.1.0 confirmed latest — HIGH confidence
+  (verified via `npm info rehype-autolink-headings version`)
+- npm registry — @tailwindcss/typography@0.5.19 confirmed latest — HIGH confidence
+  (verified via `npm info @tailwindcss/typography version`)
+- GitHub tailwindlabs/tailwindcss-typography releases — v0.5.15+ confirmed Tailwind v4 support — HIGH confidence
+  https://github.com/tailwindlabs/tailwindcss-typography/releases
+- Tailwind CSS v4 docs — `@plugin` directive confirmed as the v4 method for first-party plugins — HIGH confidence
+  https://tailwindcss.com/blog/tailwindcss-v4
+- react-markdown GitHub — v10 confirmed ESM-only, TypeScript types included — HIGH confidence
+  https://github.com/remarkjs/react-markdown
+- Vite docs — `?raw` suffix confirmed as built-in static asset handling — HIGH confidence
+  https://vite.dev/guide/assets
+- WebSearch: "react-markdown vs marked vs remark react 2026" — react-markdown confirmed dominant for React integration, marked recommended only for non-React or performance-critical contexts — MEDIUM confidence
+- WebSearch: "hash routing React no react-router 2025" — native `window.location.hash` confirmed viable for simple SPA view-switching — MEDIUM confidence
 
 ---
-*Stack research for: standalone HTML/JS interactive cost calculator dashboard*
-*Researched: 2026-03-23*
+*Stack research for: Markdown documentation rendering — v1.2 milestone addition to React+Vite+TypeScript+shadcn/ui dashboard*
+*Researched: 2026-03-24*

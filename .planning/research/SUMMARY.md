@@ -1,211 +1,187 @@
 # Project Research Summary
 
-**Project:** noMigrationCost — Shared vs Duplicated Code Cost Calculator
-**Domain:** Standalone interactive HTML/JS TCO comparison dashboard
-**Researched:** 2026-03-23
-**Confidence:** HIGH (stack and architecture), MEDIUM (features — novel niche with no direct competitor)
+**Project:** Feature Cost Calculator — v1.2 Documentation Milestone
+**Domain:** In-app Markdown documentation viewer integrated into existing React+Vite SPA
+**Researched:** 2026-03-24
+**Confidence:** HIGH
 
 ## Executive Summary
 
-This is a standalone, no-build, single-file HTML/JS dashboard that quantifies the long-term cost of duplicating code across teams versus building shared code once. The target user is an engineering lead or architect who needs to persuade stakeholders using a credible, research-backed model. The research doc (`/docs/feature-cost-shared-vs-duplicated.md`) provides worked numerical examples and multi-term formulas (sections 7.1–7.5) that are the authoritative source for every calculation — all implementation decisions flow from that document. The tool has no direct competitor; the closest analogues (Azure TCO Calculator, Codacy tech-debt tools) lack the distinguishing features: divergence rate modeling, per-copy compounding cost, and coordination overhead as explicit line items.
+This milestone adds a readable in-app documentation page to an already-functional React+Vite+TypeScript+shadcn/ui calculator. The research doc (`docs/feature-cost-shared-vs-duplicated.md`, ~45KB, 45+ sources) must be rendered as formatted HTML with sidebar navigation inside the existing SPA — without a new routing library, without touching the calculator's state engine, and without breaking the existing URL-sharing mechanism that encodes calculator state in `window.location.hash`.
 
-The recommended approach is disciplined bottom-up construction: implement the calculation engine as pure, testable functions first, wire in a minimal state object and a single `render()` function, then layer the HTML inputs and Chart.js visualization on top. This order is mandatory because formula drift and scattered state are the two pitfalls with the highest recovery cost. The stack is intentionally minimal — Alpine.js for reactive input binding, Chart.js for cumulative cost curves, Pico CSS for semantic styling — all loaded via CDN with no build step, so the delivered artifact is a single file that opens in any browser with no setup.
+The recommended approach is a prefix-based hash namespace (route hashes start with `/`, encoded state hashes never do) combined with `react-markdown` + `remark-gfm` + `rehype-slug` for rendering and `@tailwindcss/typography` for prose styling. Sidebar navigation is built with a regex-based heading extractor (`useDocSections` hook) and `IntersectionObserver` for scroll-spy. No router library is added. All new components live in `src/components/docs/` as a self-contained unit, and only `App.tsx` and `AppHeader.tsx` receive surgical modifications.
 
-The key risks are: (1) formula implementation that diverges from the research doc's worked examples, (2) scattered global state that causes chart and table to show different values, and (3) the break-even calculation failing silently for edge-case parameter combinations where costs never cross within the time horizon. All three risks are preventable by enforcing architecture discipline before any UI work begins.
+The dominant risk is hash namespace collision: two separate subsystems (`decodeAppState` and the new view router) both read `window.location.hash` on mount and write to it on user action. This collision must be resolved in Phase 1 before any other docs feature is built — retrofitting it later is effectively a rewrite. Secondary risks (IntersectionObserver sidebar flicker, fixed header obscuring anchor targets, Copy Link button capturing doc fragments) are all low-recovery-cost if the Phase 1 routing foundation is solid.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack is deliberately minimal and build-free. CDN load order matters: Pico CSS first, Chart.js second, Alpine.js last with `defer` (Alpine initializes on DOMContentLoaded and must find `x-data` attributes already in the HTML). Chart.js must be loaded before Alpine so chart instances can be created inside Alpine `init()` hooks.
+The base stack (React 19, Vite, TypeScript, shadcn/ui, Tailwind CSS 4, Recharts) is already installed and validated. This milestone requires four additional packages: `react-markdown@10.1.0` (renders Markdown as React components, ESM-native, 14M weekly downloads), `remark-gfm@4.0.1` (required for the tables in the research doc), `rehype-slug@6.0.0` (auto-generates heading `id` attributes for sidebar anchors), and `@tailwindcss/typography@0.5.19` (applies readable prose styling in one `prose` className, explicitly supports Tailwind v4 via `@plugin` directive). All versions verified against npm registry.
 
 **Core technologies:**
-- **Vanilla HTML/CSS/JS (browser-native):** Application shell — no toolchain, no deployment friction; double-clicking the file opens it
-- **Alpine.js 3.15.8:** Reactive UI binding (sliders, form inputs, show/hide, computed values) — 7.1 KB gzipped, CDN-only, attribute-driven; handles 100% of the reactivity this app needs without a build step
-- **Chart.js 4.5.1:** Cumulative cost curves and break-even visualization — 60 KB minified, canvas-based (no SVG DOM overhead), excellent animation defaults for temporal line charts
-- **Pico CSS 2.1.1:** Base styling — styles semantic HTML tags directly, no classes needed for tables/inputs/buttons, 8 KB gzipped, presentation-ready defaults
+- `react-markdown@10.1.0`: Markdown-to-React-components renderer — avoids `dangerouslySetInnerHTML`, supports remark/rehype plugin pipelines, ESM-native for Vite
+- `remark-gfm@4.0.1`: GitHub Flavored Markdown — required for pipe tables in the research doc; without it, tables render as raw pipe syntax
+- `rehype-slug@6.0.0`: Auto-generates heading `id` attributes from heading text — required for sidebar anchor links to function; configure with `prefix: 'doc-'` to prevent hash namespace collision
+- `@tailwindcss/typography@0.5.19`: `prose` class applies heading hierarchy, list spacing, table borders — replaces 150-300 lines of custom CSS; registered via `@plugin` in CSS (Tailwind v4 method)
+- Vite `?raw` import: Built-in suffix to import `.md` as a string at build time — zero runtime fetch, no plugin needed
 
-**Important constraint:** Do not use ES Module imports (`type="module"`) if the file will be opened via `file://` — Chromium and Firefox block ES Modules on the file protocol. Use plain `<script>` tags in dependency order.
-
-See: `.planning/research/STACK.md`
+**What not to use:** `dangerouslySetInnerHTML` with `marked` (no component overrides, XSS precedent), any routing library (50KB+ overhead for two views), MDX (compile step for no benefit on static prose), `fetch()` for the Markdown file (loading state complexity for a bundled asset).
 
 ### Expected Features
 
-No direct competitor exists for this specific comparison. The tool needs to match the UX expectations of general TCO calculators (Azure, AWS) while delivering insights none of them provide.
+**Must have (table stakes) — v1.2:**
+- Hash routing scheme that distinguishes `#/docs` from encoded calculator state — without this the app is broken
+- Doc page renders `docs/feature-cost-shared-vs-duplicated.md` via react-markdown with remark-gfm — core deliverable
+- rehype-slug enabled with `prefix: 'doc-'` — required for sidebar anchors to hit correct headings
+- Left sidebar listing all `##` and `###` headings with scroll-to-section on click — essential for a 45KB document
+- Active section highlighting in sidebar via IntersectionObserver — users expect this from any reference doc
+- AppHeader extended with calculator/docs nav links — required for switching between views
+- AppFooter shared on docs page — visual consistency
 
-**Must have (table stakes):**
-- Team composition input (member names, seniority, loaded hourly cost) — base unit for every downstream calculation
-- Feature size input via story points + velocity, or direct hours — covers agile and non-agile teams
-- Time horizon slider (1–10 years) — standard for all TCO tools
-- Shared vs duplicated comparison with N-copy input — the core product value
-- Break-even point as text callout and chart annotation — the single most decision-relevant output
-- Temporal cumulative cost curves (dual lines, break-even marker) — required for stakeholder presentations
-- Cost breakdown table by category (initial dev, maintenance, coordination, bugs, divergence) — required for credibility
-- Research-backed defaults pre-filled for all formula constants — enables immediate use without configuration
-- Overridable advanced inputs for all formula constants — explicitly required by the project spec
-
-**Should have (differentiators — add before first external presentation):**
-- Divergence rate modeling over time (non-linear cost growth for duplicated path) — unique insight unavailable in any TCO tool
-- URL-encoded state for scenario sharing (no account, no database) — practical for presenting to multiple audiences
-- Inline citation tooltips per formula constant — stakeholder credibility when numbers are challenged
-- Per-copy compounding cost breakdown (N teams) — surfaces the "3× is not 3×" insight
+**Should have (polish) — v1.2.x:**
+- Sidebar collapse on narrow viewports (Tailwind responsive breakpoint) — add if real non-widescreen usage is reported
+- Deep links to doc sections (`#/docs#section-id`) — add if users share doc-specific links
+- Smooth scroll behavior (`scroll-behavior: smooth`) — noticeable quality gap if missing
 
 **Defer (v2+):**
-- Mobile-responsive layout — desktop presentations are the validated use case
-- Additional locale salary datasets (UK, Germany, US) — validate French market first
-- Historical scenario comparison (multiple saved configurations) — URL sharing covers the v1 need
-- PDF export — browser Print-to-PDF is documented as sufficient for v1
-
-**Anti-features to avoid:** User accounts, persistent storage, real-time collaboration, full COCOMO II, multi-language toggle.
-
-See: `.planning/research/FEATURES.md`
+- Reading-time / section-count indicator — low value
+- Syntax highlighting for code blocks — research doc uses plain-text formulas, not real language syntax
+- Multi-page doc structure — not needed unless doc grows substantially
+- Full-text search — browser Ctrl+F already covers this for a single-file doc
 
 ### Architecture Approach
 
-The architecture is a layered, single-source-of-truth pattern: one `APP_STATE` object is the only place data lives. Controllers write to it; the calculation engine reads from it and writes outputs back to it; a single `render(state)` function reads from it to update the DOM and chart. This prevents the chart and summary table from diverging, and makes the app debuggable by logging the state object. The calculation engine must be pure functions with no DOM access — this is non-negotiable for a numerics-heavy app where formula correctness must be verifiable against worked examples.
+The architecture is additive: `App.tsx` gains a hash discriminator and an early-return branch that renders `<DocLayout>` instead of the existing calculator JSX; `AppHeader.tsx` gains a `view` prop for conditional nav links; three new components (`DocLayout`, `DocSidebar`, `DocContent`) land in `src/components/docs/`; and a `useDocSections` hook in `src/hooks/` extracts headings from the raw Markdown string via regex (avoiding post-render DOM queries). The existing `url-state.ts`, `src/engine/`, and all calculator components are completely untouched. Calculator React state survives view switches because it lives in `App.tsx` state variables, not in the component tree being swapped.
 
 **Major components:**
-1. **Reference Data** (`REFERENCE_DATA` constant) — French salary defaults, loaded-cost multipliers, divergence rates, COCOMO factors; read-only at runtime; every value cites its research doc section
-2. **Calculation Engine** (pure functions) — `StandaloneCalc`: story points → effort → cost; `ComparisonCalc`: shared vs duplicated costs over N years, break-even detection returning `null | number`
-3. **State Store** (`APP_STATE`) — single plain JS object; mutated only by Controller; read by Engine and render functions
-4. **Controller** — DOM event handlers that write to state, call Engine, trigger render; no calculation logic
-5. **HTML Shell + Pico CSS** — static layout skeleton; team input section, factor sliders, results area, chart canvas
-6. **Chart Panel** — one Chart.js instance per canvas, held in a module-level variable; updated via `chart.data.datasets[n].data = newData; chart.update()` (never destroy/recreate on state change)
-7. **Results Summary** — `renderResults(state)` reads state, writes to DOM; isolated from Engine
-
-**Suggested build order (bottom-up, dependency-driven):**
-Reference Data → Calculation Engine (test in console against worked examples) → HTML Shell → Chart Initialization → State Store + Controller → Render Functions → Standalone Cost View → Comparison + Break-even View → Polish
-
-See: `.planning/research/ARCHITECTURE.md`
+1. `App.tsx` (modified) — hash discriminator on mount and `hashchange`; `view` state (`'calculator' | 'docs'`); guard on the debounced hash-write effect to not overwrite `/docs` hash
+2. `AppHeader.tsx` (modified) — accepts `view` prop; renders "Documentation" link in calculator view, "Calculator" link in docs view; Copy Link and Reset buttons hidden in docs view
+3. `DocLayout` (new) — thin two-column shell; owns the `useDocSections` call; passes sections to `DocSidebar`, renders `DocContent`
+4. `DocSidebar` (new) — receives `DocSection[]`; renders anchor links; tracks active section via IntersectionObserver
+5. `DocContent` (new) — imports `docs/feature-cost-shared-vs-duplicated.md?raw`; renders via `<ReactMarkdown>` with prose classes; heading component overrides include `scroll-margin-top` for fixed header clearance
+6. `useDocSections` (new hook) — pure regex parse of Markdown string; returns `{ id, label, depth }[]`; `useMemo`-wrapped for stability
 
 ### Critical Pitfalls
 
-1. **Formula drift from the research document** — The formulas in sections 7.1–7.5 are multi-term with time-varying coefficients (e.g., `Double_Maintenance_Factor(year) = 1.8 + 0.05 × year`). Implement all formulas as pure functions first, then validate each against the worked numerical examples in the research doc before touching the UI. If year=1 output does not match the doc's 52,000 € example, stop and fix the formula.
+1. **Hash namespace collision** — The existing `decodeAppState` reads `window.location.hash` on mount; the new view router also writes `#/docs`. Resolution: prefix-based discrimination (`/` prefix for routes, base64url never produces `/`). Guard the hash-write effect with `if (view === 'docs') return`. Must be addressed in Phase 1 — retrofitting after sidebar is built is a full rewrite.
 
-2. **Scattered global state** — In vanilla JS, state tends to accumulate in DOM values, component variables, and chart internals. Enforce the `APP_STATE` single-object pattern from day one. Every event handler writes to `APP_STATE` and calls `render()`; no DOM reads inside calculation functions. The warning sign is chart and table showing different values for the same metric.
+2. **Heading IDs collide with hash state** — `rehype-slug` generates plain heading IDs by default; a short section name could produce a valid base64 string. Resolution: always configure `rehype-slug` with `prefix: 'doc-'`. One config option, zero implementation cost.
 
-3. **Floating-point errors in euro outputs** — Chain-multiplied formulas (e.g., `Nb_Devs × Hourly_Cost × Dev_Hours × GeneralizationFactor`) accumulate IEEE 754 drift. Apply `Math.round(value * 100) / 100` at every formula output boundary. Display using `toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })`. This can shift the break-even year by ±1 if not handled.
+3. **react-markdown re-parses on every render** — If `<ReactMarkdown>` or its `components` prop object is inside a frequently re-rendering parent, it re-parses the full 45KB doc on every render. Resolution: import Markdown as a module-level constant via `?raw`; define the `components` object as a module-level constant; render docs and calculator as mutually exclusive top-level branches.
 
-4. **Unhandled no-break-even case** — Under high generalization factor or short time horizon, cumulative costs never cross. The break-even function must return `null | number`. The UI must explicitly display "No break-even within [N]-year horizon" — this is a meaningful model output, not a bug. Test with `GeneralizationFactor=2.0` and `horizon=1`.
+4. **IntersectionObserver sidebar flicker at section boundaries** — Short sections cause simultaneous intersection events for adjacent headings, making the active highlight flicker. Resolution: maintain a `visibleSections` Map of ID to intersection ratio; derive active section as highest-ratio visible entry; use `rootMargin: '-10% 0px -80% 0px'` to bias toward the topmost section.
 
-5. **Chart.js instance memory leak** — Calling `new Chart()` on every render without destroying the previous instance causes stale event accumulation and console warnings. Store the instance in a module-level variable; call `chart.data.datasets[n].data = newData; chart.update()` on state changes.
+5. **Fixed AppHeader obscures anchor scroll targets** — Default browser anchor scroll aligns the heading to the viewport top, placing it behind the fixed header. Resolution: add `scroll-margin-top` (~`4rem`) to all heading component overrides in react-markdown's `components` prop. One CSS property, invisible in testing unless you test with sections below the fold.
 
-6. **Input interdependency division-by-zero** — `velocity=0` or `team size=0` produces `Infinity` or `NaN` that propagates silently through all downstream calculations. Every division by a user-controlled value needs an explicit guard (`velocity > 0 ? ... : 0`) with inline validation messages on the input.
-
-See: `.planning/research/PITFALLS.md`
+6. **Copy Link button captures doc anchor as calculator share URL** — If AppHeader is rendered identically in both views, clicking Copy Link on the docs page writes a doc anchor fragment to clipboard. Recipient loads the calculator at defaults. Resolution: pass `activeView` prop to AppHeader; hide Copy Link and Reset in docs view.
 
 ## Implications for Roadmap
 
-The architecture research defines a clear build order with hard dependencies. Phases must follow this order — building the UI before validating the engine is the #1 recovery-cost pitfall identified in research.
+Based on the dependency graph and pitfall severity, three phases are recommended.
 
-### Phase 1: Formula Foundation and State Architecture
+### Phase 1: Routing Foundation
 
-**Rationale:** The calculation engine and state object must exist and be verified before any UI is built. Recovery cost if formula drift is discovered after UI construction is HIGH. All downstream phases depend on a correct, tested engine. This phase has no external dependencies and requires no rendering — it is pure logic.
+**Rationale:** The hash namespace collision is a load-bearing constraint. Every other docs feature depends on a stable routing discriminator. Building sidebar navigation or Markdown rendering before this is resolved means retrofitting later at high cost. The architecture research confirms this is the integration spine — everything hangs off it.
 
-**Delivers:** Verified `REFERENCE_DATA` constants, pure calculation functions for all formulas in research doc sections 7.1–7.5, break-even function with null-safe return, rounding utility for euro display, `APP_STATE` schema, controller pattern established.
+**Delivers:** Safe view switching between calculator and docs with no state corruption; `#/docs` hash correctly routes to docs view; `#eyJ...` hashes continue to restore calculator state unchanged; hash-write effect guarded; AppHeader shows correct nav links per view.
 
-**Addresses features:** None visible yet — this phase is invisible to users but enables all subsequent phases.
+**Addresses:** Hash routing scheme (P1 feature), AppHeader nav links (P1 feature)
 
-**Avoids pitfalls:** Formula drift (pitfall 1), floating-point errors (pitfall 3), no-break-even unhandled case (pitfall 4), scattered global state (pitfall 2).
+**Avoids:** Pitfall 1 (hash namespace collision), Pitfall 2 (heading ID prefix — configure `rehype-slug` before any headings are rendered), Pitfall 6 (Copy Link — hide in docs view)
 
-**Verification gate:** All worked numerical examples from research doc sections 7.1–7.5 pass in browser console. Break-even returns `null` for `GeneralizationFactor=2.0`, `horizon=1`.
+**Sequence within phase:**
+1. Add `.md?raw` TypeScript declaration to `src/vite-env.d.ts`
+2. Add `view` state + `hashchange` listener + hash-write guard to `App.tsx`
+3. Modify `AppHeader.tsx` with `view` prop; hide Copy Link and Reset in docs view
+4. Render a `null` placeholder for docs view — confirm routing works end-to-end before building the doc page
 
-### Phase 2: HTML Shell, Input Form, and Static Layout
+### Phase 2: Doc Page Implementation
 
-**Rationale:** With a verified engine, the HTML structure and input form can be built knowing exactly what state fields are needed. This phase establishes the layout that all remaining phases build into. Pico CSS handles semantic styling without custom class work.
+**Rationale:** With routing solid, the doc page can be built without collision risk. This phase delivers the core milestone value: the research document rendered and navigable in-app.
 
-**Delivers:** Functional input form (team composition, story points or hours, velocity, time horizon slider, factor inputs), static layout skeleton, CDN links loaded in correct order, `APP_STATE` connected to input events, standalone cost calculation visible.
+**Delivers:** Fully rendered research document with prose typography, working tables, functional sidebar anchor links, and correct scroll offsets under the fixed header.
 
-**Uses:** Alpine.js for reactive form binding, Pico CSS for layout, Controller pattern from Phase 1.
+**Uses:** `react-markdown`, `remark-gfm`, `rehype-slug` (with `prefix: 'doc-'`), `@tailwindcss/typography`, Vite `?raw` import
 
-**Addresses features:** Team composition input, feature size input (SP + hours), time horizon slider, research-backed defaults pre-filled, standalone feature cost output (validates engine before comparison is added).
+**Implements:** `DocContent`, `useDocSections` hook, `DocLayout` shell, `DocSidebar` (static anchor links, no scroll-spy yet)
 
-**Avoids pitfalls:** Input interdependency / division-by-zero (pitfall 6 — validation ranges established here).
+**Avoids:** Pitfall 3 (re-parse — module-level constant for both Markdown string and `components` object), Pitfall 5 (scroll-margin-top — add to heading overrides at initial implementation)
 
-### Phase 3: Comparison Engine and Chart Visualization
+**Sequence within phase:**
+1. Install four packages
+2. Build `useDocSections` hook; verify against raw Markdown string
+3. Build `DocContent` with ReactMarkdown, GFM plugin, rehype-slug, prose classes, heading overrides
+4. Build `DocSidebar` with static anchor links
+5. Build `DocLayout` two-column shell; wire into App.tsx replacing the placeholder
+6. Verify heading IDs match sidebar `href` values end-to-end
 
-**Rationale:** The comparison view (shared vs duplicated curves) is the core product value and depends on both the verified engine (Phase 1) and the state/input infrastructure (Phase 2). The Chart.js instance lifecycle must be established before inputs are connected to avoid the memory leak pitfall.
+### Phase 3: Sidebar Polish
 
-**Delivers:** Dual cumulative cost curves (shared path vs duplicated path), break-even annotation on chart (or "no break-even" UI state), N-copy input for number of teams, cost breakdown table by category (initial dev, maintenance, coordination, bugs, divergence).
+**Rationale:** The doc is readable and navigable after Phase 2. This phase upgrades sidebar navigation from functional to polished: scroll-spy active highlighting, sidebar auto-scroll, smooth scroll, and responsive collapse.
 
-**Uses:** Chart.js 4.5.1, `updateChart()` pattern (mutate data in place, call `chart.update()`), `renderResults(state)` function.
+**Delivers:** Active section highlighted in sidebar as user scrolls; sidebar auto-scrolls to keep active item visible; smooth scroll on anchor click; sidebar collapses on narrow viewports.
 
-**Addresses features:** Shared vs duplicated comparison, temporal cost curves, break-even point, cost breakdown table, divergence rate modeling.
+**Implements:** IntersectionObserver scroll-spy in `DocSidebar`, `scrollIntoView` auto-scroll on active section change, `scroll-behavior: smooth`, responsive breakpoint (Tailwind `hidden lg:block`)
 
-**Avoids pitfalls:** Chart instance memory leak (pitfall 5 — instance stored in module-level variable, never recreated on render).
-
-### Phase 4: Advanced Inputs, Overrides, and Presentation Polish
-
-**Rationale:** Once the core calculation and visualization work, the differentiating features (overridable factors, divergence modeling controls, presentation-ready styling) are safe to add. These enhance the core without changing it. UX polish for stakeholder presentations belongs here.
-
-**Delivers:** All named formula constants (GeneralizationFactor, PortingFactor, DoubleMaintenance base, DivergenceRate, MaintenanceRate) user-adjustable via sliders or inputs; plain-language labels on all factor inputs (not raw parameter names); break-even prominently annotated with text callout; Y-axis starting at 0; per-copy coordination overhead visible as cost line; text summary of model assumptions.
-
-**Addresses features:** Overridable advanced inputs, divergence rate modeling (non-linear), coordination overhead as explicit cost line, generalization factor adjustment, annotation of research citations (tooltip per coefficient).
-
-**Avoids pitfalls:** Hardcoded factors (technical debt pattern — factors must be adjustable per requirements), UX label clarity for presentations.
-
-### Phase 5: Sharing and Export (v1.x)
-
-**Rationale:** URL-encoded state and presentation-ready export are additive features that do not change the core model. They should be added after at least one real stakeholder use to confirm the browser Print-to-PDF path is insufficient.
-
-**Delivers:** URL hash state encoding for scenario sharing (no server, no account), citation tooltips per formula constant, chart export guidance (SVG/PNG or browser print), validation that `#` fragment params (not `?` query params) are used to keep salary data out of server logs.
-
-**Addresses features:** URL-encoded state / scenario sharing, citation annotations (tooltips), chart export.
+**Avoids:** Pitfall 4 (IntersectionObserver flicker — implement map-based approach with `rootMargin` from the start, not a naive per-entry setter)
 
 ### Phase Ordering Rationale
 
-- **Engine before UI** is mandated by the PITFALLS research: formula drift discovered after the UI is built has HIGH recovery cost. Building engine first means the UI is assembled around a proven model.
-- **Input form before chart** because Chart.js needs real state values to initialize with; connecting an empty chart to unvalidated inputs creates ambiguous bugs.
-- **Core comparison before advanced factors** because advanced inputs are overrides of working defaults — they cannot be tested until the default-driven comparison works correctly.
-- **Sharing/export last** because they are genuinely additive and do not block stakeholder use.
+- Phase 1 before Phase 2: The routing discriminator is the integration spine. Any Markdown rendering built before the hash-write guard is in place risks corrupting navigation state.
+- rehype-slug `prefix: 'doc-'` confirmed in Phase 1: The sidebar `href` values in Phase 2 must match the heading IDs. Setting the prefix in Phase 1 (when routing is being configured) establishes the contract before any headings are rendered.
+- Phase 2 before Phase 3: `DocSidebar` must exist as a static component before scroll-spy behavior can be layered on. Active highlighting has no value without working anchor links.
 
 ### Research Flags
 
-Phases with standard, well-documented patterns (skip research-phase during planning):
-- **Phase 2** — HTML form construction + Alpine.js reactive binding is well-documented in Alpine docs; no novel patterns
-- **Phase 3** — Chart.js line chart + dataset update pattern is thoroughly documented in official docs and confirmed in architecture research
-- **Phase 5** — URL hash encoding is a standard browser pattern; no research needed
+Phases with standard patterns (no additional research-phase needed):
+- **Phase 1:** Hash discrimination pattern is deterministic from reading `src/App.tsx` and `src/lib/url-state.ts`; base64url alphabet is formally specified (RFC 4648); implementation approach is fully documented in ARCHITECTURE.md with code examples
+- **Phase 2:** react-markdown, remark-gfm, rehype-slug, and @tailwindcss/typography all have official documentation and verified version compatibility; Vite `?raw` import is documented and confirmed
+- **Phase 3:** IntersectionObserver scroll-spy has well-documented patterns (CSS-Tricks, MDN, LogRocket); map-based approach is established community best practice with code examples in PITFALLS.md
 
-Phases that may benefit from targeted research during planning:
-- **Phase 1** — The formula implementation should be traced against `/docs/feature-cost-shared-vs-duplicated.md` sections 7.1–7.5 directly; the research doc is the primary source and must be read closely before coding begins. No external research needed, but a formula-mapping exercise (research doc → function signatures) is recommended as a pre-coding step.
-- **Phase 4** — UX patterns for factor sliders in technical tools may benefit from a brief look at comparable calculators (HubSpot TCO, Commercetools) to confirm labeling conventions for non-technical stakeholders.
+No phase requires a `/gsd:research-phase` before implementation can begin. All integration points are resolved.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All library versions confirmed from official GitHub releases and jsDelivr; CDN load order confirmed from Alpine.js official install docs |
-| Features | MEDIUM | Table stakes inferred from Azure TCO / Codacy analogues; differentiators derived from the project research doc and competitive gap analysis — novel domain, no direct competitor to benchmark against |
-| Architecture | HIGH | Centralized state + pure engine + single render loop is a well-established pattern for vanilla JS dashboards; anti-patterns confirmed from Chart.js official docs and JS state management sources |
-| Pitfalls | HIGH | Formula-level pitfalls derived directly from the project research doc worked examples (sections 7.1–7.5); Chart.js and floating-point pitfalls confirmed from official and community sources |
+| Stack | HIGH | All four package versions verified against npm registry on 2026-03-24; Tailwind v4 compatibility verified against tailwindcss-typography release notes; Vite `?raw` import confirmed in official docs |
+| Features | HIGH | Table stakes derived from analogous tools (Docusaurus, VitePress, GitHub Markdown rendering) and direct analysis of the 45KB research doc content; P1/P2/P3 priorities based on direct impact analysis |
+| Architecture | HIGH | Integration points are deterministic from reading the existing codebase — no inferences, only code analysis of `App.tsx`, `url-state.ts`, `AppHeader.tsx`; base64url alphabet (RFC 4648) confirms disjoint hash namespaces |
+| Pitfalls | HIGH | Core hash collision pitfall directly observable in existing code; Markdown rendering pitfalls sourced from react-markdown GitHub issues; IntersectionObserver pitfalls from MDN and CSS-Tricks |
 
-**Overall confidence:** HIGH for build approach and architecture; MEDIUM for feature prioritization beyond the MVP core (the tool's niche is novel and no direct competitor validation exists).
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Exact formula mapping:** The research doc (`/docs/feature-cost-shared-vs-duplicated.md`) sections 7.1–7.5 contain the authoritative formulas. A formula-to-function mapping exercise should be done as the first step of Phase 1, before writing any code — this is not a research gap but an implementation prerequisite.
-- **French salary defaults:** The research doc section 1.3 provides loaded hourly costs for four seniority levels (32–68 €/h). These must be transcribed exactly into `REFERENCE_DATA` — not derived from gross salary. Verify during Phase 1.
-- **Validation ranges for inputs:** Exact min/max values for story points, velocity, salary, time horizon, and factor sliders are documented in PITFALLS.md but should be confirmed against the research doc before Phase 2 form construction.
-- **Break-even edge case behavior:** The UX for "no break-even within horizon" needs a design decision before Phase 3: inline chart message, summary table callout, or both. Decide before implementing the visualization.
+- **Sidebar auto-scroll timing:** `scrollIntoView({ behavior: 'smooth', block: 'nearest' })` on the active sidebar item is the recommended approach, but the exact timing (synchronous with state update vs. deferred in a `useEffect`) needs to be validated during Phase 3 to avoid scroll conflicts between sidebar auto-scroll and the main document scroll.
+- **Docs-to-calculator transition flash:** When navigating from docs back to calculator, the hash-write effect re-encodes state after a 300ms debounce. There is a brief window where the hash is empty. This is likely imperceptible but should be verified during Phase 1 to rule out any flash of default state.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `/docs/feature-cost-shared-vs-duplicated.md` — formula definitions, worked numerical examples, French salary data, COCOMO factors (sections 1.3, 7.1–7.5)
-- Alpine.js GitHub releases + official install docs — v3.15.8 confirmed stable, CDN URL and defer requirement verified
-- Chart.js GitHub releases + official API docs — v4.5.1 confirmed latest stable; instance lifecycle patterns verified
-- Pico CSS GitHub releases — v2.1.1 confirmed latest
+
+- npm registry (`npm info [package] version`) — react-markdown@10.1.0, remark-gfm@4.0.1, rehype-slug@6.0.0, rehype-autolink-headings@7.1.0, @tailwindcss/typography@0.5.19 all verified
+- GitHub tailwindlabs/tailwindcss-typography releases — v0.5.15+ Tailwind v4 support via `@plugin` directive confirmed
+- Vite documentation: https://vite.dev/guide/assets — `?raw` suffix as built-in static asset handling
+- RFC 4648 §5 — base64url alphabet: `A-Z a-z 0-9 - _` (no `/` character, confirming disjoint hash namespace)
+- react-markdown GitHub: https://github.com/remarkjs/react-markdown — ESM-only, TypeScript types included in package
+- rehype-slug README — `prefix` option and DOM Clobbering warning documented
+- MDN: Intersection Observer API — https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+- Existing codebase analysis: `src/App.tsx`, `src/lib/url-state.ts`, `src/components/AppHeader.tsx`
 
 ### Secondary (MEDIUM confidence)
-- Azure TCO Calculator (feature UX reference, being deprecated Aug 2025) — table stakes feature expectations
-- Codacy Technical Debt Calculator — cost breakdown table conventions
-- HubSpot TCO Calculator — advanced input UX reference
-- WebSearch: "vanilla JS reactive UI without framework no build step 2025" — Alpine.js as standard confirmed across multiple sources
+
+- WebSearch: "react-markdown vs marked vs remark react 2026" — react-markdown confirmed dominant for React integration
+- WebSearch: "hash routing React no react-router 2025" — native `window.location.hash` confirmed viable for simple SPA view-switching
+- CSS-Tricks: Table of Contents with IntersectionObserver — map-based active tracking approach
+- Strapi: React Markdown Complete Guide 2025 — security and rehype-sanitize recommendations
+- LogRocket: Create table of contents with highlighting in React — IntersectionObserver implementation reference
 
 ### Tertiary (LOW confidence)
-- ECharts v6.0.0 (July 2025 release, new major) — considered and rejected in favor of Chart.js for this use case; bundle size differential confirmed
-- Vibidsoft / NamasteDev state management articles (2025/2026) — supporting evidence for centralized state pattern
+
+- react-markdown GitHub Issues #899 and #289 — re-render performance issues (confirmed pattern but no precise benchmark for this specific document size)
 
 ---
-*Research completed: 2026-03-23*
+*Research completed: 2026-03-24*
 *Ready for roadmap: yes*
