@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: React Rebuild
 status: Ready to execute
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-24T10:08:49.711Z"
+stopped_at: "Checkpoint: 06-02 Task 2 human-verify"
+last_updated: "2026-03-24T10:11:35.103Z"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -80,6 +80,7 @@ Recent decisions affecting current work:
 - [Phase 05]: base-ui Slider onValueChange union type requires Array.isArray guard; CollapsibleTrigger renders button natively (no asChild); useState<number> needed with as-const literals
 - [Phase 06]: Base64URL padding formula uses (4 - (hash.length % 4)) % 4 — handles all lengths including already-aligned
 - [Phase 06]: AppHeader uses named export matching existing component conventions; clipboard.writeText uses .then() callback to avoid async event handler
+- [Phase 06]: AlertDialogTrigger uses base-ui render prop pattern not Radix asChild — base-ui Trigger does not support asChild prop
 
 ### Pending Todos
 
@@ -92,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T10:08:49.708Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-24T10:11:30.608Z
+Stopped at: Checkpoint: 06-02 Task 2 human-verify
 Resume file: None
