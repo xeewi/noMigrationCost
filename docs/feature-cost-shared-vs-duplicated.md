@@ -437,6 +437,62 @@ Onboarding_Cost = 3 × (60 × 50 + 20 × 65) = 3 × (3,000 + 1,300) = 12,900 €
 | Onboarding | — | 12,900 € | 12,900 € | 12,900 € |
 | **Total Cumulative** | **52,000 €** | **118,954 €** | **185,908 €** | **252,862 €** |
 
+### 7.1.1 Standalone Cost Model — Organizational Costs Included
+
+#### Overview
+
+A feature built by a single team and not shared across codebases still incurs **organizational costs** beyond initial development and maintenance. Even without consuming teams, versioning, consumer support, and developer onboarding are ongoing realities for any maintained codebase. These costs are now included in the standalone cost model.
+
+#### Organizational Cost Components
+
+**Versioning Cost** — Managing releases even for internal, single-consumer features:
+```
+Annual_Versioning_Cost = 12 releases/year × 3h/release × Hourly_Rate
+                       = 36h/year
+```
+With 12 monthly releases at 3h each (changelog, version bump, test verification):
+```
+Annual_Versioning_Cost = 36 × 65 €/h = 2,340 €/year
+```
+
+**Consumer Support Cost** — Time answering questions, onboarding other developers in the same team onto the feature:
+```
+Annual_Support_Cost = 7.5h/week × 52 weeks × Hourly_Rate
+                    = 390h/year
+```
+```
+Annual_Support_Cost = 390 × 65 €/h = 25,350 €/year
+```
+
+**Onboarding Cost** — New developers joining the team must learn the feature:
+```
+Onboarding_Cost = Nb_New_Devs × (Training_Hours × Mid_Rate + Mentoring_Hours × Senior_Rate)
+```
+For 3 new developers per year (60h training at mid-level rate, 20h mentoring at senior rate):
+```
+Onboarding_Cost = 3 × (60 × 50 + 20 × 65) = 3 × 4,300 = 12,900 €/year
+```
+
+**Coordination Cost** — For standalone features (no consuming codebases), this defaults to **0**. It scales with the number of consuming codebases when shared.
+
+#### Corrected Standalone Total — Reference Example
+
+For the reference example (rate = 65 €/h, devHours = 400h, horizon = 3 years, maintenanceRate = 0.18, generalizationFactor = 1.3, nbConsumingCodebases = 0):
+
+| Item | Year 0 | Year 1 | Year 2 | Year 3 |
+|------|--------|--------|--------|--------|
+| Initial Dev | 33,800 € | — | — | — |
+| Annual Maintenance | — | 6,084 € | 6,084 € | 6,084 € |
+| Annual Versioning | — | 2,340 € | 2,340 € | 2,340 € |
+| Consumer Support | — | 25,350 € | 25,350 € | 25,350 € |
+| Onboarding | — | 12,900 € | 12,900 € | 12,900 € |
+| Coordination | — | 0 € | 0 € | 0 € |
+| **Total Cumulative** | **33,800 €** | **80,474 €** | **127,148 €** | **173,822 €** |
+
+The corrected standalone total over 3 years is **173,822 €**, compared to a dev+maintenance-only estimate of **52,052 €**. The difference — 121,770 € — represents the organizational overhead that is invisible in naive cost estimates.
+
+> **Note:** The previous standalone estimate of ~52,052 € (dev + 3 years of maintenance) excluded versioning, support, and onboarding costs. The calculator now includes these by default to reflect real-world team costs.
+
 ---
 
 ### 7.2 Total Cost — Duplicated Code Approach
