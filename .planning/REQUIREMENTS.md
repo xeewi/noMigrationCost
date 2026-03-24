@@ -77,6 +77,35 @@ Requirements for Author Branding milestone. Each maps to roadmap phases.
 
 - [ ] **HEAD-01**: Every source file contains a comment header with author name, creation date, and project identifier
 
+## v1.2 Requirements
+
+Requirements for Documentation milestone. Each maps to roadmap phases.
+
+### Routing
+
+- [ ] **ROUTE-01**: User can navigate to the documentation page via a link in the AppHeader
+- [ ] **ROUTE-02**: User can navigate back to the calculator via a link in the AppHeader from the docs page
+- [ ] **ROUTE-03**: User can share a URL that deep-links to a specific documentation section (e.g. `#/docs/section-id`)
+- [ ] **ROUTE-04**: User can use browser back/forward to switch between calculator and docs views
+- [ ] **ROUTE-05**: User's calculator inputs are preserved when switching to docs and back
+
+### Documentation Rendering
+
+- [ ] **DOC-01**: User can read the full research document rendered as HTML on the docs page
+- [ ] **DOC-02**: User can see GFM tables rendered correctly (pipe tables from the research doc)
+- [ ] **DOC-03**: User can see properly styled prose (headings, paragraphs, lists, links) via Tailwind Typography
+- [ ] **DOC-04**: User can click a sidebar anchor link and land at the correct heading without it being hidden behind the fixed header
+
+### Sidebar Navigation
+
+- [ ] **NAV-01**: User can see a left sidebar listing all document sections as clickable anchor links
+- [ ] **NAV-02**: User can see the currently visible section highlighted in the sidebar as they scroll
+- [ ] **NAV-03**: Sidebar auto-scrolls to keep the active section link visible when the document is long
+
+### Source File Headers
+
+- [ ] **HEAD-01**: Every source file contains a comment header with author name, creation date, and project identifier
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -161,4 +190,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-24 — v1.1 traceability added (Phase 7, Phase 8)*
+*Last updated: 2026-03-24 — v1.2 requirements added (Routing, Documentation Rendering, Sidebar Navigation, Source File Headers)*
