@@ -1,5 +1,5 @@
 ---
-status: complete
+status: resolved
 phase: 05-comparison-view-chart-and-advanced-controls
 source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md]
 started: 2026-03-24T00:00:00Z
@@ -74,11 +74,14 @@ blocked: 0
 ## Gaps
 
 - truth: "Consuming Teams input accepts values from 1 to 10"
-  status: failed
+  status: resolved
   reason: "User reported: It should be able to go to 1"
   severity: major
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "ConsumingTeams.tsx hardcodes min=2 in three places: fallback on NaN (line 25), Math.max clamp (line 27), and HTML min attribute (line 42). ENGINE_DEFAULTS.nbConsumingCodebases is also 2 but that's the default value, not the minimum."
+  artifacts:
+    - path: "src/components/ConsumingTeams.tsx"
+      issue: "min hardcoded to 2 on lines 25, 27, 42 — should be 1"
+  missing:
+    - "Change min from 2 to 1 in ConsumingTeams.tsx (3 locations)"
   debug_session: ""
