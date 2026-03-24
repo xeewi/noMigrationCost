@@ -52,6 +52,10 @@ export interface StandaloneOutputs {
   annualMaintenanceCost: number;
   totalMaintenanceCost: number;
   totalStandaloneCost: number;
+  annualVersioningCost: number;
+  annualSupportCost: number;
+  annualCoordinationCost: number;
+  annualOnboardingCost: number;
   breakdown: BreakdownRow[];
 }
 
