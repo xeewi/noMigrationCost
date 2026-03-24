@@ -86,7 +86,7 @@ Plans:
 | 10. Sidebar Polish | v1.2 | 1/1 | Complete | 2026-03-24 |
 | 11. Source File Headers | v1.2 | 1/1 | Complete | 2026-03-24 |
 | 12. Standalone Organizational Costs | — | 2/2 | Complete    | 2026-03-24 |
-| 13. Story Points Input Clearing Bug | — | 1/1 | Complete   | 2026-03-24 |
+| 13. Story Points Input Clearing Bug | — | 1/1 | Complete    | 2026-03-24 |
 
 ## Backlog
 
