@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: React Rebuild
-status: Ready to plan
-stopped_at: Completed 11-source-file-headers-01-PLAN.md
-last_updated: "2026-03-24T20:25:14.390Z"
+milestone: v1.2
+milestone_name: Documentation
+status: Milestone v1.2 shipped — planning next milestone
+stopped_at: v1.2 milestone archived
+last_updated: "2026-03-24T20:44:52.662Z"
 progress:
   total_phases: 11
   completed_phases: 9
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** Phase 11 — source-file-headers
+**Current focus:** Planning next milestone
 
 ## Current Position
 
