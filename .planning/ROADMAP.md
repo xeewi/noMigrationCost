@@ -58,10 +58,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Goal:** Enrich the Standalone cost model with organizational costs (support, versioning, onboarding, coordination) that currently only appear in Shared/Duplicated paths. A feature built by a single team still incurs these costs — the current Standalone mode underestimates by ~5× because it only counts dev + maintenance.
 **Requirements:** ORG-ENGINE, ORG-BREAKDOWN, ORG-UI, ORG-DOCS
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 12-01-PLAN.md — Engine: extend calcStandaloneCost with organizational costs + tests
+- [x] 12-01-PLAN.md — Engine: extend calcStandaloneCost with organizational costs + tests
 - [ ] 12-02-PLAN.md — UI footer fix + documentation update
 
 ### Phase 13: Story Points Input Clearing Bug
@@ -85,7 +85,7 @@ Plans:
 | 9. Doc Page Implementation | v1.2 | 1/1 | Complete | 2026-03-24 |
 | 10. Sidebar Polish | v1.2 | 1/1 | Complete | 2026-03-24 |
 | 11. Source File Headers | v1.2 | 1/1 | Complete | 2026-03-24 |
-| 12. Standalone Organizational Costs | — | 0/2 | Not Started | — |
+| 12. Standalone Organizational Costs | — | 1/2 | In Progress|  |
 | 13. Story Points Input Clearing Bug | — | 0/0 | Not Started | — |
 
 ## Backlog

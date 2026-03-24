@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Milestone v1.2 shipped — planning next milestone
-stopped_at: Phase 12 context gathered
-last_updated: "2026-03-24T21:00:59.357Z"
+status: Ready to execute
+stopped_at: Completed 12-01-PLAN.md — calcStandaloneCost extended with org costs
+last_updated: "2026-03-24T21:34:31.016Z"
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** Planning next milestone
+**Current focus:** Phase 12 — standalone-organizational-costs
 
 ## Current Position
 
-Phase: 998.1
-Plan: Not started
+Phase: 12 (standalone-organizational-costs) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Plan: Not started
 | Phase 10-doc-page-implementation P01 | 2 | 3 tasks | 5 files |
 | Phase 10-sidebar-polish P01 | 2 | 2 tasks | 3 files |
 | Phase 11-source-file-headers P01 | 4 | 2 tasks | 36 files |
+| Phase 12-standalone-organizational-costs P01 | 16 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 10-sidebar-polish]: bestRatio > 0 guard preserves active state when all headings scroll out of observation zone
 - [Phase 10-sidebar-polish]: Lazy useState initializer (ids[0] ?? '') highlights first heading on initial page load without scroll
 - [Phase 11]: JSDoc 5-line block headers with @file/@author/@created/@project applied to all 36 src files
+- [Phase 12-standalone-organizational-costs]: Plan arithmetic typo corrected: totalStandaloneCost with nbConsumingCodebases=2 is 234662 not 234472; reference value 173822 (nbConsumingCodebases=0) is correct
 
 ### Pending Todos
 
@@ -118,6 +120,6 @@ None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T21:00:59.355Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-standalone-organizational-costs/12-CONTEXT.md
+Last session: 2026-03-24T21:34:31.013Z
+Stopped at: Completed 12-01-PLAN.md — calcStandaloneCost extended with org costs
+Resume file: None
