@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: React Rebuild
-status: Ready to plan
-stopped_at: Phase 10 context gathered
-last_updated: "2026-03-24T17:12:46.987Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 10-sidebar-polish-01-PLAN.md
+last_updated: "2026-03-24T17:25:11.552Z"
 progress:
   total_phases: 10
-  completed_phases: 7
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 8
+  total_plans: 16
+  completed_plans: 16
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Make the hidden long-term costs of code duplication visible and quantifiable
-**Current focus:** Phase 10 — doc-page-implementation
+**Current focus:** Phase 10 — sidebar-polish
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 10 (sidebar-polish) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: Not started
 | Phase 09-routing-foundation P01 | 1 | 2 tasks | 2 files |
 | Phase 09-routing-foundation P02 | 5 | 1 tasks | 1 files |
 | Phase 10-doc-page-implementation P01 | 2 | 3 tasks | 5 files |
+| Phase 10-sidebar-polish P01 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Recent decisions affecting current work:
 - [Phase 10-doc-page-implementation]: REHYPE_PLUGINS typed as any[] to resolve readonly tuple vs Pluggable[] TypeScript incompatibility
 - [Phase 10-doc-page-implementation]: Module-level constants for ReactMarkdown plugins prevent re-parse on every parent re-render
 - [Phase 10-doc-page-implementation]: DocsSidebar heading IDs prefixed with doc- matching rehype-slug prefix config for consistent anchor navigation
+- [Phase 10-sidebar-polish]: IntersectionObserver Map-based ratio tracking with rootMargin '-10% 0px -80% 0px' prevents flicker at section boundaries
+- [Phase 10-sidebar-polish]: bestRatio > 0 guard preserves active state when all headings scroll out of observation zone
+- [Phase 10-sidebar-polish]: Lazy useState initializer (ids[0] ?? '') highlights first heading on initial page load without scroll
 
 ### Pending Todos
 
@@ -112,6 +116,6 @@ None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T17:12:46.985Z
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-sidebar-polish/10-CONTEXT.md
+Last session: 2026-03-24T17:25:11.549Z
+Stopped at: Completed 10-sidebar-polish-01-PLAN.md
+Resume file: None
