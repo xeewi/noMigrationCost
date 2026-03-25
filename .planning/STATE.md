@@ -118,6 +118,7 @@ None.
 |---|-------------|------|--------|-----------|
 | 260324-jpj | Move Consuming Teams into Advanced Parameters panel | 2026-03-24 | 3d8a91e | [260324-jpj-move-consuming-teams-into-advanced-param](./quick/260324-jpj-move-consuming-teams-into-advanced-param/) |
 | 260324-jxg | Move Time Horizon near chart (output column) | 2026-03-24 | 7ebd5ed | [260324-jxg-move-consuming-teams-to-top-of-advanced-](./quick/260324-jxg-move-consuming-teams-to-top-of-advanced-/) |
+| 260325-6ga | Fix docs page heading 2.2 broken by markdown link syntax | 2026-03-25 | 5e75c2e | [260325-6ga-fix-docs-page-heading-2-2-broken-by-link](./quick/260325-6ga-fix-docs-page-heading-2-2-broken-by-link/) |
 
 ### Blockers/Concerns
 
@@ -125,6 +126,6 @@ None for v1.2.
 
 ## Session Continuity
 
-Last session: 2026-03-24T22:21:35.536Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-03-25T00:00:00Z
+Stopped at: Completed quick task 260325-6ga
 Resume file: None
