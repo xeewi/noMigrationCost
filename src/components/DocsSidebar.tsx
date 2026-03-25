@@ -13,6 +13,11 @@ export interface HeadingEntry {
   level: 2 | 3;  // h2 or h3 only
 }
 
+/** Strip markdown link syntax [text](url) -> text, preserving link text */
+function stripMarkdownLinks(s: string): string {
+  return s.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').trim();
+}
+
 function toSlug(text: string): string {
   return text
     .toLowerCase()
@@ -29,7 +34,7 @@ export function extractHeadings(markdown: string): HeadingEntry[] {
     const m = line.match(/^(#{2,3})\s+(.+)$/);
     if (!m) continue;
     const level = m[1].length as 2 | 3;
-    const text = m[2].trim();
+    const text = stripMarkdownLinks(m[2]);
     const base = toSlug(text);
     const count = counts[base] ?? 0;
     counts[base] = count + 1;
