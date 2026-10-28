@@ -1,208 +1,177 @@
 # Notes de Présentation — Coût Feature : Code Partagé vs Dupliqué
 
 > Document de référence pour accompagner la présentation. Bullet points pour lecture rapide.
+> Révisé en octobre 2026 après la revue théorique (`docs/revue-theorique-2026-10.md`). Tous les chiffres viennent du moteur du calculateur (`src/engine/formulas.ts`) avec ses valeurs par défaut.
+
+---
+
+## Scénario de référence (utilisé partout)
+
+- **Équipe** : 1 junior, 2 confirmés, 1 senior → taux chargé moyen **40,50 €/h** (France 2026 : 32 / 40 / 50 / 62 €/h pour junior / confirmé / senior / lead)
+- **Feature** : 40 story points, vélocité 10, sprints de 2 semaines → 4 sprints × 2 semaines × 35 h × 4 personnes = **1 120 heures-personnes**
+- **Coût de build d'une copie** : C0 = 1 120 h × 40,50 € = **45 360 €**
+- **2 apps, 5 ans, une nouvelle lib partagée à créer**
+- **Valeurs par défaut** : généralisation G = 1,2, portage p = 0,65, intégration i = 0,2, entretien m = 20 %/an, entretien d'une copie supplémentaire e0 = 1,0, dérive δ = +0,05/an (plafond 1,5), coordination k = 4 %/an par app supplémentaire, nouvelle lib = 280 h de setup + 100 h/an de fonctionnement
 
 ---
 
 ## Slide 2 — Contexte : Pourquoi cette analyse ?
 
-- **Question centrale** : quand on développe une feature pour plusieurs codebases, vaut-il mieux partager le code (lib commune / monorepo) ou dupliquer (copier-adapter) ?
-- **Impact financier massif** : la maintenance = 50-80% du coût total d'un logiciel → le choix initial conditionne le long terme
-- **Pas dogmatique** : chaque approche a ses cas d'usage. L'objectif est de quantifier pour décider
-- **Sources** : modèle COCOMO II, études IEEE sur la propagation de bugs, données salariales France 2025-2026
+- **Question centrale** : quand une feature doit exister dans plusieurs apps, vaut-il mieux la partager (une lib) ou la copier-adapter dans chaque app ?
+- **Chaque coût suit la taille de la feature** : chaque coût est une part de C0 = heures-personnes × taux chargé. Seuls le setup et le fonctionnement d'une nouvelle lib sont des heures fixes
+- **Le taux horaire ne fait jamais basculer le verdict** : l'écart est proportionnel au taux (9 088 € à 32 €/h, 11 502 € à 40,50 €/h, 17 608 € à 62 €/h)
+- **Pas dogmatique** : selon la taille, le nombre d'apps et l'horizon, l'une ou l'autre option gagne
+- **Sources** : modèle de réutilisation COCOMO II, Krüger & Berger (FSE 2020), Ray & Kim (FSE 2012), Poulin, données de coût du travail France 2026. Chaque paramètre est marqué « mesuré » ou « hypothèse »
 
 ---
 
-## Slide 3 — La maintenance domine le coût total
+## Slide 3 — L'entretien est un coût récurrent
 
-- **50-80% du coût total** d'un logiciel est de la maintenance (jusqu'à 90% pour les systèmes legacy)
-- Sur 5 ans : **~21% dev initial** vs **~79% maintenance/évolution**
-- Répartition de la maintenance :
-  - Corrective (bugs) : 17-21%
-  - Adaptative (environnement, OS, APIs) : 18-25%
-  - Perfective (nouvelles features) : 50-60%
-  - Préventive (refactoring) : 4-5%
-- **Conclusion** : optimiser la maintenance a beaucoup plus d'impact que réduire le coût de dev initial
-- Le budget annuel de maintenance = 15-25% du coût de développement initial
-- Sur 5 ans, le coût total = 2x à 4x le dev initial
+- Ordre de grandeur retenu : **~20 % du coût de build par copie et par an** (règle DoD, règle 60/60 de Glass, annual change traffic de Boehm)
+- Une app, une copie, 5 ans : build 45 360 € + entretien 45 360 € → **l'entretien = la moitié du coût sur 5 ans**
+- Le choix se joue donc surtout après la livraison : dans l'entretien des copies supplémentaires
+- Les bugs ne sont pas chiffrés à part : les corriger fait partie de l'entretien. Il n'existe pas de donnée fiable pour chiffrer les « bugs propagés » seuls, et la règle 1-10-100 du coût par phase n'est pas soutenue par les données (Menzies et al., EMSE 2017 : aucun effet du délai sur 171 projets)
 
 ---
 
-## Slide 4 — Coûts initiaux : l'investissement de départ
+## Slide 4 — Coûts initiaux : à peu près égaux pour 2 apps
 
 ### Code partagé
-- Dev initial + surcoût de généralisation : **+20-40% de code** pour rendre le code suffisamment abstrait
-  - Créer des interfaces/abstractions
-  - Options de configuration
-  - Tests plus exhaustifs
-  - Documentation API
-- Setup infrastructure : **5-11 semaines** d'effort dev senior
-  - Config repo/monorepo : 0.5-1 sem
-  - Pipeline CI/CD : 1-2 sem
-  - Documentation : 1-2 sem
-  - Versioning/registry : 0.5-1 sem
-  - Tests d'intégration : 1-2 sem
-- **Exemple chiffré** : 33 800€ (dev) + 18 200€ (setup) = **~52 000€**
+- La construire une fois, pensée pour être partagée : **G = 1,2 × C0** (mesuré : RUSE de COCOMO II 1,07-1,24, Krüger & Berger médiane +20 %) → 54 432 €
+- La brancher dans chaque autre app : **i = 20 % de C0** (Poulin, Krüger & Berger) → 9 072 €
+- Monter une nouvelle lib (repo, CI, versioning, doc) : **280 h** (hypothèse ; 0 si la lib existe) → 11 340 €
+- **Total initial : 74 844 €** (63 504 € si la lib existe déjà)
 
 ### Code dupliqué
-- Dev codebase A : coût de base (ex: 26 000€)
-- Portage codebase B : **+50-80%** de l'effort initial
-  - Le design est déjà fait, les edge cases identifiés
-  - MAIS il faut adapter aux conventions, patterns et deps de la codebase B
-  - Plus les codebases diffèrent, plus le facteur est élevé
-- **Exemple chiffré** : 26 000€ × 1.65 = **~43 000€**
-- **Différence initiale : la duplication est ~20% moins chère au départ**
+- La construire pour la première app : C0 = 45 360 €
+- La copier-adapter dans chaque autre app : **p = 65 % de C0** (mesuré : modèle de réutilisation COCOMO II 0,55-0,8, Selby/NASA) → 29 484 €
+- **Total initial : 74 844 €**
+
+### À retenir
+- **Pour 2 apps avec une nouvelle lib, les coûts initiaux sont égaux.** Copier n'est pas moins cher au départ ; ce qui décide, c'est l'entretien récurrent des copies supplémentaires
 
 ---
 
-## Slide 5 — Le piège : des coûts de maintenance qui accélèrent
+## Slide 5 — Ce qui décide : l'entretien des copies supplémentaires
 
-### Double maintenance (facteur 1.8x → 2.0x+)
-- Chaque bug doit être trouvé et fixé dans les 2 codebases
-- Chaque évolution fonctionnelle : implémentation double (1.5x-2x)
-- Tests de régression : 2x (suites séparées)
-- Code review : 2x (PRs dans 2 repos)
-- Le facteur augmente de +0.05 par an car les copies divergent progressivement
-- Monitoring et alerting : 2x (systèmes séparés)
+### Chaque copie s'entretient (e0 = 1,0)
+- Chaque copie supplémentaire coûte à peu près autant d'entretien par an que la première : 20 % de C0, synchronisation et corrections propagées comprises
+- Indice dans les données : entre forks BSD, 11 à 16 % des changements sont portés depuis le fork voisin, à un rythme stable (Ray & Kim, FSE 2012). La valeur exacte de e0 reste une hypothèse
 
-### Synchronisation croissante (+20%/an d'augmentation)
-- Coût de synchro exponentiel : chaque différence rend les futures synchros plus complexes
-- Année 1 : ~10 000€ → Année 3 : ~14 400€ → Année 5 : ~23 000€
-- Le coût triple en 5 ans (effet boule de neige / composé)
-- À chaque évolution dans A, il faut : comprendre le changement → adapter à B (qui a divergé) → tester dans B → review séparée → déployer dans B
+### Les copies dérivent (δ = +0,05/an, plafond 1,5×)
+- Hypothèse, sans donnée : l'entretien d'une copie supplémentaire augmente de 0,05 par an (1,0 l'année 1 → 1,2 l'année 5)
+- Pas d'exponentielle : des copies qui divergent trop cessent simplement d'être synchronisées
 
-### Bugs propagés : 33% jamais corrigés dans l'autre copie
-- **Étude IEEE sur 4 projets open source Java** : 1/3 des fragments de code clonés qui subissent des corrections de bugs contiennent des bugs propagés (= le même bug non corrigé dans les autres copies)
-- Le clonage multiplie aussi les **vulnérabilités de sécurité** (ACM ESEM 2017)
-- Mécanismes : propagation incomplète, régression croisée, faux sentiment de sécurité
-- Estimation coût bugs supplémentaires : **~50 600€/an** (2 critiques + 6 majeurs + 12 mineurs)
+### Le partage a aussi son entretien
+- Entretien du code partagé : 20 % de 1,2 × C0 = **24 % de C0 par an**
+- Coordination et montées de version cassantes : **k = 4 % de C0 par app supplémentaire et par an** (ordre de grandeur : Krüger & Berger ~5 % vs ~7 % d'effort de coordination ; Xavier 2017 : 14,8 % des changements d'API cassent la compatibilité)
+- Faire tourner une nouvelle lib : **100 h/an** (hypothèse)
 
-### Conclusion slide
-- **La duplication n'est viable que pour des features à durée de vie courte**
+### Conclusion de la slide
+- Coût annuel dans le scénario de référence :
+  - Partagé : 10 886 € d'entretien + 1 814 € de coordination + 4 050 € de fonctionnement = **16 751 €/an**
+  - Dupliqué : 9 072 € pour la première copie + 9 072 € → 10 886 € pour la copie supplémentaire = **18 144 € → 19 958 €/an**
+- L'écart annuel est petit, mais il se paie chaque année et grandit avec le nombre d'apps
 
 ---
 
-## Slide 6 — Comparaison chiffrée sur 3 ans (contexte France)
+## Slide 6 — Projection sur 5 ans (scénario de référence)
 
 ### Tableau des coûts cumulés
 
-| | Année 0 | Année 1 | Année 2 | Année 3 |
+| | Année 0 | Année 1 | Année 3 | Année 5 |
 |---|---|---|---|---|
-| **Code partagé** | 52 000€ | 119 000€ | 186 000€ | 253 000€ |
-| **Code dupliqué** | 43 000€ | 114 000€ | 187 000€ | 263 000€ |
+| **Code partagé** | 74 844 € | 91 595 € | 125 096 € | 158 598 € |
+| **Code dupliqué** | 74 844 € | 92 988 € | 130 637 € | 170 100 € |
+| **Écart** | 0 € | 1 393 € | 5 540 € | 11 502 € |
 
 ### Points clés à retenir
-- **Année 0** : la duplication est ~9 000€ moins chère (pas de setup lib)
-- **Année 1** : les coûts cumulés sont quasi identiques (~5K€ de diff)
-- **Année 2** : le croisement s'opère, la duplication commence à coûter plus
-- **Année 3** : la duplication coûte ~10 000€ de plus — et **l'écart s'accélère ensuite**
-- Au-delà de 3 ans, l'écart se creuse de manière exponentielle
-
-### Hypothèses de calcul
-- Feature de 400h de dev (2 seniors, 5 semaines)
-- Coût horaire fully loaded : 65€/h (senior France)
-- 2 équipes de consumers
-- 8 évolutions par an
-- Taux de divergence : 20%/an
+- **Année 0** : même coût initial
+- Le partage n'est jamais plus cher, donc **il est rentable dès le départ (même coût de construction, moins cher chaque mois ensuite)**
+- L'écart grandit un peu plus vite chaque année à mesure que les copies dérivent : **11 502 € après 5 ans (7 % du coût dupliqué)**
+- **Avec une lib existante** : partagé 127 008 € vs dupliqué 170 100 € → **écart de 43 092 €**
+- La marge est mince pour 2 apps : une généralisation plus chère (G ≥ 1,33) ou un entretien des copies moins cher (e0 < 0,75, seuil ≈ 0,746) fait basculer le verdict
 
 ---
 
-## Slide 7 — Break-even : quand le partage devient rentable
+## Slide 7 — Seuil de rentabilité : lu sur les mêmes courbes
 
-- **Break-even typique : 6 à 18 mois**
-- Dans l'exemple chiffré : **~18 mois** (1 an et demi)
-- Calcul : surcoût initial (26 000€) / économie nette mensuelle (~1 400€/mois)
-- L'économie mensuelle = économie maintenance (~3 100€) - coût coordination (~1 700€)
+- Seuil = **premier mois à partir duquel le partage reste moins cher jusqu'à l'horizon**, lu sur les mêmes courbes cumulées que l'écart (pas de formule à part)
+- Scénario de référence : **mois 0** (même coût initial, entretien moins cher)
+- Petite feature (140 h, nouvelle lib) : **jamais** sur 5 ans. Le partage coûte 47 466 € contre 21 263 € pour la duplication (2,2×), car les heures de setup et de fonctionnement de la lib écrasent la feature
+- Portage bon marché (p = 0,4) : seuil atteint seulement au mois 60
 
-### Ce qui raccourcit le break-even
-- Feature volumineuse (plus d'économies de maintenance)
-- Haute fréquence d'évolution (plus de synchronisation évitée)
-- Bugs fréquents en production (coûts de bugs supplémentaires évités)
-- Plus de 2 codebases consumers → effet multiplicateur
-- Équipes déjà dans un monorepo (setup allégé)
+### Ce qui favorise le partage
+- Feature volumineuse (avec une nouvelle lib et 2 apps, le partage gagne au-delà de ~820 h sur 5 ans)
+- Plus d'apps (avec 3 apps, le seuil tombe à ~340 h)
+- Une lib partagée existe déjà (le partage gagne alors quelle que soit la taille, avec les valeurs par défaut)
+- Horizon long
 
-### Ce qui allonge le break-even
-- Feature petite et stable (peu de maintenance nécessaire)
-- Équipes très indépendantes (coordination coûteuse)
-- Codebases très différentes (généralisation difficile, facteur 1.4+)
-- Feature en fin de vie (peu de temps pour amortir)
-
-### Point important
-- Si l'économie de maintenance < coût de coordination → **le break-even n'existe jamais** = le partage n'est pas rentable pour cette feature
+### Ce qui favorise la copie
+- Petite feature, surtout s'il faut créer une nouvelle lib pour elle
+- Horizon court (1 an : le partage a besoin de ~1 030 h pour gagner)
+- Portage ou entretien des copies bon marché
+- Généralisation coûteuse (apps très différentes)
 
 ---
 
-## Slide 8 — Facteur d'échelle : l'effet multiplicateur
+## Slide 8 — Facteur d'échelle : l'avantage grandit avec le nombre d'apps
 
-### Ratio coût dupliqué / coût partagé sur 3 ans
-- **2 codebases : ratio 1.04x** → quasi équivalent, léger avantage partage
-- **3 codebases : ratio 1.56x** → le partage économise ~160 000€ sur 3 ans
-- **5 codebases : ratio 2.47x** → la duplication coûte 2.5x plus cher
+### Coût dupliqué / partagé sur 5 ans (nouvelle lib)
+- **2 apps : 1,07×** → le partage économise ~11 500 €
+- **3 apps : 1,41×** → le partage économise ~72 700 €
+- **5 apps : 1,92×** → le partage économise ~195 200 €
+- (10 apps : 2,65×, ~501 400 €)
 
-### Pourquoi cette accélération ?
-- Code dupliqué : chaque nouvelle codebase = coût quasi-linéaire (portage + maintenance + synchro + bugs)
-- Code partagé : chaque nouveau consumer = **seulement 5-10% du coût de portage** (intégration de la lib)
-- La formule de Brooks s'applique à la coordination : n(n-1)/2 interfaces
-  - 2 équipes = 1 interface, 3 équipes = 3, 5 équipes = 10
-  - MAIS ce coût de coordination est largement compensé par les économies de maintenance
-
-### Conclusion
-- **À partir de 3 codebases, le partage est clairement gagnant**
-- À 5 codebases, pas de débat possible
+### Pourquoi
+- Chaque copie supplémentaire coûte 65 % du build au départ, puis une part entière d'entretien chaque année (et croissante)
+- Chaque app supplémentaire sur une lib partagée coûte 20 % du build au départ, puis 4 %/an
+- Pas de coordination en n(n−1)/2 : une lib qui sert N apps a environ N interfaces, pas N²
 
 ---
 
-## Slide 9 — Impact organisationnel
+## Slide 9 — Contre-arguments : ce que les chiffres ne disent pas
 
-### Onboarding
-- Code partagé : le dev apprend 1 source + le système de partage → +1-2 sem au processus standard
-- Code dupliqué : le dev doit comprendre les 2 implémentations ET leurs différences
-- Temps avant productivité complète : 3-6 mois sans structure, 8-12 semaines avec onboarding structuré
-- Coût de remplacement d'un dev en France : 50 000-100 000€ (recrutement + onboarding + productivité perdue)
+### Les clones sont souvent inoffensifs
+- Jusqu'à 71 % des clones jugés bénéfiques (Kapser & Godfrey 2008, 2 systèmes)
+- 54 à 72 % des clones qui disparaissent le font en ~8 commits (Kim et al. 2005)
+- Les clones ne sont pas plus sujets aux défauts (Rahman et al. 2012)
 
-### QA / Testing
-- QA = 20-30% de l'effort dev en standard (40-50% pour systèmes critiques)
-- **Duplication = double effort de test** (2 suites, 2 environnements, 2 pipelines)
-- Code review : ~12.5% du temps dev (5h/semaine/dev). Avec duplication = doublé.
+### La mauvaise abstraction
+- « Duplication is far cheaper than the wrong abstraction » (Sandi Metz)
+- Une copie qui doit évoluer différemment n'est pas un coût
+- 49 % des ingénieurs Microsoft gèrent leurs problèmes de dépendances en supprimant des dépendances de code (Begel et al. 2009)
 
-### Product Management
-- Partagé : 1 backlog unifié + surcoût de généralisation des specs (+20%)
-- Dupliqué : 1.3-1.5x effort de planification (2 backlogs à coordonner)
-- Gestion des incidents : 1x (partagé) vs 1.5-2x (dupliqué, investigation dans 2 codebases)
+### Les breaking changes des libs partagées
+- 14,8 % des changements d'API cassent la compatibilité et touchent 2,5 % des clients (Xavier et al., SANER 2017)
+- 81,5 % des systèmes gardent des dépendances obsolètes (Kula et al. 2018)
+- Le modèle ne le chiffre que via k = 4 %/an par app
 
-### Cohérence UX
-- Partagé : **garantie par le code** — même composant = même comportement
-- Dupliqué : dégradation progressive et inévitable
-  - Divergence fonctionnelle au fil du temps
-  - Incohérences UX et bugs spécifiques à chaque version
+### Hors modèle
+- Time-to-market et goulot de release d'une lib partagée
+- Divergence voulue entre apps
+- Cohérence UX (un bénéfice du partage, non chiffré)
+- Actualisation (VAN) : effet faible sur 5 ans
 
 ---
 
-## Slide 10 — Dette technique
+## Slide 10 — Mesuré vs hypothèse
 
-### Chiffre clé
-- **42% du temps dev** est perdu en dette technique et code de mauvaise qualité (Stripe Developer Coefficient 2018)
-  - 13.5h/semaine sur la dette technique
-  - 3.8h/semaine sur du bad code
-  - Sur 41.1h/semaine totales
-- Coût global pour l'économie US : **2 410 milliards $** (CISQ 2022), dont 1 520 milliards $ de dette technique seule
+### Mesuré (fourchettes publiées)
+- Généralisation **G = 1,2** (RUSE de COCOMO II 1,07-1,24, Krüger & Berger ; plage 1,1-1,6)
+- Portage **p = 0,65** (modèle de réutilisation COCOMO II 0,55-0,8, Selby/NASA)
+- Intégration par app supplémentaire **i = 0,2** (Poulin, Krüger & Berger ≈ 0,2-0,33)
+- Entretien **m = 20 %/an**, ordre de grandeur (règle DoD, Glass 60/60, ACT de Boehm)
 
-### Duplication = accélérateur de dette
-- Le facteur de divergence commence à 1.0 et peut atteindre 3.0-5.0 après 2 ans
-- Le code churn double avec la duplication → augmente la probabilité de bugs
-- Cible Technical Debt Ratio ≤ 5% — la duplication fait exploser ce ratio
-- Coût de correction par ligne : 1-5$ selon la complexité
+### Hypothèses (pas de donnée solide)
+- Entretien d'une copie supplémentaire e0 = 1,0 (Ray & Kim donnent un indice, pas une valeur)
+- Dérive δ = +0,05/an, plafond 1,5×
+- Coordination et montées de version k = 4 %/an par app supplémentaire (ordre de grandeur)
+- Nouvelle lib : 280 h de setup, 100 h/an de fonctionnement
 
-### Coût des bugs selon la phase
-- Design : 1x (correction documentaire)
-- Implémentation : 3-5x (modification code + tests)
-- QA/Testing : 5-10x (diagnostic + correction + re-test + potentiel re-design)
-- Production : 10-30x (diagnostic prod + hotfix + déploiement + impact utilisateurs)
-- **Avec duplication, un bug en prod touche potentiellement 2 codebases → coût amplifié**
-
-### Note méthodologique
-- Les ratios historiques "1x→100x" (attribués à IBM) proviennent de notes de formation internes de 1981, pas d'une étude publiée
-- Le principe reste valide, mais les multiplicateurs exacts varient selon le contexte
+### Non chiffré
+- Les bugs à part : pas de donnée fiable. La règle 1-10-100 n'est pas soutenue (Menzies et al. 2017)
+- Le verdict est surtout sensible à G et e0 : les tester dans le calculateur avant de décider
 
 ---
 
@@ -210,52 +179,54 @@
 
 | Dimension | Code Partagé | Code Dupliqué |
 |---|---|---|
-| Coût initial | +30-50% (généralisation + setup) | ~170-220% d'une feature |
-| Maintenance/an | 15-25% du dev initial | 30-50% (double) |
-| Risque de bugs | 1x (source unique) | 33% bugs propagés non corrigés |
-| Cohérence UX | Garantie par le code | Dégradation progressive |
-| Scalabilité | Excellent (linéaire) | Mauvais (N × coût) |
-| Break-even | 6-18 mois | Jamais (coûts croissants) |
-| Onboarding | Simple (1 source) | Complexe (N sources + différences) |
-| Time to market | Plus long au début | Plus court initialement |
-| Flexibilité | Limitée (couplage) | Élevée (indépendance totale) |
+| Coût initial | 120 % + 20 % par app supplémentaire (+ setup de la lib) | 100 % + 65 % par copie supplémentaire |
+| Entretien annuel | 24 % + 4 % par app supplémentaire (+ fonctionnement de la lib) | 20 % + 20 % par copie supplémentaire, croissant |
+| Corrections de bugs | Une fois, à un seul endroit | Dans chaque copie (inclus dans l'entretien) |
+| Cohérence | Même code, même comportement | Peut dériver (parfois voulu) |
+| Chaque app en plus | Peu coûteuse | Coûteuse |
+| Seuil (réf.) | Dès le départ (égalité au build) | Gagne pour les petites features ou à court terme |
+| Risque principal | Mauvaise abstraction, breaking changes | Corrections oubliées, dérive |
+
+(Les pourcentages sont des parts de C0, le coût de construire la feature une fois.)
 
 ---
 
 ## Slide 12 — Recommandations : quand choisir quoi ?
 
 ### Privilégier le code partagé si :
-- La feature a une durée de vie > 18 mois
-- Fréquence d'évolution élevée (plusieurs fois par trimestre)
-- 3+ codebases consumers (ou prévues à terme)
-- La cohérence UX est critique pour le produit
-- L'équipe peut investir dans le setup initial
-- Le système est en croissance (nouveaux consumers prévisibles)
+- 3 apps ou plus ont besoin de la feature (ou sont prévues)
+- La feature est volumineuse (2 apps et une nouvelle lib : au-delà de ~800 h)
+- L'horizon est de plusieurs années
+- Une lib partagée existe déjà
+- Les apps doivent se comporter pareil
+- La généralisation est peu coûteuse (G ≤ ~1,3)
 
-### La duplication peut convenir si :
-- Feature à durée de vie courte (< 6 mois, prototype, MVP)
-- Très peu d'évolutions prévues après la livraison
-- Codebases très différentes (langages, frameworks, architectures)
-- Équipes totalement indépendantes et non alignées
-- Prototype ou MVP rapide où le time-to-market prime
-- Pas de besoin de cohérence UX entre les produits
+### La copie peut être meilleure si :
+- La feature est petite ou l'horizon court
+- Une nouvelle lib serait créée pour cette seule feature
+- Les copies sont censées diverger
+- Les apps sont très différentes (généralisation coûteuse)
+- Prototype ou MVP
+- Les équipes ne peuvent pas coordonner leurs releases
 
 ### Message clé pour conclure
-- **La duplication est une facilité à court terme qui se paie cher à moyen/long terme**
-- Le partage est un investissement : plus cher au départ, mais amorti rapidement
-- Au-delà de 2 codebases, le partage est quasi-systématiquement gagnant
+- **Pour 2 apps, les coûts initiaux sont à peu près égaux ; c'est l'entretien récurrent des copies supplémentaires qui décide**
+- **L'avantage du partage grandit à chaque app**
+- **Les petites features et les horizons courts favorisent la copie, surtout s'il faut créer une nouvelle lib**
 
 ---
 
 ## Chiffres clés à retenir (aide-mémoire)
 
-| Métrique | Valeur |
+| Indicateur | Valeur |
 |---|---|
-| Maintenance en % du TCO | 50-80% |
-| Break-even code partagé | 6-18 mois |
-| Bugs propagés dans les clones | 33% (IEEE) |
-| Temps dev perdu en dette tech | 42% (Stripe) |
-| Ratio à 5 codebases | 2.47x en faveur du partage |
-| Coût bug en production vs design | 10-30x |
-| Facteur de portage | 0.5-0.8x de l'effort initial |
-| Surcoût généralisation | +20-40% |
+| Coût initial, 2 apps, nouvelle lib | 74 844 € chacun (égaux) |
+| Écart sur 5 ans, scénario de référence | 11 502 € en faveur du partage (7 %) |
+| Idem, lib existante | 43 092 € |
+| Seuil, scénario de référence | Dès le départ (égalité au build) |
+| Dupliqué / partagé à 3 / 5 apps (5 ans) | 1,41× / 1,92× |
+| Taille minimale pour que le partage gagne (2 apps, nouvelle lib, 5 ans) | ~820 h |
+| Petite feature (140 h, nouvelle lib) | La copie est 2,2× moins chère |
+| Facteur de portage | 0,65 du build (mesuré) |
+| Facteur de généralisation | 1,2 (mesuré) |
+| Entretien | ~20 % du build par copie et par an |

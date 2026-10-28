@@ -1,849 +1,503 @@
-# Coût d'une Feature : Code Partagé vs Code Dupliqué
+# Coût d'une feature : code partagé vs code dupliqué
 
-## Guide de données pour construire un calculateur de coûts
+Les recherches derrière le calculateur : d'où vient chaque chiffre, quel degré de confiance lui accorder, et les formules exactes utilisées par l'application.
 
----
+**La question à laquelle répond le calculateur.** Une feature est nécessaire dans N applications (N ≥ 2). On peut la construire une seule fois sous forme de bibliothèque partagée utilisée par toutes les applications, ou la construire pour une application puis la copier et l'adapter dans les autres. Le calculateur additionne le coût de chaque option, mois par mois, sur un horizon de 1 à 10 ans. Il affiche le total de chacune, l'écart entre les deux et le mois à partir duquel le partage reste moins cher. Il donne aussi le coût de la feature construite une seule fois, pour une seule application.
 
-## 1. Modèles d'estimation du coût de développement
+**Ce qu'il laisse volontairement de côté.**
 
-### 1.1 COCOMO II (Constructive Cost Model)
+- **Délai de mise sur le marché.** Copier est souvent plus rapide pour la deuxième application quand aucune bibliothèque n'existe encore. Le calculateur compte l'effort, pas le temps calendaire.
+- **Goulot d'étranglement des releases.** Une bibliothèque partagée peut obliger les équipes à attendre les releases des autres. Ce coût est réel, mais il n'est mesuré nulle part sous une forme exploitable.
+- **Divergence volontaire.** Si une copie est censée évoluer différemment, sa maintenance séparée n'est pas du gaspillage. Le modèle traite chaque copie comme devant rester synchronisée.
+- **Actualisation.** Tous les montants sont en euros nominaux. Un euro dépensé en année 5 compte autant qu'un euro dépensé aujourd'hui.
 
-Le modèle COCOMO II est le standard industriel pour estimer l'effort de développement logiciel [[1]](https://en.wikipedia.org/wiki/COCOMO) [[2]](https://softwarecost.org/tools/COCOMO/). Il se base sur la taille du projet (en milliers de lignes de code, KSLOC) et des facteurs d'ajustement.
+Le §6 détaille ces limites et les autres.
 
-**Formule principale :**
-
-```
-Effort (Person-Months) = 2.94 × EAF × (KSLOC)^E
-```
-
-Où [[3]](https://docs.linuxfoundation.org/lfx/insights/v3-beta-version-current/getting-started/landing-page/cocomo-cost-estimation-simplified) :
-- **EAF** (Effort Adjustment Factor) : dérivé des Cost Drivers (valeurs typiques : 0.9 à 1.4)
-- **E** : exposant dérivé des 5 Scale Drivers
-- **KSLOC** : milliers de lignes de code source
-
-**Classification des projets** [[4]](https://www.geeksforgeeks.org/software-engineering/software-engineering-cocomo-model/) :
-
-| Type | Description | Coefficient a | Exposant b |
-|------|-------------|---------------|------------|
-| Organique | Petite équipe, environnement bien compris | 2.4 | 1.05 |
-| Semi-détaché | Équipe mixte, complexité modérée | 3.0 | 1.12 |
-| Embarqué | Grande complexité, contraintes fortes | 3.6 | 1.20 |
-
-**Calcul du temps de développement :**
-
-```
-Temps (mois) = 2.5 × (Effort)^(0.32 à 0.39)
-```
-
-**Calcul du nombre de personnes nécessaires :**
-
-```
-Personnes = Effort / Temps
-```
-
-### 1.2 Estimation par Story Points
-
-Pour les équipes agiles, une approche alternative consiste à utiliser les story points :
-
-```
-Coût par story point = (Salaire moyen équipe × Durée sprint) / Vélocité moyenne
-```
-
-**Données de référence :**
-- Vélocité moyenne d'une équipe de 5-7 devs : 30-50 story points par sprint de 2 semaines
-- Coût moyen d'un story point (US) : 1 000 $ à 3 000 $ selon la séniorité
-
-### 1.3 Coût des développeurs — Données France (2025-2026)
-
-#### Salaires bruts annuels (CDI) [[35]](https://welovedevs.com/fr/salaires/developpeur-web) [[36]](https://www.journaldunet.com/business/salaire/developpeur/salaire-00419) [[37]](https://blog.adatechschool.fr/salaire-developpeur-web/)
-
-| Séniorité | Salaire brut annuel (médian France) | Salaire brut annuel (Paris / Île-de-France) |
-|-----------|-------------------------------------|---------------------------------------------|
-| Junior (0-2 ans) | 33 000 - 40 000 € | 38 000 - 45 000 € |
-| Mid-level (3-5 ans) | 40 000 - 50 000 € | 45 000 - 55 000 € |
-| Senior (5-10 ans) | 50 000 - 65 000 € | 55 000 - 75 000 € |
-| Lead / Staff (10+ ans) | 60 000 - 80 000 € | 70 000 - 95 000 € |
-
-#### Coût chargé employeur (salariés CDI)
-
-En France, les charges patronales représentent environ 42-45 % du salaire brut [[5]](https://www.dougs.fr/blog/charges-patronales/) [[6]](https://staffmatch.com/blog/fr/charges-patronales/) (assurance maladie, allocations familiales, retraite, chômage, etc.). Le coût employeur total ("super-brut") est donc :
-
-```
-Coût employeur ≈ Salaire brut × 1.42 à 1.45
-```
-
-| Séniorité | Salaire brut annuel | Coût employeur annuel | Coût horaire chargé (1 607h/an) |
-|-----------|--------------------|-----------------------|---------------------------------|
-| Junior | 36 000 € | 51 120 - 52 200 € | 32 - 33 €/h |
-| Mid-level | 45 000 € | 63 900 - 65 250 € | 40 - 41 €/h |
-| Senior | 58 000 € | 82 360 - 84 100 € | 51 - 52 €/h |
-| Lead / Staff | 75 000 € | 106 500 - 108 750 € | 66 - 68 €/h |
-
-**Note :** Le coût horaire chargé ci-dessus est basé sur 1 607 heures travaillées par an (base légale en France, 35h/semaine). Pour un coût "fully loaded" incluant aussi les outils, locaux, management overhead, on ajoute généralement 20-30 %, ce qui donne :
-
-| Séniorité | Coût "fully loaded" horaire (estimation) |
-|-----------|------------------------------------------|
-| Junior | 38 - 43 €/h |
-| Mid-level | 48 - 53 €/h |
-| Senior | 61 - 68 €/h |
-| Lead / Staff | 80 - 88 €/h |
-
-#### TJM Freelance (Tarif Journalier Moyen) — France 2025
-
-Alternative utile pour le calculateur si l'équipe utilise des prestataires externes [[7]](https://www.portage360.fr/tjm-developpeur-en-france/) [[8]](https://www.silkhom.com/barometre-des-tjm-informatique-electronique-digital/) [[9]](https://www.blogdumoderateur.com/freelances-taux-journaliers-moyens-it-france-2025/) :
-
-| Profil | TJM moyen (province) | TJM moyen (Paris/IDF) |
-|--------|----------------------|-----------------------|
-| Junior (0-3 ans) | 300 - 400 €/jour | 350 - 450 €/jour |
-| Confirmé (3-7 ans) | 400 - 550 €/jour | 450 - 650 €/jour |
-| Senior (7+ ans) | 550 - 700 €/jour | 600 - 800 €/jour |
-| Expert / Lead (10+ ans) | 700 - 900 €/jour | 750 - 1 000+ €/jour |
-
-**Conversion TJM → coût horaire :** TJM / 7h (journée standard freelance) ou TJM / 8h selon la convention.
+**Comment lire les preuves.** Chaque paramètre du modèle est étiqueté **Mesuré** (une étude empirique en donne au moins l'ordre de grandeur) ou **Hypothèse** (une valeur raisonnée sans mesure directe). Le §7.4 donne le tableau complet.
 
 ---
 
-## 2. Coûts de maintenance logicielle
+## 1. Coût d'un développeur en France (2026)
 
-### 2.1 La maintenance comme pourcentage du TCO
+### 1.1 Salaires
 
-La maintenance est le poste de dépense le plus important dans le cycle de vie d'un logiciel [[10]](https://www.scnsoft.com/software-development/maintenance-and-support/costs) [[11]](https://idealink.tech/blog/software-development-maintenance-true-cost-equation) [[12]](https://galorath.com/blog/software-maintenance-costs/) :
+La source principale est l'étude de rémunération de l'Apec de décembre 2025 [[1]](https://corporate.apec.fr/files/live/sites/corporate/files/Nos%20etudes/PDF/Les%20remunerations%20des%20cadres%20dans%20111%20familles%20de%20metiers%202025.pdf). Elle repondère 26 000 réponses de cadres du secteur privé sur les données officielles de paie (DSN). Pour la famille de métiers « développement informatique » :
 
-| Métrique | Valeur |
-|----------|--------|
-| Maintenance en % du TCO total | 50-80 % (jusqu'à 90 % pour les systèmes legacy) |
-| Cloud-based apps | 30-60 % du TCO |
-| On-premises / enterprise | 70-90 % du TCO |
-| Embedded software | 65-80 % du TCO |
-| Budget annuel de maintenance | 15-25 % du coût de développement initial |
-| Coût sur la durée de vie (5 ans) | 2x à 4x le coût de développement initial |
+- Médiane de **50 k€** brut par an (fixe + variable). 80 % des développeurs gagnent entre 38 k€ et 74 k€.
+- Par âge : moins de 35 ans, médiane 44 k€ ; 35–45 ans, 52 k€ ; plus de 45 ans, 57 k€.
+- Médiane Île-de-France 55 k€, autres régions 46 k€ (environ +20 % pour Paris).
 
-**Répartition sur 5 ans** [[11]](https://idealink.tech/blog/software-development-maintenance-true-cost-equation) [[34]](https://www.techstep.io/articles/app-maintenance-cost-can-be-three-times-higher-than-development-cost) :
-- Planning + Développement initial : ~21 % du coût total
-- Maintenance et évolution : ~79 % du coût total
+L'Apec ne couvre **que les cadres**. Les développeurs non cadres, surtout des juniors, ne figurent pas dans ses données.
 
-### 2.2 Types de maintenance et leur répartition [[12]](https://galorath.com/blog/software-maintenance-costs/) [[13]](https://maddevs.io/customer-university/software-maintenance-costs/)
+Deux autres sources concordent :
 
-| Type | % de l'effort de maintenance | Description |
-|------|------------------------------|-------------|
-| Corrective | 17-21 % | Correction de bugs |
-| Adaptative | 18-25 % | Adaptation à l'environnement (OS, APIs, dépendances) |
-| Perfective | 50-60 % | Nouvelles fonctionnalités, améliorations |
-| Préventive | 4-5 % | Refactoring, optimisation proactive |
+- WeLoveDevs : médiane junior (0–1 an) 35 k€ [[2]](https://welovedevs.com/fr/salaires/junior), médiane senior (5 ans et plus) 50 k€ [[3]](https://welovedevs.com/fr/salaires/senior). Ce sont les *prétentions* salariales des candidats, pas des salaires versés.
+- Baromètre Silkhom 2026 : développeur Java/Python autour de 45 k€, −1,1 % sur un an [[4]](https://www.blogdumoderateur.com/salaires-informatique-digital-remunerations-2026/).
 
-### 2.3 Coût des bugs selon la phase de détection
+Le marché est stable, voire en léger recul, pour les développeurs généralistes. L'Apec indique que les recrutements de jeunes cadres restent 13 % sous leur niveau de 2023 [[5]](https://corporate.apec.fr/home/nos-etudes/toutes-nos-etudes/previsions-de-recrutements-de-cadres-2026.html).
 
-L'idée que le coût de correction d'un bug croît avec le temps dans le cycle de développement est largement acceptée dans l'industrie. Des études empiriques montrent que les défauts détectés plus tard nécessitent plus de travail de diagnostic, de correction et de re-test [[14]](https://www.functionize.com/blog/the-cost-of-finding-bugs-later-in-the-sdlc) [[15]](https://www.blackduck.com/blog/cost-to-fix-bugs-during-each-sdlc-phase.html).
+Valeurs ponctuelles retenues ci-dessous (brut annuel) :
 
-**Ordres de grandeur réalistes (basés sur des données de l'industrie) :**
+| Niveau | National | Paris / IDF |
+|---|---|---|
+| Junior (0–2 ans) | 37 k€ | 42 k€ |
+| Confirmé (3–5 ans) | 45 k€ | 51 k€ |
+| Senior (5–10 ans) | 55 k€ | 62 k€ |
+| Lead / Staff (10 ans et plus) | 68 k€ | 78 k€ |
 
-| Phase de détection | Coût relatif | Justification |
-|--------------------|-------------|---------------|
-| Spécifications / Design | 1x | Correction documentaire, pas de code à modifier |
-| Implémentation | 3-5x | Modification de code + tests unitaires |
-| QA / Testing | 5-10x | Diagnostic + correction + re-test + potentiel re-design |
-| Production | 10-30x | Diagnostic en prod + hotfix + déploiement + impact utilisateurs |
+Il s'agit d'une synthèse des sources ci-dessus, pas d'un tableau publié tel quel. La ligne Lead est la moins sûre : l'Apec ne ventile pas par niveau, et les 68 k€ nationaux se situent entre sa médiane des plus de 45 ans (57 k€) et son décile supérieur des 35–45 ans (74 k€).
 
-**Note méthodologique :** Les ratios historiques souvent cités (1x→6x→15x→100x, attribués à "IBM Systems Sciences Institute") proviennent en réalité de notes de formation internes IBM de 1981 et non d'une étude de recherche publiée [[40]](https://www.theregister.com/2021/07/22/bugs_expense_bs/). Le principe général reste valide — corriger tard coûte plus cher — mais les multiplicateurs exacts varient considérablement selon le contexte.
+### 1.2 Cotisations patronales en 2026
 
-**Données vérifiées sur la propagation de bugs dans le code dupliqué :** Une étude IEEE sur la propagation de bugs dans les clones de code montre que jusqu'à 33 % des fragments de code clonés qui subissent des corrections de bugs contiennent des bugs propagés (bugs identiques non corrigés dans les autres copies) [[41]](https://ieeexplore.ieee.org/document/8094424/) [[42]](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815).
+Un forfait de « +42–45 % » n'est plus exact. Depuis le 1er janvier 2026, la **RGDU** (réduction générale dégressive unique) remplace l'ancienne réduction générale ainsi que les taux réduits maladie (7 %) et famille (3,45 %) [[6]](https://entreprendre.service-public.gouv.fr/vosdroits/F24542) :
 
-**Implication pour la duplication :** Quand une feature est dupliquée, un bug trouvé dans une codebase doit être identifié et corrigé dans l'autre aussi. Les études empiriques confirment que cette propagation est un problème réel et fréquent, doublant potentiellement le coût de correction et augmentant le risque de régression.
+- Elle s'applique jusqu'à **3 SMIC**, soit 65 629 € par an en 2026 (le SMIC retenu dans la formule reste celui du 1er janvier toute l'année).
+- Elle a un **plancher de 2 %** : tout salaire sous ce seuil bénéficie d'au moins 2 % de réduction.
+- Aux salaires des développeurs, elle représente environ 10 % du brut à 36 k€, 4,9 % à 45 k€, 2,6 % à 55 k€ et 2,1 % à 62 k€.
 
----
+Au-delà du plafond de la Sécurité sociale (PASS, 48 060 € en 2026), la retraite complémentaire (Agirc-Arrco tranche 2) monte à 12,95 %, ce qui relève le multiplicateur du lead. Les taux proviennent des barèmes URSSAF 2026 [[7]](https://www.legisocial.fr/reperes-sociaux/taux-cotisations-sociales-urssaf-2026.html).
 
-## 3. Coûts spécifiques : Code Partagé (Shared Library / Monorepo)
+Le multiplicateur obtenu (brut → coût employeur) dépend donc de la tranche. Hypothèses : cadre, entreprise de 50 salariés ou plus, taux accident du travail de 0,6 %, prévoyance cadre obligatoire, mutuelle modeste. « Paris » ajoute le versement mobilité de 3,2 %.
 
-### 3.1 Coûts initiaux (one-time)
+| Niveau | Brut (national) | Multiplicateur | Coût employeur | Brut (Paris) | Multiplicateur (Paris) | Coût employeur (Paris) |
+|---|---|---|---|---|---|---|
+| Junior | 37 000 € | ×1,372 | 50 765 € | 42 000 € | ×1,433 | 60 167 € |
+| Confirmé | 45 000 € | ×1,412 | 63 532 € | 51 000 € | ×1,459 | 74 420 € |
+| Senior | 55 000 € | ×1,431 | 78 726 € | 62 000 € | ×1,466 | 90 881 € |
+| Lead | 68 000 € | ×1,452 | 98 765 € | 78 000 € | ×1,482 | 115 558 € |
 
-| Poste de coût | Estimation |
-|---------------|------------|
-| Architecture et design de la librairie partagée | 2-4 semaines (1-2 seniors) |
-| Configuration CI/CD pour le package | 1-2 semaines |
-| Documentation API | 1-2 semaines |
-| Setup monorepo ou registry privé (npm, PyPI, etc.) | 0.5-1 semaine |
-| Tests unitaires et d'intégration de la lib | 1-2 semaines |
-| **Total estimé setup** | **5-11 semaines d'effort dev senior** |
+Les taux légaux sont solides. Les totaux comportent une incertitude de ±0,03, liée à la taille de l'entreprise, à la ville, et aux contrats de mutuelle et de prévoyance supérieurs au minimum légal.
 
-### 3.2 Coûts récurrents de maintenance
+### 1.3 Coût horaire chargé (taux par défaut de l'application)
 
-| Poste de coût | Fréquence | Effort estimé |
-|---------------|-----------|---------------|
-| Gestion des versions (semver, changelog) | À chaque release | 2-4h par release |
-| Review des PRs sur la lib partagée | Continu | 5-10h/semaine |
-| Résolution des conflits de merge | Variable | 2-8h/semaine |
-| Migration des breaking changes | Trimestriel | 1-3 jours par consumer |
-| Mise à jour des dépendances | Mensuel | 0.5-1 jour |
-| Maintenance de la CI/CD | Mensuel | 0.5-1 jour |
-| Support aux équipes consumers | Continu | 5-10h/semaine |
+Le taux horaire divise le coût employeur par **1 607 heures**, la durée légale annuelle du travail pour un contrat de 35 heures [8]. C'est le coût par heure *payée*.
 
-### 3.3 Coûts de coordination
+Beaucoup de développeurs cadres sont plutôt au **forfait jours**. La DARES compte 15,1 % des salariés à temps complet du privé au forfait jours, dont 84,2 % de cadres [[9]](https://www.moneyvox.fr/votre-argent/actualites/108773/les-salaries-au-forfait-jours-principalement-des-cadres-font-plus-heures-que-les-autres). Sous la convention Syntec, le plafond est de 218 jours par an [10], soit 218 × 7 h = 1 526 h. Le calculateur garde 1 607 h parce que c'est la base légale et qu'elle donne le taux le plus bas (prudent). Avec 1 526 h, un senior coûte 51,6 €/h au lieu de 49,0 €/h. Par heure *productive* (environ 1 400 h une fois retirés les arrêts maladie, la formation et l'administratif — une convention plutôt qu'une statistique), ce serait environ 15 % de plus.
 
-| Facteur | Impact |
-|---------|--------|
-| Réunions de synchronisation inter-équipes | 2-4h/semaine par équipe |
-| Négociation des interfaces/APIs | 1-2 jours par feature majeure |
-| Revue de design conjointe | 0.5-1 jour par feature |
-| Temps de coordination (étude ING) | 11-23 % du temps dev [[17]](https://andrewbegel.com/papers/coordination-chase09.pdf) |
-| Interfaces de coordination (formule de Brooks) | n(n-1)/2 où n = nombre d'équipes |
+| Niveau | €/h national (÷ 1 607) | **Défaut de l'application** | €/h Paris |
+|---|---|---|---|
+| Junior | 31,6 | **32** | 37,4 → 37 |
+| Confirmé | 39,5 | **40** | 46,3 → 46 |
+| Senior | 49,0 | **50** | 56,6 → 57 |
+| Lead | 61,5 | **62** | 71,9 → 72 |
 
-### 3.4 Risques et coûts cachés
+**Les valeurs par défaut de l'application sont « chargées », pas « complètement chargées ».** Elles comprennent uniquement le salaire et les cotisations patronales. Un coût *complètement chargé* couvre aussi les outils, les locaux, le management et le recrutement. Il n'existe pas de statistique française pour ces frais généraux. Deux forfaits officiels en donnent un encadrement : Horizon Europe finance les coûts indirects à 25 % des coûts directs [[11]](https://www.ffg.at/en/europe/heu/legal-financial/theme_indirect-costs), et le crédit d'impôt recherche compte les frais de fonctionnement à 40 % des dépenses de personnel de R&D [[12]](https://www.impots.gouv.fr/sites/default/files/formulaires/2069-a-sd/2026/2069-a-sd_5270.pdf). Un facteur ×1,25 donne des taux nationaux complètement chargés d'environ 40 / 49 / 61 / 77 €/h (senior autour de 71 €/h à Paris). Pour raisonner sur cette base, saisissez ces taux dans le tableau de l'équipe.
 
-- **Couplage fort :** Les modifications de la lib partagée impactent tous les consumers. Un breaking change peut bloquer N équipes [[31]](https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/monorepo-vs-multirepo).
-- **Bottleneck de release :** La lib devient un point de contention pour les releases [[38]](https://kodus.io/en/monorepo-vs-multi-repo-strategy/).
-- **Versioning hell :** Quand différentes équipes ont besoin de versions différentes simultanément [[39]](https://www.aviator.co/blog/what-is-a-monorepo-and-why-use-one/).
-- **Complexité accrue :** Le code doit être suffisamment générique pour servir plusieurs cas d'usage, ce qui augmente la complexité (estimé +20-40 % de code par rapport à une implémentation spécifique) [[31]](https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/monorepo-vs-multirepo) [[32]](https://livebook.manning.com/book/software-mistakes-and-tradeoffs/chapter-2).
+### 1.4 Taux journaliers des freelances (TJM)
+
+Si le travail est confié à des freelances, utilisez plutôt leur TJM :
+
+| Expérience | Hays 2026, full-stack Paris [[13]](https://www.blogdumoderateur.com/freelance-tech-taux-journaliers-moyens-metier-2026/) | Malt, tarifs affichés [14] |
+|---|---|---|
+| Junior | 450 €/jour (0–3 ans) | 317 €/jour (< 2 ans) |
+| Confirmé | 515 €/jour (3–5 ans) | 435 €/jour (3–7 ans) |
+| Senior | 580 €/jour (5–8 ans) | 575 €/jour (8–15 ans) |
+| Expert | 650 €/jour (8 ans et plus) | 672 €/jour (15 ans et plus) |
+
+Hays situe les régions environ 10 % sous Paris. Pour obtenir un taux horaire, divisez par 7 (TJM / 7, la même journée de 7 heures que celle utilisée par l'application pour les jours-homme). Un TJM est un *prix* : il inclut déjà les charges du freelance, ses jours non facturés et sa marge. Il n'est pas comparable au coût chargé d'un salarié (une journée chargée de senior coûte environ 78 726 € / 218 ≈ 361 €).
 
 ---
 
-## 4. Coûts spécifiques : Code Dupliqué
+## 2. Maintenance
 
-### 4.1 Coûts initiaux (one-time)
+### 2.1 Combien coûte la maintenance par an ?
 
-| Poste de coût | Estimation |
-|---------------|------------|
-| Développement de la feature (codebase A) | X semaines (baseline) |
-| Adaptation et portage vers codebase B | 0.5X à 0.8X (50-80 % de l'effort initial) |
-| Tests pour la codebase B | 0.6X à 1X de l'effort de test initial |
-| Adaptation du design (points d'entrée, UI) | 0.2X à 0.4X |
-| **Total estimé** | **1.7X à 2.2X d'une seule implémentation** |
+Il n'existe pas de chiffre précis et général. L'ordre de grandeur est d'environ **20 % du coût de construction par an** :
 
-### 4.2 Coûts récurrents de maintenance
+- Une règle empirique du Département de la Défense américain situe la maintenance annuelle à environ 20 % de l'effort de développement du parc installé [15].
+- Le COCOMO 81 de Boehm calcule la maintenance annuelle comme le *trafic annuel de changements* (la part du code ajoutée ou modifiée chaque année) × l'effort de développement [16]. Ce trafic dépend du projet, mais c'est le cadrage retenu par le calculateur : un taux annuel multiplié par le coût de construction.
+- La « règle des 60/60 » de Glass : environ 60 % du coût sur le cycle de vie est de la maintenance, et environ 60 % de celle-ci est de l'amélioration [17]. Sur une durée de vie de 5 à 10 ans, cela implique environ 15–30 % du coût de construction par an.
 
-| Poste de coût | Impact vs code unique |
-|---------------|-----------------------|
-| Correction de bugs | 2x (chaque bug doit être trouvé et fixé dans les 2 codebases) |
-| Évolutions fonctionnelles | 1.5x à 2x (implémentation double) |
-| Tests de régression | 2x (suites de tests séparées) |
-| Revue de code | 2x (PRs dans 2 repos) |
-| Monitoring et alerting | 2x (systèmes séparés) |
-| Documentation | 1.5x à 2x |
+Un chiffre souvent cité à ce sujet, les **« 15–22 % » de Gartner**, désigne autre chose : d'après la presse spécialisée dont il provient, c'est la redevance annuelle de support facturée par les éditeurs, en pourcentage du prix de la licence. Il ne dit rien de l'effort d'ingénierie.
 
-### 4.3 Risques et coûts cachés de la duplication
+Le calculateur applique un seul taux, `m`, à chaque copie du code (0,20 par défaut). COCOMO II applique sa prime « conçu pour la réutilisation » au développement seulement, pas à la maintenance [[18]](https://www.rose-hulman.edu/class/csse/csse372/201310/Homework/CII_modelman2000.pdf). Le calculateur applique néanmoins `m` au coût plus élevé de la construction partagée (§7.2), au motif que le code générique est plus volumineux. Ce choix pénalise légèrement le partage.
 
-- **Divergence fonctionnelle :** Au fil du temps, les deux copies divergent, créant des incohérences UX et des bugs spécifiques à chaque version [[20]](https://www.graphapp.ai/blog/the-hidden-costs-of-duplicate-code-in-software-engineering).
-- **Perte de connaissance :** L'équipe qui maintient la copie B peut ne pas comprendre les décisions initiales de la copie A [[32]](https://livebook.manning.com/book/software-mistakes-and-tradeoffs/chapter-2).
-- **Double effort de test :** Chaque feature, chaque bug fix nécessite des tests dans les deux codebases [[21]](https://idealink.tech/blog/understanding-software-testing-costs-development-breakdown).
-- **Synchronisation manuelle :** Le suivi des différences entre les deux versions nécessite un effort constant d'inventaire et de comparaison [[19]](https://linearb.io/blog/code-duplication).
-- **Code churn accru :** Les métriques de code churn doublent, augmentant la probabilité de bugs [[29]](https://getdx.com/blog/technical-debt-ratio/).
+### 2.2 En quoi consiste la maintenance
 
-**Métrique de référence :** Une étude IEEE sur 4 projets open source Java montre que jusqu'à 33 % des fragments de code clonés qui subissent des corrections de bugs contiennent des bugs propagés (i.e. le même bug non corrigé dans les autres copies) [[41]](https://ieeexplore.ieee.org/document/8094424/) [[42]](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815). De plus, le clonage de code multiplie les vulnérabilités de sécurité [[45]](https://dl.acm.org/doi/abs/10.1109/ESEM.2017.9). Concrètement, la duplication augmente significativement le risque de défauts car les corrections ne sont pas toujours propagées uniformément [[18]](https://www.software.com/engineering-metrics/code-duplication) [[19]](https://linearb.io/blog/code-duplication).
+La répartition classique provient des enquêtes de Lientz et Swanson auprès de responsables informatiques :
 
----
+| Type | 1978, 69 organisations [[19]](https://doi.org/10.1145/359511.359522) | 1980, 487 organisations [20] |
+|---|---|---|
+| Perfective (améliorations) | 60,3 % | environ 50 % |
+| Adaptative (évolutions de l'environnement) | 18,2 % | environ 25 % |
+| Corrective (corrections de bugs) | 17,4 % | environ 22 % |
+| Autre | 4,1 % | environ 3–4 % |
 
-## 5. Coûts organisationnels et transversaux
+Ce sont des estimations de responsables. Quand Schach et al. ont plutôt mesuré les journaux de modifications, le correctif représentait plus de la moitié de la maintenance [[21]](https://doi.org/10.1023/A:1025368318006). Dans les deux cas, **la correction de bugs fait déjà partie de la maintenance** : le calculateur n'ajoute donc pas de coût de bugs séparé en plus de `m`.
 
-### 5.1 Product Management
+### 2.3 Construction vs coût sur le cycle de vie
 
-| Activité | Shared Code | Duplicated Code |
-|----------|-------------|-----------------|
-| Planification du backlog | 1x (backlog unifié pour la feature) | 1.3x-1.5x (coordination de 2 backlogs) |
-| Spécifications | 1x + surcoût de généralisation (+20 %) | 1.5x-2x (specs adaptées par codebase) |
-| Suivi des releases | Complexe (dépendances inter-repos) | Simple mais double (2 releases indépendantes) |
-| Gestion des incidents | 1x (source unique) | 1.5x-2x (investigation dans 2 codebases) |
+Zarnekow et Brenner ont suivi 30 systèmes applicatifs sur une période de production de 5 ans [[22]](https://aisel.aisnet.org/ecis2005/26). La planification et le développement initial représentaient environ 21 % du coût total, et les 79 % restants allaient à l'exploitation, à la maintenance et à l'évolution des systèmes. Ces 79 % incluent l'*exploitation* (infrastructure, support), que le calculateur ne compte pas. C'est un rappel qu'au bout de quelques années, ce sont les coûts récurrents qui dominent, pas la construction.
 
-### 5.2 Design / UX
+### 2.4 Un bug coûte-t-il plus cher quand il est trouvé tard ?
 
-| Activité | Shared Code | Duplicated Code |
-|----------|-------------|-----------------|
-| Design system | 1x (composants réutilisés) | 1x initial puis divergence progressive |
-| User research | 1x (feature identique) | 1x-1.2x (contextes différents) |
-| Itérations design | 1x + coût de négociation | 1.5x-2x (itérations indépendantes) |
-| Cohérence UX long terme | Garantie par le code partagé | Dégradation progressive (effort de sync) |
+La « règle des 1-10-100 » est plus fragile que sa réputation :
 
-### 5.3 QA / Testing
+- Le NIST Planning Report 02-3 donne des coûts relatifs de correction de 1× (exigences/conception), 5× (codage), 10× (intégration), 15× (bêta) et 30× (après livraison), mais son tableau est étiqueté « **Example Only** » [[23]](https://www.nist.gov/system/files/documents/director/planning/report02-3.pdf).
+- Les chiffres 1-6-15-100 souvent attribués à l'« IBM Systems Sciences Institute » remontent à des supports de formation internes d'IBM, pas à une étude publiée [[24]](https://www.theregister.com/2021/07/22/bugs_expense_bs/) [[25]](https://leanpub.com/leprechauns).
+- Boehm et Basili affirment que les corrections après livraison coûtent « souvent » 100× plus cher, mais « plutôt 5:1 » pour les petits systèmes non critiques [[26]](https://doi.org/10.1109/2.962984).
+- Menzies et al. ont testé l'effet sur 171 projets logiciels (2006–2014) et n'ont trouvé **aucune preuve** que les problèmes deviennent plus difficiles à résoudre à mesure qu'ils sont découverts tard [[27]](https://arxiv.org/abs/1609.04886).
 
-| Métrique | Valeur de référence |
-|----------|---------------------|
-| QA en % de l'effort de développement | 20-30 % (standard), 40-50 % (systèmes critiques) [[21]](https://idealink.tech/blog/understanding-software-testing-costs-development-breakdown) [[22]](https://intersog.com/blog/development/software-testing-percent-of-software-development-costs/) |
-| Ratio testeurs/développeurs | 1 testeur pour 3-4 développeurs [[23]](https://hypersense-software.com/blog/2025/07/19/software-development-effort-allocation-dev-qa-design-pm-ratio/) |
-| Réduction de bugs avec code review | -10 % de temps sur les bugs [[24]](https://blog.codacy.com/10-facts-about-code-reviews-and-quality) |
-| Coût de la code review | 12.5 % du temps dev (5h/semaine/dev en moyenne) [[25]](https://coralogix.com/blog/this-is-what-your-developers-are-doing-75-of-the-time-and-this-is-the-cost-you-pay/) [[33]](https://engineering.fb.com/2022/11/16/culture/meta-code-review-time-improving/) |
-
-### 5.4 Onboarding et turnover
-
-| Métrique | Valeur |
-|----------|--------|
-| Temps avant productivité complète | 3-6 mois (sans structure), 8-12 semaines (avec onboarding structuré) [[26]](https://fullscale.io/blog/developer-onboarding-best-practices/) |
-| Coût de productivité perdue par nouveau dev | ~30 000 - 40 000 € sur 6 semaines (France) [[26]](https://fullscale.io/blog/developer-onboarding-best-practices/) |
-| Impact sur la vélocité de l'équipe | -25 à -40 % pendant l'intégration [[26]](https://fullscale.io/blog/developer-onboarding-best-practices/) |
-| Perte de productivité des mentors | -30 % pendant l'onboarding [[27]](https://about.gitlab.com/the-source/platform/how-to-accelerate-developer-onboarding-and-why-it-matters/) |
-| Coût de remplacement d'un dev (France) | 50 000 - 100 000 € (recrutement + onboarding + productivité perdue) [[28]](https://www.growin.com/blog/developer-retention-costs-onboarding/) |
-
-**Impact pour le calculateur :** Avec du code dupliqué, un nouveau développeur doit comprendre les deux implémentations et leurs différences. Avec du code partagé, il n'apprend qu'une seule implémentation mais doit comprendre le système de partage.
+Il n'existe pas non plus de chiffre crédible pour le coût moyen d'un bug en production. **Le calculateur ne chiffre donc pas les bugs séparément.** La correction de bugs est incluse dans le taux de maintenance `m` (§2.2), et les corrections répétées d'une copie à l'autre sont incluses dans le ratio par copie supplémentaire `e` (§4.3).
 
 ---
 
-## 6. Dette technique
+## 3. Code partagé
 
-### 6.1 Métriques quantitatives
+### 3.1 Coûts ponctuels
 
-| Métrique | Formule / Valeur | Cible idéale |
-|----------|------------------|--------------|
-| Technical Debt Ratio (TDR) | Coût de correction / Coût de reconstruction [[29]](https://getdx.com/blog/technical-debt-ratio/) | ≤ 5 % |
-| Code Churn | (Lignes ajoutées + supprimées) / Total lignes × 100 [[29]](https://getdx.com/blog/technical-debt-ratio/) | < 15 % par sprint |
-| Temps passé sur la dette technique | % du temps dev consacré à la dette + mauvais code | 42 % (13.5h dette + 3.8h bad code sur 41.1h/semaine, Stripe Developer Coefficient 2018) [[43]](https://stripe.com/files/reports/the-developer-coefficient.pdf) |
-| Coût pour l'économie US (2022, CISQ) | 2 410 milliards $ (dont 1 520 milliards $ de dette technique seule) [[44]](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/) | — |
+**Le construire pour être partagé (`G`).** Du code écrit pour être réutilisé coûte plus cher que du code écrit pour une seule application :
 
-### 6.2 Impact de la duplication sur la dette technique
+| Source | Valeur | Ce que c'est |
+|---|---|---|
+| COCOMO II, cost driver RUSE [[18]](https://www.rose-hulman.edu/class/csse/csse372/201310/Homework/CII_modelman2000.pdf) | 1,07 / 1,15 / 1,24 | Multiplicateur d'effort pour une réutilisation au sein d'un programme / d'une ligne de produits / de plusieurs lignes de produits |
+| Lim, HP [[28]](https://doi.org/10.1109/52.311048) | 1,11 | L'un des deux programmes HP : un composant réutilisable coûtait 111 % d'un composant non réutilisable (via la revue de Mohagheghi & Conradi [[29]](https://doi.org/10.1007/s10664-007-9040-x)) |
+| Poulin [[30]](http://jeffreypoulin.info/html/reucalc_basic.html) | environ 1,5 | Valeur par défaut recommandée (plage 1,0–2,2), pas une mesure |
+| Krüger & Berger [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf) | médiane +20 % | Revue systématique : cinq études sur le développement de features pour une plateforme ; les personnes interrogées ont signalé des cas extrêmes nettement plus coûteux |
 
-La duplication de code est l'un des principaux contributeurs à la dette technique :
+Défaut **G = 1,20**. Les valeurs au-dessus de 1,5 correspondent à de véritables plateformes multi-produits plutôt qu'à une feature partagée par quelques applications.
 
-```
-Dette technique (duplication) = Nb_lignes_dupliquées × Coût_correction_par_ligne × Facteur_divergence
-```
+**L'intégrer dans chaque application supplémentaire (`i`).** Réutiliser un composant existant n'est pas gratuit : l'application doit l'intégrer, le configurer et le tester. Poulin recommande un coût relatif de réutilisation de 0,2 d'une construction neuve (plage d'environ 0,03–0,4) [[30]](http://jeffreypoulin.info/html/reucalc_basic.html). Krüger & Berger constatent que développer une nouvelle variante sur une plateforme économise environ 67 % par rapport à une construction from scratch (médiane de neuf études), soit environ 0,33 [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf). Défaut **i = 0,20** par application supplémentaire.
 
-Où :
-- **Facteur_divergence** augmente avec le temps (1.0 au début, peut atteindre 3.0-5.0 après 2 ans)
-- **Coût_correction_par_ligne** : 1-5 $ par ligne de code (dépend de la complexité)
+**Mettre en place une nouvelle bibliothèque : 280 heures (hypothèse).** Création du package, de son dépôt ou de son entrée dans le registre, de la CI, du versioning et de la documentation d'API. Le calculateur retient 8 semaines × 35 h = 280 h, au taux moyen de l'équipe. Aucune étude ne le mesure ; c'est proche de zéro dans un monorepo existant. Si la bibliothèque existe déjà, désactivez « nouvelle bibliothèque » : les coûts de mise en place et de fonctionnement tombent à zéro.
 
----
+### 3.2 Coûts récurrents
 
-## 7. Formules pour le calculateur — Explications détaillées
+**Maintenance du code partagé.** `m × G × C0` par an (voir §2.1 et §7.2).
 
-Cette section décompose chaque formule de manière verbeuse avec le raisonnement derrière chaque composant, des exemples chiffrés concrets, et des conseils d'implémentation pour le calculateur.
+**Faire vivre la bibliothèque : 100 heures par an (hypothèse).** Releases, changelog, CI et mises à jour de dépendances, environ 2 heures par semaine. Là encore, aucune mesure n'existe. Ne s'applique qu'à une nouvelle bibliothèque.
 
----
+**Coordination et montées de version (`k`).** Le partage crée une dépendance entre équipes. Deux coûts distincts sont fusionnés en un seul paramètre, car aucun n'est mesuré assez précisément pour être modélisé seul :
 
-### 7.1 Coût total — Approche Code Partagé
+- *Coordination.*
+  - Le n(n−1)/2 de Brooks compte les canaux de communication entre **personnes** sur une même tâche [32]. C'est un argument, pas une mesure. Une équipe de bibliothèque qui sert N applications a environ N interfaces : le calculateur fait donc croître la coordination linéairement avec le nombre d'applications supplémentaires.
+  - Dans une enquête Microsoft auprès de 775 ingénieurs, 72 % dépendaient du calendrier de releases d'une autre équipe, et 49 % déclaraient qu'ils « élimineraient les dépendances de code (par ex. "clone and own") » pour régler leurs problèmes de dépendances [[33]](https://andrewbegel.com/papers/coordination-chase09.pdf). C'est une réponse à choix multiples sur les parades, pas une part de temps mesurée. L'enquête ne donne aucun « pourcentage du temps passé à se coordonner ». Le chiffre « 11–23 % (étude ING) » qui circule sur les blogs n'y figure pas, et aucune source n'a été trouvée.
+  - Le meilleur indice quantitatif vient des entretiens de Krüger & Berger : la coordination représentait environ 5 % de l'effort de développement d'une variante en clone-and-own et environ 7 % sur une plateforme [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf). La *différence* est d'environ 2 points.
+- *Montées de version cassantes.*
+  - Sur 317 bibliothèques Java, 14,78 % des changements d'API cassaient la rétrocompatibilité, mais seuls 2,54 % des projets clients étaient réellement touchés [[34]](https://repositorio.ufmg.br/handle/1843/JCES-ARMPK6).
+  - 81,5 % des 4 600 projets étudiés conservaient des dépendances obsolètes [[35]](https://doi.org/10.1007/s10664-017-9521-5), ce qui suggère que les équipes repoussent souvent ce coût plutôt que de le payer.
 
-#### Vue d'ensemble
-
-L'idée de cette formule est de capturer la totalité du coût lorsqu'on choisit de créer une librairie (ou un package, ou un module dans un monorepo) qui sera consommée par plusieurs codebases. Ce choix implique un investissement initial plus lourd (il faut concevoir du code générique, documenter une API, mettre en place de l'outillage), mais on en récolte les bénéfices sur la durée parce que toute correction ou évolution n'a lieu qu'une seule fois.
-
-#### Formule
-
-```
-Coût_Partagé_Total = Coût_Dev_Initial
-                   + Coût_Setup_Lib
-                   + Σ(Coût_Maintenance_Annuel × Année)
-                   + Coût_Coordination_Annuel × Nb_Années
-                   + Coût_Onboarding × Nb_Nouveaux_Devs
-```
-
-#### Décomposition de chaque terme
-
-**1. Coût_Dev_Initial — Le développement de la feature elle-même**
-
-```
-Coût_Dev_Initial = Nb_Devs × Coût_Horaire × Heures_Dev × Facteur_Généralisation
-```
-
-Ce terme représente le coût pour développer la feature dans sa version "partageable". Le `Facteur_Généralisation` (typiquement 1.2 à 1.4, valeur par défaut recommandée : 1.3) reflète le surcoût pour rendre le code suffisamment abstrait et configurable pour fonctionner dans plusieurs contextes. Concrètement, cela signifie que là où un développeur écrirait du code "en dur" adapté à un seul cas d'usage, il doit maintenant :
-
-- Créer des interfaces/abstractions pour les points de variation (points d'entrée, affichage des données, etc.)
-- Ajouter des options de configuration pour couvrir les différences entre les codebases cibles
-- Écrire des tests plus exhaustifs qui couvrent les différentes combinaisons de configuration
-- Documenter l'API publique de manière claire pour les équipes consommatrices
-
-**Exemple chiffré (contexte France) :**
-Imaginons une feature qui prendrait 400 heures à développer de manière spécifique (2 devs seniors pendant 5 semaines). Avec un coût horaire "fully loaded" de 65 €/h (senior en France) :
-- Version spécifique : 400h × 65 € = 26 000 €
-- Version partageable : 400h × 65 € × 1.3 = 33 800 €
-- Le surcoût de généralisation est donc de 7 800 €, mais c'est un investissement qui sera amorti sur la durée.
-
-**2. Coût_Setup_Lib — La mise en place de l'infrastructure de partage**
-
-```
-Coût_Setup_Lib = Nb_Semaines_Setup × 40h × Coût_Horaire_Senior
-```
-
-C'est le coût "one-time" pour créer toute l'infrastructure technique nécessaire au partage. Ce n'est pas du développement de la feature en elle-même, c'est le travail d'outillage autour. Cela comprend :
-
-- **Configuration du repository / monorepo** (0.5-1 semaine) : Mise en place de la structure du package, configuration de l'outil de build (Webpack, Rollup, esbuild...), définition des entry points, configuration du tree-shaking, etc.
-- **Pipeline CI/CD** (1-2 semaines) : Tests automatisés sur chaque PR, publication automatique des nouvelles versions, gestion des environnements de staging, vérification de compatibilité avec les consumers.
-- **Documentation** (1-2 semaines) : README, guide d'intégration, documentation de l'API (JSDoc, Storybook pour les composants UI, etc.), exemples d'utilisation.
-- **Versioning et registry** (0.5-1 semaine) : Configuration du semantic versioning, mise en place du changelog automatique, publication sur un registry privé (npm private, Artifactory, etc.).
-- **Tests d'intégration** (1-2 semaines) : Tests qui vérifient que la lib fonctionne correctement dans le contexte de chaque codebase consommatrice.
-
-**Exemple chiffré (contexte France) :**
-Pour un setup typique de 8 semaines avec un dev senior à 65 €/h (fully loaded) :
-- Coût_Setup_Lib = 8 × 35h × 65 = 18 200 €
-- (Note : 35h/semaine en France, base légale)
-- Ce coût n'est payé qu'une seule fois, au début du projet.
-
-**3. Coût_Maintenance_Annuel — L'entretien courant de la librairie partagée**
-
-```
-Coût_Maintenance_Annuel = (Coût_Dev_Initial × Taux_Maintenance)
-                        + Coût_Versioning_Annuel
-                        + Coût_Support_Consumers_Annuel
-```
-
-La maintenance annuelle d'une librairie partagée a trois composantes :
-
-- **Taux_Maintenance** (0.15 à 0.25) : C'est le pourcentage du coût de développement initial qu'on dépense chaque année pour maintenir le code (corrections de bugs, mises à jour de dépendances, améliorations de performance, refactoring préventif). Les données de l'industrie montrent que la maintenance coûte 15-25 % du développement initial par an [[10]](https://www.scnsoft.com/software-development/maintenance-and-support/costs) [[12]](https://galorath.com/blog/software-maintenance-costs/). Pour une librairie partagée, on est plutôt dans le bas de la fourchette (0.15-0.18) parce qu'il n'y a qu'une seule base de code à maintenir.
-
-- **Coût_Versioning_Annuel** : Le temps passé à gérer les releases. Si on fait 12 releases par an (une par mois), avec 3h de travail par release (mise à jour du changelog, bump de version, vérification des tests, communication aux consumers) :
-  ```
-  Coût_Versioning_Annuel = 12 × 3h × 65 €/h = 2 340 €/an
-  ```
-
-- **Coût_Support_Consumers_Annuel** : Le temps passé à aider les équipes consommatrices à intégrer les nouvelles versions, résoudre des problèmes d'utilisation, répondre aux questions. Typiquement 5-10h par semaine :
-  ```
-  Coût_Support = 7.5h × 52 × 65 = 25 350 €/an
-  ```
-
-**Exemple chiffré complet (France) :**
-```
-Coût_Maintenance_Annuel = (33 800 × 0.18) + 2 340 + 25 350
-                        = 6 084 + 2 340 + 25 350
-                        = 33 774 €/an
-```
-
-**4. Coût_Coordination_Annuel — Le prix de la synchronisation inter-équipes**
-
-```
-Coût_Coordination_Annuel = Nb_Équipes × Heures_Coordination_Semaine × 52 × Coût_Horaire_Moyen
-```
-
-C'est le coût le plus souvent sous-estimé. Quand plusieurs équipes partagent du code, elles doivent se coordonner. Cela se manifeste par :
-
-- **Réunions de synchronisation** : Typiquement 1-2h par semaine par équipe pour discuter des évolutions de la lib, des breaking changes à venir, des priorités.
-- **Négociation des interfaces** : Quand une équipe a besoin d'une nouvelle fonctionnalité dans la lib qui pourrait impacter l'autre équipe. Cela nécessite des discussions de design, des compromis, parfois des POCs.
-- **Gestion des conflits de priorité** : L'équipe A a besoin d'un changement urgent mais l'équipe B n'est pas prête à absorber l'impact. Il faut négocier, planifier, parfois faire des contournements temporaires.
-
-La formule de Brooks nous dit que le nombre d'interfaces de communication croît de manière quadratique : n(n-1)/2 [[17]](https://andrewbegel.com/papers/coordination-chase09.pdf). Avec 2 équipes, c'est 1 interface. Avec 3 équipes, c'est 3. Avec 5 équipes, c'est 10.
-
-**Exemple chiffré (France) :**
-Avec 2 équipes, 3h de coordination par semaine par équipe, à 65 €/h :
-```
-Coût_Coordination = 2 × 3 × 52 × 65 = 20 280 €/an
-```
-
-**5. Coût_Onboarding — Le coût d'intégration des nouveaux développeurs**
-
-```
-Coût_Onboarding = Nb_Nouveaux_Devs × (Heures_Formation_Lib × Coût_Horaire_Nouveau
-                + Heures_Mentorat × Coût_Horaire_Mentor)
-```
-
-Chaque nouveau développeur doit comprendre non seulement la feature, mais aussi le système de partage (comment publier, versionner, tester la lib). Typiquement, cela ajoute 1-2 semaines au processus d'onboarding standard [[26]](https://fullscale.io/blog/developer-onboarding-best-practices/) [[27]](https://about.gitlab.com/the-source/platform/how-to-accelerate-developer-onboarding-and-why-it-matters/).
-
-**Exemple chiffré (France) :**
-Pour 3 nouveaux devs par an, avec 60h de formation (coût mid-level 50 €/h) et 20h de mentorat (coût senior 65 €/h) :
-```
-Coût_Onboarding = 3 × (60 × 50 + 20 × 65) = 3 × (3 000 + 1 300) = 12 900 €/an
-```
-
-#### Coût total annuel de l'approche Code Partagé — Exemple récapitulatif (France)
-
-| Poste | Année 0 (setup) | Année 1 | Année 2 | Année 3 |
-|-------|-----------------|---------|---------|---------|
-| Dev initial | 33 800 € | — | — | — |
-| Setup lib | 18 200 € | — | — | — |
-| Maintenance | — | 33 774 € | 33 774 € | 33 774 € |
-| Coordination | — | 20 280 € | 20 280 € | 20 280 € |
-| Onboarding | — | 12 900 € | 12 900 € | 12 900 € |
-| **Total cumulé** | **52 000 €** | **118 954 €** | **185 908 €** | **252 862 €** |
+Défaut **k = 0,04** : chaque application supplémentaire ajoute 4 % du coût de construction par an. C'est une **hypothèse** calibrée sur les éléments ci-dessus, pas une mesure.
 
 ---
 
-### 7.2 Coût total — Approche Code Dupliqué
+## 4. Code dupliqué
 
-#### Vue d'ensemble
+### 4.1 Copier dans une autre application (`p`)
 
-Avec cette approche, on développe la feature dans la codebase A, puis on la "porte" (copie et adapte) dans la codebase B. Il n'y a pas de mécanisme formel de partage : chaque codebase vit sa propre vie. C'est plus rapide à mettre en place au départ, mais le coût de maintenance augmente avec le temps à cause de la divergence progressive entre les deux copies.
-
-#### Formule
+Le modèle de réutilisation de COCOMO II donne le coût d'adaptation d'un code existant [[18]](https://www.rose-hulman.edu/class/csse/csse372/201310/Homework/CII_modelman2000.pdf) :
 
 ```
-Coût_Dupliqué_Total = Coût_Dev_Initial × (1 + Facteur_Portage)
-                    + Σ(Coût_Maintenance_Annuel_Dupliqué × Année)
-                    + Coût_Sync_Annuel × Nb_Années
-                    + Coût_Bugs_Supplémentaires × Nb_Années
+AAF = 0.4·DM + 0.3·CM + 0.3·IM
+AAM = [AA + AAF·(1 + 0.02·SU·UNFM)] / 100     (when AAF ≤ 50)
 ```
 
-#### Décomposition de chaque terme
+DM, CM et IM sont les pourcentages de conception modifiée, de code modifié et d'intégration/tests refaits. SU (10–50) est la pénalité de compréhension du logiciel, UNFM (0–1) le manque de familiarité de l'équipe avec le code et AA (0–8) l'effort d'évaluation. AAM est le coût relatif à du code neuf. Trois réglages illustratifs pour « copier une feature dans une application similaire » :
 
-**1. Coût_Dev_Initial × (1 + Facteur_Portage) — Le développement dans les deux codebases**
+| DM / CM / IM | AA, SU, UNFM | AAM |
+|---|---|---|
+| 20 / 30 / 80 | 4, 30, 0,4 (même équipe) | ≈ 0,55 |
+| 20 / 30 / 80 | 4, 30, 1,0 (autre équipe) | ≈ 0,70 |
+| 20 / 30 / 100 | 4, 30, 1,0 (retest complet, autre équipe) | ≈ 0,79 |
 
-```
-Coût_Dev_Dupliqué = Coût_Dev_Base × (1 + Facteur_Portage)
-```
+Données empiriques :
 
-Le `Facteur_Portage` (typiquement 0.5 à 0.8) représente le pourcentage de l'effort initial nécessaire pour adapter et porter la feature dans la seconde codebase. Ce n'est pas un simple copier-coller : il faut adapter les points d'entrée, les conventions de code, les patterns d'architecture de la codebase cible, les tests, etc.
+- L'analyse de Selby portant sur 2 954 modules NASA réutilisés, reproduite par Boehm et al. [[36]](https://staff.emu.edu.tr/alexanderchefranov/Documents/CMPE412/Boehm1995%20COCOMO%202%20.pdf) : la réutilisation sans modification coûte environ 5 % d'un code neuf, mais le coût relatif bondit à environ **0,55 dès qu'environ 12,5 % du code est modifié** (lu sur la figure publiée), puis augmente lentement (environ 0,70 à 62,5 % modifié). L'essentiel du coût tient à la compréhension du code et au re-test des interfaces.
+- Krüger & Berger rapportent que le clone-and-own réduisait le coût de développement d'une variante d'environ 35 %, soit un facteur d'environ 0,65 [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf). Ce chiffre provient d'**une seule étude** (Henry & Faller), pas d'une médiane.
 
-Pourquoi une fourchette de 0.5 à 0.8 et pas simplement 1.0 (le double) ?
-- Le design est déjà fait (on ne re-réfléchit pas la logique métier)
-- Les edge cases sont déjà identifiés
-- Les tests peuvent être adaptés plutôt que réécrits de zéro
-- MAIS il faut adapter le code aux conventions, patterns et dépendances de la codebase B
+Défaut **p = 0,65** par application supplémentaire.
 
-Plus les deux codebases sont différentes (frameworks différents, langages différents, architectures différentes), plus le facteur se rapproche de 0.8 ou même 1.0.
+### 4.2 Faire vivre les copies supplémentaires (`e0`)
 
-**Exemple chiffré (France) :**
-Feature de base : 400h × 65 €/h = 26 000 €
-Avec un facteur de portage de 0.65 (codebases assez similaires, même langage) :
-```
-Coût_Dev_Dupliqué = 26 000 × (1 + 0.65) = 26 000 × 1.65 = 42 900 €
-```
+Chaque copie a besoin de sa propre maintenance : ses propres corrections de bugs, sa propre adaptation à la plateforme et aux dépendances de son application. En plus, les modifications faites dans une copie doivent souvent être refaites dans les autres.
 
-**2. Coût_Maintenance_Annuel_Dupliqué — L'entretien de deux copies**
+Les seules données solides sur la synchronisation entre bases de code viennent de l'étude de Ray & Kim sur 18 ans des forks FreeBSD, NetBSD et OpenBSD [[37]](https://baishakhir.github.io/uploads/fse2012-bsd.pdf) :
 
-```
-Coût_Maintenance_Annuel_Dupliqué = Coût_Maintenance_Base × Facteur_Double_Maintenance
-```
+- **10,7–15,5 % des lignes modifiées** dans les patchs de release étaient portées depuis un fork voisin (13,8 % FreeBSD, 15,5 % NetBSD, 10,7 % OpenBSD).
+- Le taux de portage **n'a pas diminué** avec le temps.
+- 26 %, 59 % et 45 % des développeurs actifs ont porté des changements à chaque release.
+- La **latence médiane de portage était de 10 à 20 mois**, et les changements portés étaient *moins* sujets aux défauts que les autres.
 
-Le `Facteur_Double_Maintenance` (typiquement 1.8 à 2.0) reflète le fait que maintenir deux copies n'est pas exactement le double du coût d'une seule. Il y a une légère économie parce que le diagnostic d'un problème dans la copie A donne souvent des indices pour la copie B. Mais cette économie s'érode avec le temps à mesure que les deux copies divergent.
+Le calculateur exprime la maintenance de chaque copie supplémentaire comme un ratio `e` de la maintenance de la première copie. Défaut **e0 = 1,00** : une copie supplémentaire coûte autant à maintenir que la première, synchronisation et corrections répétées comprises. C'est une **hypothèse**. Ray & Kim confortent l'idée que la synchronisation représente une fraction stable et modérée du volume de changements, mais personne n'a mesuré le ratio lui-même.
 
-On peut modéliser cela avec un facteur qui augmente :
-```
-Facteur_Double_Maintenance(année) = 1.8 + (0.05 × année)
-```
-Autrement dit, le facteur commence à 1.8 la première année et augmente de 0.05 chaque année (parce que les deux copies divergent de plus en plus, rendant la maintenance croisée plus difficile).
+### 4.3 Bugs dans le code cloné
 
-Concrètement, le `Coût_Maintenance_Base` est le coût de maintenance d'une seule copie, calculé comme :
-```
-Coût_Maintenance_Base = Coût_Dev_Base × Taux_Maintenance
-```
+La littérature sur les clones est souvent sur-citée. Précisément :
 
-Avec un `Taux_Maintenance` entre 0.20 et 0.30 (plus élevé que pour le code partagé parce qu'il n'y a pas de facteur de généralisation qui simplifie la maintenance).
+- Mondal et al. (ICSME 2017) ont étudié **4 systèmes Java** (jEdit, Freecol, Carol, Jabref). **Jusqu'à 33 %** des fragments clonés *ayant reçu une correction de bug* contenaient un bug propagé [[38]](https://clones.usask.ca/pubfiles/articles/MondalICSME2017BugPropagation.pdf). La version étendue en revue (JSS 2019, **7 systèmes**, Java, C et C#) donne **18,42 %** au global [[39]](https://clones.usask.ca/pubfiles/articles/MMondalBugProposationJSS.pdf).
+  - Le dénominateur est l'ensemble des fragments clonés ayant reçu une correction de bug, pas tous les clones.
+  - « Propagé » est **déduit** : deux fragments ayant reçu la même correction tout en restant des clones sont supposés avoir partagé un bug copié avec le code.
+  - Tous les clones sont **dans un même dépôt**, pas entre bases de code.
+- Juergens et al. ont constaté qu'environ une modification incohérente *non intentionnelle* d'un clone sur deux à trois entraînait un défaut, sur cinq systèmes industriels et open source [[40]](https://arxiv.org/abs/1701.05472).
+- Islam et al. ont analysé 34 systèmes (8,7 MLOC) avec deux détecteurs statiques : les vulnérabilités du code cloné étaient **plus graves**, mais **pas plus denses**, que dans le code non cloné [[41]](https://doi.org/10.1109/ESEM.2017.9).
 
-**Exemple chiffré (France) :**
-```
-Coût_Maintenance_Base = 26 000 × 0.22 = 5 720 €/an (pour une seule copie)
+Les bugs dupliqués sont donc réels, mais rien ne fonde un « multiplicateur de bugs » fixe. Le calculateur inclut les corrections répétées dans le ratio par copie supplémentaire `e` au lieu de les chiffrer à part.
 
-Année 1 : 5 720 × 1.80 = 10 296 €
-Année 2 : 5 720 × 1.85 = 10 582 €
-Année 3 : 5 720 × 1.90 = 10 868 €
-```
+### 4.4 Divergence dans le temps (`δ`, plafond 1,5)
 
-**3. Coût_Sync_Annuel — Le coût de garder les deux copies alignées**
+Aucune étude ne mesure un coût de synchronisation qui croîtrait exponentiellement avec l'âge des copies. Ce que montrent les études, c'est que les copies qui s'éloignent **cessent d'être synchronisées** :
 
-```
-Coût_Sync_Annuel = Nb_Features_Évoluées_Par_An × Heures_Sync_Par_Feature × Coût_Horaire
-```
+- la plupart des hard forks sur GitHub ne se resynchronisent jamais avec l'upstream [[42]](https://www.cs.cmu.edu/~shuruiz/paper/icse20-hardfork.pdf) ;
+- il y a peu d'intégration de code entre membres d'une même famille de forks dans les écosystèmes Android, .NET et JavaScript [[43]](https://doi.org/10.1007/s10664-021-10078-2) ;
+- une personne interrogée par Krüger & Berger, à propos des clones de longue durée : « we don't do it at all » [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf).
 
-C'est le coût le plus insidieux de la duplication. Chaque fois qu'on fait évoluer la feature dans la codebase A, il faut se demander : "est-ce que ce changement doit aussi être appliqué dans la codebase B ?". Si oui, il faut :
-
-- Comprendre le changement dans le contexte de A
-- Adapter le changement au contexte de B (qui a peut-être divergé)
-- Tester dans le contexte de B
-- Faire une code review séparée pour B
-- Déployer dans B
-
-Le temps de synchronisation par feature augmente avec le temps parce que les deux copies divergent. On peut modéliser cela avec un facteur de divergence :
-
-```
-Heures_Sync_Par_Feature(année) = Heures_Sync_Base × (1 + Taux_Divergence)^année
-```
-
-Où `Taux_Divergence` est typiquement 0.15 à 0.30 par an (15-30 % de complexité supplémentaire chaque année pour synchroniser).
-
-**Exemple chiffré (France) :**
-Avec 8 évolutions par an, 16h de sync par évolution au départ, un taux de divergence de 0.20, à 65 €/h :
-```
-Année 1 : 8 × 16 × 1.20^1 × 65 = 8 × 19.2 × 65 = 9 984 €
-Année 2 : 8 × 16 × 1.20^2 × 65 = 8 × 23.0 × 65 = 11 981 €
-Année 3 : 8 × 16 × 1.20^3 × 65 = 8 × 27.6 × 65 = 14 377 €
-```
-
-On voit clairement l'accélération des coûts année après année.
-
-**4. Coût_Bugs_Supplémentaires — Le prix de la duplication sur la qualité**
-
-```
-Coût_Bugs_Supplémentaires = Nb_Bugs_Base × Facteur_Duplication_Bugs × Coût_Moyen_Bug
-```
-
-Les études IEEE montrent que jusqu'à 33 % des clones de code corrigés contiennent des bugs propagés non corrigés dans les autres copies [[41]](https://ieeexplore.ieee.org/document/8094424/) [[42]](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815). Le clonage multiplie aussi les vulnérabilités de sécurité [[45]](https://dl.acm.org/doi/abs/10.1109/ESEM.2017.9). Cela s'explique par plusieurs mécanismes :
-
-- **Propagation incomplète** : Un bug est corrigé dans A mais pas dans B (ou inversement). C'est le cas le plus fréquent.
-- **Régression croisée** : La correction dans B introduit un nouveau bug parce que le contexte a divergé.
-- **Faux sentiment de sécurité** : L'équipe pense que le bug a été corrigé partout alors qu'il ne l'a été que dans une codebase.
-
-Le `Facteur_Duplication_Bugs` (1.5 à 3.0) dépend de la discipline de l'équipe et de la qualité du suivi entre les deux copies. En pratique :
-- 1.5 : Équipe très disciplinée avec un processus formel de propagation des fixes
-- 2.0 : Équipe moyenne avec un suivi informel
-- 3.0 : Pas de processus de suivi, la propagation dépend de la mémoire individuelle
-
-Le `Coût_Moyen_Bug` dépend de la phase de détection (voir section 2.3). En production, un bug coûte en moyenne 5 000 à 15 000 $ à diagnostiquer, corriger, tester, déployer et communiquer [[14]](https://www.functionize.com/blog/the-cost-of-finding-bugs-later-in-the-sdlc) [[16]](https://deepsource.com/blog/exponential-cost-of-fixing-bugs).
-
-**Exemple chiffré (France) :**
-Pour une estimation réaliste, on sépare les bugs par sévérité. Les coûts de correction en France sont plus bas qu'aux US mais restent significatifs :
-```
-Coût_Bugs_Supp = (Nb_Bugs_Critiques × Coût_Bug_Critique)
-               + (Nb_Bugs_Majeurs × Coût_Bug_Majeur)
-               + (Nb_Bugs_Mineurs × Coût_Bug_Mineur)
-```
-
-Avec par exemple :
-- 2 bugs critiques × 10 000 € = 20 000 € (hotfix, rollback, astreinte, communication)
-- 6 bugs majeurs × 3 500 € = 21 000 € (diagnostic + correction + tests + review + déploiement)
-- 12 bugs mineurs × 800 € = 9 600 € (correction simple + tests)
-- **Total : 50 600 €/an**
-
-#### Coût total annuel de l'approche Code Dupliqué — Exemple récapitulatif (France)
-
-| Poste | Année 0 (dev) | Année 1 | Année 2 | Année 3 |
-|-------|---------------|---------|---------|---------|
-| Dev initial (A + B) | 42 900 € | — | — | — |
-| Maintenance (2 copies) | — | 10 296 € | 10 582 € | 10 868 € |
-| Synchronisation | — | 9 984 € | 11 981 € | 14 377 € |
-| Bugs supplémentaires | — | 50 600 € | 50 600 € | 50 600 € |
-| **Total cumulé** | **42 900 €** | **113 780 €** | **186 943 €** | **262 788 €** |
+La synchronisation non payée devient de la dérive : comportements incohérents, corrections manquées, coût croissant d'une éventuelle refusion. Le calculateur modélise cela comme une **légère hausse linéaire** du ratio par copie supplémentaire, par défaut **δ = 0,05 par an**, **plafonnée à 1,5×**. Au-delà du plafond, l'hypothèse est que les équipes arrêtent de synchroniser plutôt que de payer davantage. δ et le plafond sont tous deux des **hypothèses**.
 
 ---
 
-### 7.3 Formule de point de croisement (break-even)
+## 5. L'autre côté de l'argument
 
-#### Vue d'ensemble
+Les preuves ne vont pas toutes dans le sens du partage :
 
-Le code partagé coûte plus cher au départ (investissement dans l'infrastructure de partage) mais moins cher sur la durée (maintenance unique, pas de synchronisation). Le code dupliqué coûte moins cher au départ mais les coûts accélèrent avec le temps. Le point de croisement (break-even) est le moment où le coût cumulé du code partagé devient inférieur à celui du code dupliqué.
+- **Beaucoup de clones sont sans problème.** Dans Apache httpd et Gnumeric, jusqu'à 71 % des clones ont été jugés avoir un effet *positif* sur la maintenabilité [[44]](https://doi.org/10.1007/s10664-008-9076-6).
+- **Beaucoup de clones ont une vie courte.** Parmi les généalogies de clones disparues, 54–72 % l'ont fait en environ 8 check-ins, et la plupart n'étaient pas faciles à refactorer localement [[45]](https://dada.cs.washington.edu/research/tr/2005/04/UW-CSE-05-04-01.pdf).
+- **Les clones ne sont pas plus bogués.** Dans quatre projets open source en C, la plupart des bugs n'avaient rien à voir avec les clones, et le code cloné était plutôt *moins* sujet aux défauts [[46]](https://doi.org/10.1007/s10664-011-9195-3).
+- **Les ingénieurs choisissent le clonage pour échapper aux dépendances.** 49 % des ingénieurs Microsoft interrogés élimineraient les dépendances de code, par exemple par clone-and-own [[33]](https://andrewbegel.com/papers/coordination-chase09.pdf). Les personnes interrogées par Krüger & Berger jugeaient la *propagation des changements* plus coûteuse sur une plateforme qu'avec des clones [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf).
+- **La mauvaise abstraction.** « Duplication is far cheaper than the wrong abstraction » [[47]](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction). Une bibliothèque partagée construite avant que les cas d'usage soient compris peut coûter plus cher que les copies qu'elle remplace. C'est un billet d'opinion, mais cohérent avec les études ci-dessus.
+- **L'heuristique des « environ trois produits ».** La littérature sur les lignes de produits logiciels indique qu'une plateforme de réutilisation devient rentable à partir d'environ trois produits [[48]](https://doi.org/10.1007/3-540-28901-1). C'est une règle issue de l'expérience, pas une mesure. Le fait que le verdict du calculateur soit serré à N = 2 (§7.5) est cohérent avec elle.
 
-#### Formule
+**Assistants de code IA.** Les preuves sont récentes et contrastées :
 
-```
-Nb_Mois_Break_Even = (Coût_Setup_Lib + Surcoût_Généralisation) /
-                      (Économie_Maintenance_Mensuelle - Coût_Coordination_Mensuel)
-```
+- Le rapport 2025 de GitClear, une analyse d'éditeur, a relevé environ 8× plus de blocs de code dupliqués en 2024 qu'auparavant [49]. Il montre davantage de duplication, pas son coût.
+- Une expérience contrôlée pré-enregistrée avec 151 participants n'a trouvé **aucun effet** du développement assisté par IA sur la facilité avec laquelle d'autres pouvaient ensuite faire évoluer le code [[50]](https://arxiv.org/abs/2507.00788).
+- Un LLM a porté correctement 42 % des patchs Vim vers Neovim [[51]](https://arxiv.org/abs/2404.17964), ce qui suggère que le portage pourrait devenir moins cher.
 
-Détaillons chaque composant :
-
-- **Coût_Setup_Lib** : L'investissement initial pour mettre en place l'infrastructure de partage (calculé en 7.1).
-- **Surcoût_Généralisation** : La différence entre le coût de développement d'une feature partageable et celui d'une feature spécifique. C'est `Coût_Dev_Initial × (Facteur_Généralisation - 1)`.
-- **Économie_Maintenance_Mensuelle** : Combien on économise chaque mois en n'ayant qu'une seule copie à maintenir au lieu de deux. C'est `(Coût_Maintenance_Dupliqué - Coût_Maintenance_Partagé) / 12`.
-- **Coût_Coordination_Mensuel** : Le surcoût mensuel de coordination qu'on paie pour le partage et qu'on ne paierait pas avec du code dupliqué. C'est `Coût_Coordination_Annuel / 12`.
-
-La formule ne fonctionne (le break-even existe) que si l'économie de maintenance est supérieure au coût de coordination. Sinon, le code partagé ne devient jamais rentable — c'est un signal que la feature est trop petite ou que le coût de coordination est trop élevé pour justifier le partage.
-
-**Exemple chiffré (avec les données françaises précédentes) :**
-```
-Surcoût_Généralisation = 33 800 - 26 000 = 7 800 €
-Coût_Setup_Lib = 18 200 €
-
-Économie_Maintenance_Annuelle (année 1) = (10 296 + 9 984 + 50 600) - 33 774 = 37 106 €
-Économie_Maintenance_Mensuelle = 37 106 / 12 = 3 092 €/mois
-
-Coût_Coordination_Mensuel = 20 280 / 12 = 1 690 €/mois
-
-Nb_Mois_Break_Even = (18 200 + 7 800) / (3 092 - 1 690)
-                   = 26 000 / 1 402
-                   ≈ 18.5 mois
-```
-
-Dans cet exemple, le code partagé devient rentable après environ 18-19 mois (~1 an et demi).
-
-**Facteurs qui raccourcissent le break-even :**
-- Feature de grande taille (plus d'économies de maintenance)
-- Haute fréquence d'évolution (plus de synchronisation évitée)
-- Bugs fréquents en production (coûts de bugs supplémentaires évités)
-- Plus de 2 codebases consumers
-
-**Facteurs qui allongent le break-even :**
-- Feature petite et stable (peu de maintenance)
-- Équipes très indépendantes (coordination coûteuse)
-- Codebases très différentes (généralisation difficile)
-- Feature en fin de vie (peu de temps pour amortir)
+**Le calculateur ne modélise pas l'IA.** Si vous pensez que vos outils rendent la copie moins chère, baissez vous-même `p` et `e0`.
 
 ---
 
-### 7.4 Facteur d'échelle — L'effet multiplicateur du nombre de consumers
+## 6. Périmètre et limites
 
-#### Vue d'ensemble
+Ce que le modèle ne capture pas, pour que le lecteur puisse ajuster le verdict par son jugement :
 
-Le vrai avantage du code partagé se révèle quand le nombre de codebases consommatrices augmente. Avec du code dupliqué, chaque nouvelle codebase multiplie les coûts de manière quasi-linéaire. Avec du code partagé, le coût marginal de chaque nouveau consumer est bien plus faible.
-
-#### Formule
-
-```
-Ratio_Avantage(N) = Coût_Total_Dupliqué(N) / Coût_Total_Partagé(N)
-```
-
-Que l'on peut décomposer comme :
-
-```
-Coût_Total_Dupliqué(N) = Coût_Dev_Base + (N-1) × Coût_Dev_Base × Facteur_Portage
-                        + N × Coût_Maintenance_Unitaire × Nb_Années
-
-Coût_Total_Partagé(N) = Coût_Dev_Base × Facteur_Généralisation + Coût_Setup_Lib
-                       + Coût_Maintenance_Lib × Nb_Années
-                       + N × Coût_Intégration_Unitaire × Nb_Années
-                       + Coût_Coordination(N) × Nb_Années
-```
-
-Où `Coût_Intégration_Unitaire` est le faible coût pour intégrer la lib dans une nouvelle codebase (typiquement 5-10 % du coût de portage).
-
-Le ratio devient clairement favorable au partage (> 1.5) quand N ≥ 3 dans la plupart des scénarios.
-
-**Exemple avec N = 2, 3, et 5 codebases (coûts sur 3 ans, contexte France) :**
-
-| N codebases | Coût dupliqué (3 ans) | Coût partagé (3 ans) | Ratio |
-|-------------|----------------------|---------------------|-------|
-| 2 | 262 788 € | 252 862 € | 1.04 |
-| 3 | 438 000 € | 280 000 € | 1.56 |
-| 5 | 790 000 € | 320 000 € | 2.47 |
-
-On voit que l'avantage du code partagé s'accélère avec le nombre de consumers. À 5 codebases, le code dupliqué coûte 2.5 fois plus cher.
+| Non modélisé | Dans quel sens cela joue |
+|---|---|
+| Délai de mise sur le marché | Dans les deux sens. Sans bibliothèque, copier livre généralement la deuxième application plus tôt. Une fois une plateforme établie, la revue de Krüger & Berger rapporte une réduction du délai de mise sur le marché plus forte pour la plateforme (environ −63 %) que pour le clone-and-own (environ −30 %) [[31]](https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf). |
+| Goulot d'étranglement des releases | Contre le partage : les équipes attendent les releases de la bibliothèque. |
+| Divergence volontaire | Contre le coût côté duplication : si les copies *doivent* différer, leur maintenance séparée n'est pas du gaspillage. |
+| Actualisation (VAN) | Les coûts tardifs pèseraient moins. L'avantage du partage vient des coûts récurrents, donc l'actualisation le réduit légèrement. |
+| Intégration des nouveaux arrivants | Neutre dans le modèle. Aucune étude ne distingue « apprendre le mécanisme de partage » de « apprendre deux copies divergentes ». |
+| Dérive non payée | Contre la duplication : les comportements incohérents et les corrections manquées une fois que les copies ne sont plus synchronisées (§4.4) ont un coût que le modèle ne chiffre pas. |
+| Assistance IA | Voir §5. |
+| Bugs comme ligne séparée | Pas chiffrés à part ; inclus dans `m` et `e` (§2.4). |
 
 ---
 
-### 7.5 Formule bonus : Coût de la divergence dans le temps
+## 7. Le modèle du calculateur
 
-Un aspect crucial pour le calculateur est de modéliser comment le coût de la duplication croît dans le temps. On peut le faire avec une courbe exponentielle :
+Chaque formule ci-dessous est implémentée dans `src/engine/formulas.ts`, et chaque chiffre du §7.5 peut être reproduit en l'appelant.
+
+**À propos de COCOMO.** Le calculateur n'utilise pas l'équation d'effort de COCOMO fondée sur la taille : c'est vous qui fournissez directement l'effort. Seules deux parties de COCOMO II servent de preuves : le cost driver RUSE (pour G, §3.1) et le modèle de réutilisation (pour p, §4.1).
+
+**Définitions communes.**
+
+- **w** : le taux horaire chargé moyen de l'équipe, pondéré par l'effectif (§1.3).
+- **B** : les heures-personne nécessaires pour construire la feature une fois, pour une application.
+  - Story points : `B = (story points / vélocité) × semaines par sprint × 35 h × effectif`. La vélocité est celle de toute l'équipe, donc chaque sprint coûte les heures de chaque membre.
+  - Mode direct : la valeur est déjà en heures-personne, ou en jours-personne × 7 h.
+- **C0 = B × w** : le coût de construction de la feature une fois, pour une application. Tous les coûts du modèle sont des multiples de C0, sauf la mise en place et le fonctionnement de la bibliothèque, qui sont des heures fixes × w.
+- **N** : nombre d'applications ayant besoin de la feature (de 2 à 10 dans l'interface). **T** : horizon en années.
+- **Calendrier** : les constructions sont payées au mois 0. Les coûts annuels s'accumulent de façon régulière, un douzième par mois. Le mois t appartient à l'année y = ⌈t / 12⌉.
+
+### 7.1 Coût autonome
+
+La feature construite une fois, pour une application :
 
 ```
-Coût_Divergence(t) = Coût_Sync_Base × e^(Taux_Divergence × t)
+Standalone(T) = C0 + m · C0 · T
 ```
 
-Où :
-- `t` est le temps en années
-- `Taux_Divergence` est typiquement 0.15 à 0.30
-- `Coût_Sync_Base` est le coût de synchronisation de la première année
+Exemple avec le scénario par défaut (§7.5) : 45 360 + 0,20 × 45 360 × 5 = **90 720 €**.
 
-Cette formule capture le fait que la divergence n'est pas linéaire : les deux codebases accumulent des différences qui se composent. Chaque différence rend les futures synchronisations plus complexes, créant un effet boule de neige.
+### 7.2 Bibliothèque partagée
 
-**Exemple (France) avec Coût_Sync_Base = 8 500 €/an et Taux_Divergence = 0.20 :**
 ```
-Année 1 : 8 500 × e^(0.20 × 1) = 10 382 €
-Année 2 : 8 500 × e^(0.20 × 2) = 12 680 €
-Année 3 : 8 500 × e^(0.20 × 3) = 15 488 €
-Année 5 : 8 500 × e^(0.20 × 5) = 23 106 €
+Build_S  = G·C0  +  i·C0·(N−1)  +  280 h · w        (setup only for a new library)
+Yearly_S = m·G·C0  +  k·C0·(N−1)  +  100 h · w      (running only for a new library)
 ```
 
-Au bout de 5 ans, le coût de synchronisation a presque triplé par rapport à la première année. C'est un argument fort pour montrer que la duplication n'est viable que pour des features à durée de vie courte.
+| Ligne dans l'application | Formule |
+|---|---|
+| La construire une fois, conçue pour être partagée | G · C0 |
+| L'intégrer dans les autres applications | i · C0 · (N−1) |
+| Mettre en place la bibliothèque | 280 h · w (0 si la bibliothèque existe) |
+| Maintenance du code partagé | m · G · C0 · T |
+| Coordination et montées de version | k · C0 · (N−1) · T |
+| Faire vivre la bibliothèque | 100 h · w · T (0 si la bibliothèque existe) |
+
+### 7.3 Copies dupliquées
+
+```
+Build_D     = C0  +  p·C0·(N−1)
+Yearly_D(y) = m·C0  +  m·C0·(N−1)·e(y)
+e(y)        = min(1.5, e0 + δ·(y−1))
+```
+
+| Ligne dans l'application | Formule |
+|---|---|
+| La construire pour la première application | C0 |
+| La copier dans les autres applications | p · C0 · (N−1) |
+| Maintenance de la première copie | m · C0 · T |
+| Maintenance des copies supplémentaires | m · C0 · (N−1) · [e(1) + e(2) + … + e(T)] |
+
+Le ratio par copie supplémentaire démarre à e0 en année 1, augmente de δ chaque année et s'arrête à 1,5.
+
+### 7.4 Paramètres
+
+Réglables dans le panneau « Paramètres avancés » :
+
+| Symbole | Dans l'application | Défaut | Plage dans l'interface | Preuve | Fondement |
+|---|---|---|---|---|---|
+| G | Travail supplémentaire pour la rendre réutilisable | 1,20 | 1,0–1,6 | Mesuré | COCOMO II RUSE 1,07–1,24 ; HP 1,11 ; Krüger & Berger médiane +20 % ; Poulin 1,5 comme défaut recommandé (§3.1) |
+| p | Effort pour la copier dans une autre application | 0,65 | 0,3–1,0 | Mesuré | Modèle de réutilisation COCOMO II 0,55–0,8 ; Selby 0,55 à ~12,5 % modifié ; Krüger & Berger −35 %, une seule étude (§4.1) |
+| i | Effort pour intégrer la bibliothèque dans une autre application | 0,20 | 0–0,5 | Mesuré | Poulin RCR 0,2 ; Krüger & Berger variante sur plateforme ≈ 0,33 (§3.1) |
+| m | Maintenance annuelle d'une copie | 0,20 | 0,1–0,4 | Mesuré (ordre de grandeur) | Règle empirique DoD ~20 %/an ; trafic annuel de changements de Boehm ; Glass 60/60 (§2.1) |
+| e0 | Maintenance de chaque copie supplémentaire | 1,00 | 0,5–1,5 | Hypothèse | Étayé par Ray & Kim : 10,7–15,5 % des changements portés entre forks, à un rythme stable (§4.2) |
+| δ | Vitesse de divergence des copies | 0,05 / an | 0–0,2 | Hypothèse | Aucune mesure ; les forks cessent de se synchroniser plutôt que de payer davantage (§4.4) |
+| k | Coordination et montées de version par application supplémentaire | 0,04 / an | 0–0,15 | Hypothèse | Krüger & Berger coordination 5 % vs 7 % ; Xavier et al. 14,78 % de changements d'API cassants (§3.2) |
+
+Constantes fixes (non exposées dans l'interface) :
+
+| Constante | Valeur | Preuve | Fondement |
+|---|---|---|---|
+| Mise en place de la bibliothèque | 280 h (8 semaines × 35 h) | Hypothèse | §3.1 |
+| Fonctionnement de la bibliothèque | 100 h / an | Hypothèse | §3.2 |
+| Plafond du ratio par copie supplémentaire | 1,5 | Hypothèse | §4.4 |
+| Semaine / journée de travail | 35 h / 7 h | Base légale | §1.3 |
+
+« Mesuré » signifie qu'une source empirique donne au moins l'ordre de grandeur. Cela ne signifie pas que la valeur par défaut est la bonne pour votre équipe.
+
+### 7.5 Exemple chiffré : le scénario par défaut de l'application
+
+**Entrées.**
+
+- Équipe : 1 Junior (32 €/h), 2 Confirmés (40 €/h), 1 Senior (50 €/h), 0 Lead (62 €/h). Moyenne w = (32 + 2 × 40 + 50) / 4 = **40,5 €/h**.
+- Feature : 40 story points, vélocité d'équipe de 10, sprints de 2 semaines → 4 sprints × 2 semaines × 35 h × 4 personnes = **B = 1 120 heures-personne**.
+- C0 = 1 120 × 40,5 = **45 360 €**.
+- N = 2 applications, horizon de 5 ans, nouvelle bibliothèque, tous les paramètres par défaut.
+
+**Bibliothèque partagée.**
+
+| Ligne | Calcul | Coût |
+|---|---|---|
+| La construire une fois, conçue pour être partagée | 1,20 × 45 360 | 54 432 € |
+| L'intégrer dans les autres applications | 0,20 × 45 360 × 1 | 9 072 € |
+| Mettre en place la bibliothèque | 280 h × 40,5 | 11 340 € |
+| Maintenance du code partagé | 0,20 × 1,20 × 45 360 × 5 | 54 432 € |
+| Coordination et montées de version | 0,04 × 45 360 × 1 × 5 | 9 072 € |
+| Faire vivre la bibliothèque | 100 h × 40,5 × 5 | 20 250 € |
+| **Total après 5 ans** | | **158 598 €** |
+
+**Copies dupliquées.**
+
+| Ligne | Calcul | Coût |
+|---|---|---|
+| La construire pour la première application | 45 360 | 45 360 € |
+| La copier dans les autres applications | 0,65 × 45 360 × 1 | 29 484 € |
+| Maintenance de la première copie | 0,20 × 45 360 × 5 | 45 360 € |
+| Maintenance des copies supplémentaires | 0,20 × 45 360 × (1,00 + 1,05 + 1,10 + 1,15 + 1,20) | 49 896 € |
+| **Total après 5 ans** | | **170 100 €** |
+
+**Verdict : dupliquer coûte 11 502 € de plus sur 5 ans** (environ 7 % du total dupliqué). Point mort : **mois 0**.
+
+Coût cumulé à chaque fin d'année :
+
+| | Année 0 | Année 1 | Année 2 | Année 3 | Année 4 | Année 5 |
+|---|---|---|---|---|---|---|
+| Partagé | 74 844 € | 91 595 € | 108 346 € | 125 096 € | 141 847 € | 158 598 € |
+| Dupliqué | 74 844 € | 92 988 € | 111 586 € | 130 637 € | 150 142 € | 170 100 € |
+
+**À quel point c'est serré.** Dans le cas par défaut, les coûts initiaux sont *exactement* égaux : 1,20 + 0,20 + 280 / 1 120 = 1,65 = 1 + 0,65 fois C0, soit 74 844 € de chaque côté. C'est une coïncidence liée à cette taille de feature, pas une propriété du modèle. Le point mort au « mois 0 » signifie une égalité au départ : le moteur considère « partagé ≤ dupliqué » comme un partage qui n'est pas plus cher. Le verdict est entièrement décidé par les **coûts récurrents** : 16 751 € par an côté partagé, contre 18 144 € en année 1 côté dupliqué, en hausse de 454 € par an avec la dérive. Une modification modeste d'une seule hypothèse suffit à l'inverser, comme le montre le tableau suivant.
+
+**Sensibilité** (une seule entrée modifiée à la fois par rapport au scénario par défaut ; montants arrondis à l'euro) :
+
+| Variante | Total partagé | Total dupliqué | Écart (dupliqué − partagé) | Point mort |
+|---|---|---|---|---|
+| Défaut | 158 598 € | 170 100 € | +11 502 € | mois 0 (égalité à la construction) |
+| N = 3 | 176 742 € | 249 480 € | +72 738 € | mois 0 |
+| N = 5 | 213 030 € | 408 240 € | +195 210 € | mois 0 |
+| N = 10 | 303 750 € | 805 140 € | +501 390 € | mois 0 |
+| Bibliothèque existante | 127 008 € | 170 100 € | +43 092 € | mois 0 |
+| Feature de 140 h | 47 466 € | 21 263 € | −26 203 € | aucun sur l'horizon |
+| Horizon d'1 an | 91 595 € | 92 988 € | +1 393 € | mois 0 |
+| p = 0,4 | 158 598 € | 158 760 € | +162 € | mois 60 |
+| G = 1,5 | 185 814 € | 170 100 € | −15 714 € | aucun sur l'horizon |
+
+Un écart positif signifie que le partage est moins cher. Lecture du tableau :
+
+- Davantage d'applications favorise fortement le partage : chaque application supplémentaire coûte 0,65 C0 à copier plus la maintenance d'une copie complète, contre 0,20 C0 à intégrer plus 0,04 C0 par an.
+- Une bibliothèque existante supprime les coûts de mise en place et de fonctionnement, qui sont des heures fixes. C'est pourquoi une petite feature sur une nouvelle bibliothèque favorise la copie : pour 140 h de travail, les 280 h de mise en place et les 100 h par an de fonctionnement l'emportent sur tout le reste.
+- Une copie bon marché (p = 0,4) ne laisse le partage devant qu'au tout dernier mois. Une forte prime de généralisation (G = 1,5) rend la duplication moins chère sur tout l'horizon.
+
+### 7.6 Point mort et écart
+
+```
+Gap(T)     = CumD(T) − CumS(T)
+Break-even = earliest month t such that CumS(u) ≤ CumD(u) for every month u from t to T·12
+```
+
+- **0** signifie que le partage n'est pas plus cher dès le premier jour.
+- **« Aucun »** signifie que le partage n'est pas moins cher à l'horizon.
+- Sinon, c'est le mois à partir duquel le partage reste moins cher jusqu'à l'horizon.
+
+Le point mort est lu sur les mêmes courbes mensuelles que les totaux, donc l'écart et le point mort ne peuvent jamais se contredire. Si le partage est moins cher à l'horizon, un mois de point mort existe. S'il est plus cher, il n'y en a pas.
+
+**Le taux horaire n'inverse jamais le verdict.** Chaque terme est un nombre d'heures × w (C0 = B × w ; la mise en place et le fonctionnement sont des heures fixes × w). L'écart est donc proportionnel au taux : doubler tous les taux double l'écart, et le mois de point mort ne bouge pas. Ce qui décide du verdict, c'est l'effort B, le nombre d'applications, l'horizon et les paramètres.
 
 ---
 
-## 8. Variables d'entrée recommandées pour le calculateur
+## 8. Sources
 
-### 8.1 Paramètres de l'équipe
+Numérotées par ordre de première citation. Les entrées sans lien sont des livres, des rapports ou des pages sans URL publique stable.
 
-- Nombre de développeurs
-- Coût horaire moyen (chargé)
-- Séniorité moyenne de l'équipe
-- Taux de turnover annuel
-- Nombre d'équipes impliquées
-
-### 8.2 Paramètres de la feature
-
-- Taille estimée (story points ou KLOC)
-- Complexité (simple, modérée, complexe)
-- Nombre de codebases cibles
-- Pourcentage de code commun vs spécifique (%)
-- Fréquence d'évolution prévue (features/trimestre)
-
-### 8.3 Paramètres temporels
-
-- Horizon de calcul (en années)
-- Durée du sprint
-- Temps estimé de développement initial
-
-### 8.4 Paramètres organisationnels
-
-- Méthodologie (Agile, Waterfall, hybride)
-- Niveau de maturité CI/CD (1-5)
-- Qualité de la documentation existante (1-5)
-- Couverture de tests existante (%)
-
----
-
-## 9. Tableau comparatif synthétique
-
-| Dimension | Code Partagé | Code Dupliqué |
-|-----------|-------------|---------------|
-| **Coût initial** | Plus élevé (+30-50 %) | Plus bas, mais double (~170-220 % d'une feature) |
-| **Coût de maintenance annuel** | 15-25 % du dev initial | 30-50 % du dev initial (double maintenance) |
-| **Coût de coordination** | Élevé (11-23 % du temps dev) | Faible si équipes indépendantes |
-| **Risque de bugs** | 1x (source unique) | ~33 % des clones contiennent des bugs propagés [[41]](https://ieeexplore.ieee.org/document/8094424/) |
-| **Cohérence fonctionnelle** | Garantie | Se dégrade avec le temps |
-| **Flexibilité** | Limitée (couplage) | Élevée (indépendance totale) |
-| **Scalabilité (N codebases)** | Linéaire (excellent) | N × coût (mauvais) |
-| **Temps de mise sur le marché** | Plus long (setup initial) | Plus court initialement |
-| **Onboarding** | Plus simple (1 source) | Plus complexe (N sources + différences) |
-| **Break-even** | 6-18 mois | Jamais (coûts croissants) |
-
----
-
-## 10. Sources
-
-### Modèles de coût et estimation
-- [COCOMO - Wikipedia](https://en.wikipedia.org/wiki/COCOMO)
-- [COCOMO Model - GeeksforGeeks](https://www.geeksforgeeks.org/software-engineering/software-engineering-cocomo-model/)
-- [COCOMO II - Constructive Cost Model](https://softwarecost.org/tools/COCOMO/)
-- [Linux Foundation - COCOMO Cost Estimation](https://docs.linuxfoundation.org/lfx/insights/v3-beta-version-current/getting-started/landing-page/cocomo-cost-estimation-simplified)
-
-### Coûts de maintenance
-- [ScienceSoft - Software Maintenance Costs](https://www.scnsoft.com/software-development/maintenance-and-support/costs)
-- [IdeaLink - Software Development vs Maintenance](https://idealink.tech/blog/software-development-maintenance-true-cost-equation)
-- [MadDevs - Software Maintenance Costs](https://maddevs.io/customer-university/software-maintenance-costs/)
-- [Galorath - Software Maintenance Cost](https://galorath.com/blog/software-maintenance-costs/)
-- [TechStep - App Maintenance Cost](https://www.techstep.io/articles/app-maintenance-cost-can-be-three-times-higher-than-development-cost)
-- [O'Reilly - The 60/60 Rule (97 Things Every Project Manager Should Know)](https://www.oreilly.com/library/view/97-things-every/9780596805425/ch34.html) — Source originale de la règle des 60 % de coûts en maintenance
-- [NIH/PMC - Factors Affecting Software Projects Maintenance Cost](https://pmc.ncbi.nlm.nih.gov/articles/PMC3610582/) — Étude académique peer-reviewed
-
-### Duplication de code et dette technique
-- [Software.com - Code Duplication Metrics](https://www.software.com/engineering-metrics/code-duplication)
-- [LinearB - Code Duplication](https://linearb.io/blog/code-duplication)
-- [Graph AI - Hidden Costs of Duplicate Code](https://www.graphapp.ai/blog/the-hidden-costs-of-duplicate-code-in-software-engineering)
-- [GetDX - Technical Debt Ratio](https://getdx.com/blog/technical-debt-ratio/)
-- [SonarSource - Measuring Technical Debt](https://www.sonarsource.com/resources/library/measuring-and-identifying-code-level-technical-debt-a-practical-guide/)
-- [Manning - Software Mistakes and Tradeoffs, Chapter 2](https://livebook.manning.com/book/software-mistakes-and-tradeoffs/chapter-2)
-- [Stripe - The Developer Coefficient (2018)](https://stripe.com/files/reports/the-developer-coefficient.pdf) — Étude originale sur le temps perdu en dette technique
-- [CISQ - Cost of Poor Software Quality in the US (2022)](https://www.it-cisq.org/the-cost-of-poor-quality-software-in-the-us-a-2022-report/) — Rapport officiel 2.41T$
-
-### Études académiques sur la propagation de bugs dans le code cloné
-- [IEEE - Bug Propagation through Code Cloning (2017)](https://ieeexplore.ieee.org/document/8094424/) — Étude empirique montrant ~33 % de bugs propagés dans les clones
-- [ScienceDirect - Empirical study on bug propagation through code cloning (2019)](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815) — Version étendue de l'étude IEEE
-- [ACM ESEM - Security vulnerabilities in cloned vs non-cloned code (2017)](https://dl.acm.org/doi/abs/10.1109/ESEM.2017.9) — Impact de la duplication sur les vulnérabilités de sécurité
-- [SANER - Bug Replication in Code Clones (2016)](https://clones.usask.ca/pubfiles/articles/JudithSANER2016BugReplication.pdf) — Étude sur la réplication de bugs entre clones
-
-### Monorepo vs Multirepo
-- [ThoughtWorks - Monorepo vs Multi-repo](https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/monorepo-vs-multirepo)
-- [Kodus - Monorepo vs Multi-repo Strategy](https://kodus.io/en/monorepo-vs-multi-repo-strategy/)
-- [Aviator - What is a Monorepo](https://www.aviator.co/blog/what-is-a-monorepo-and-why-use-one/)
-
-### Coût des bugs
-- [Functionize - Cost of Finding Bugs Later](https://www.functionize.com/blog/the-cost-of-finding-bugs-later-in-the-sdlc)
-- [Black Duck - Cost to Fix Bugs per SDLC Phase](https://www.blackduck.com/blog/cost-to-fix-bugs-during-each-sdlc-phase.html)
-- [DeepSource - Exponential Cost of Fixing Bugs](https://deepsource.com/blog/exponential-cost-of-fixing-bugs)
-- [The Register - "Bugs 100x more expensive" study might not exist](https://www.theregister.com/2021/07/22/bugs_expense_bs/) — Enquête sur la source IBM contestée
-
-### Effort de test et QA
-- [IdeaLink - Software Testing Costs](https://idealink.tech/blog/understanding-software-testing-costs-development-breakdown)
-- [Hypersense - Effort Allocation](https://hypersense-software.com/blog/2025/07/19/software-development-effort-allocation-dev-qa-design-pm-ratio/)
-- [Intersog - Testing Percent of Costs](https://intersog.com/blog/development/software-testing-percent-of-software-development-costs/)
-
-### Code review et productivité
-- [Codacy - Facts About Code Reviews](https://blog.codacy.com/10-facts-about-code-reviews-and-quality)
-- [Coralogix - Developer Time Allocation](https://coralogix.com/blog/this-is-what-your-developers-are-doing-75-of-the-time-and-this-is-the-cost-you-pay/)
-- [Meta Engineering - Code Review Time](https://engineering.fb.com/2022/11/16/culture/meta-code-review-time-improving/)
-
-### Onboarding et coût des équipes
-- [FullScale - Developer Onboarding](https://fullscale.io/blog/developer-onboarding-best-practices/)
-- [GitLab - Accelerate Developer Onboarding](https://about.gitlab.com/the-source/platform/how-to-accelerate-developer-onboarding-and-why-it-matters/)
-- [Growin - Developer Retention Costs](https://www.growin.com/blog/developer-retention-costs-onboarding/)
-- [FullScale - Team Capacity Planning](https://fullscale.io/blog/team-capacity-planning/)
-
-### Coordination inter-équipes
-- [Count - Cross-Team Dependency Analysis](https://count.co/metric/cross-team-dependency-analysis)
-- [Minware - Tracking Cross-Team Dependencies](https://www.minware.com/blog/tracking-cross-team-dependencies)
-- [Andrew Begel, Microsoft Research - Coordination in Large-Scale Software Teams](https://andrewbegel.com/papers/coordination-chase09.pdf)
-
-### Salaires et coûts — France
-- [Licorne Society - Salaire développeur en 2026](https://www.licornesociety.com/blog/salaire-developpeur)
-- [WeLoveDevs - Salaire développeur junior 2025](https://welovedevs.com/fr/salaires/junior)
-- [WeLoveDevs - Salaire développeur web 2025](https://welovedevs.com/fr/salaires/developpeur-web)
-- [WeLoveDevs - Salaire développeur à Paris 2025](https://welovedevs.com/fr/salaires/paris)
-- [Journal du Net - Salaire développeur](https://www.journaldunet.com/business/salaire/developpeur/salaire-00419)
-- [Ada Tech School - Salaire développeur 2025 par niveau](https://blog.adatechschool.fr/salaire-developpeur-web/)
-- [GEFOR - Salaire Développeur Web 2025 France](https://www.gefor.com/salaire-developpeur-web-en-france/)
-
-### TJM Freelance — France
-- [Portage360 - TJM Développeur en France 2025](https://www.portage360.fr/tjm-developpeur-en-france/)
-- [Silkhom - Baromètre des TJM 2025 IT & Digital](https://www.silkhom.com/barometre-des-tjm-informatique-electronique-digital/)
-- [RH Solutions - TJM freelances tech 2025](https://www.rh-solutions.com/le-grand-guide-du-portage/tjm-freelance-tech-2025/)
-- [Blog du Modérateur - TJM freelances IT France 2025](https://www.blogdumoderateur.com/freelances-taux-journaliers-moyens-it-france-2025/)
-- [Free-Work - TJM Développeur Fullstack](https://www.free-work.com/fr/tech-it/developpeur-fullstack/rate-tjm-freelance)
-
-### Charges patronales et coût employeur — France
-- [Dougs - Charges patronales 2026](https://www.dougs.fr/blog/charges-patronales/)
-- [Staffmatch - Charges patronales 2025](https://staffmatch.com/blog/fr/charges-patronales/)
-- [Watt Portage - Charges patronales France 2025-2026](https://www.watt-portage.fr/charges-patronales-en-2026)
-- [HelloWork - Coût d'un salarié](https://www.hellowork.com/fr-fr/outil/salaire-brut-net/guides/calcul-salaire-brut-cout-employeur.html)
-- [PayFit - Charges patronales 2026](https://payfit.com/fr/fiches-pratiques/charges-patronales/)
-
-### Salaires et coûts — International (référence)
-- [FullStack Labs - Software Development Price Guide 2025](https://www.fullstack.com/labs/resources/blog/software-development-price-guide-hourly-rate-comparison)
-- [Glassdoor - Software Engineer Salary 2026](https://www.glassdoor.com/Salaries/software-engineer-salary-SRCH_KO0,17.htm)
+1. Apec, *Les rémunérations des cadres dans 111 familles de métiers*, édition 2025 (publiée en décembre 2025), p. 63, « Métiers du développement informatique ». Cadres uniquement. <https://corporate.apec.fr/files/live/sites/corporate/files/Nos%20etudes/PDF/Les%20remunerations%20des%20cadres%20dans%20111%20familles%20de%20metiers%202025.pdf>
+2. WeLoveDevs, « Salaire développeur junior » (prétentions salariales déclarées par les candidats inscrits, page mise à jour en octobre 2026). <https://welovedevs.com/fr/salaires/junior>
+3. WeLoveDevs, « Salaire développeur senior » (même méthode, page mise à jour en octobre 2026). <https://welovedevs.com/fr/salaires/senior>
+4. Silkhom, *Baromètre des salaires IT 2026* (juillet 2026), relayé par le Blog du Modérateur, 7 juillet 2026. <https://www.blogdumoderateur.com/salaires-informatique-digital-remunerations-2026/>
+5. Apec, *Prévisions de recrutements de cadres 2026* (avril 2026). <https://corporate.apec.fr/home/nos-etudes/toutes-nos-etudes/previsions-de-recrutements-de-cadres-2026.html>
+6. Service-public.fr (Entreprendre), « Réduction générale des cotisations patronales » (fiche F24542, paramètres RGDU 2026). <https://entreprendre.service-public.gouv.fr/vosdroits/F24542>
+7. LégiSocial, « Taux de cotisations sociales URSSAF 2026 » (mis à jour le 1er janvier 2026). <https://www.legisocial.fr/reperes-sociaux/taux-cotisations-sociales-urssaf-2026.html>
+8. Code du travail, art. L3121-41 (durée annuelle de référence de 1 607 heures).
+9. Étude DARES sur le forfait jours (mai 2026, année de référence 2024), relayée par l'AFP / MoneyVox, mai 2026. La publication DARES elle-même n'a pas été lue. <https://www.moneyvox.fr/votre-argent/actualites/108773/les-salaries-au-forfait-jours-principalement-des-cadres-font-plus-heures-que-les-autres>
+10. Convention collective Syntec (IDCC 1486), avenant du 1er avril 2014 relatif à la durée du travail, art. 4.4 (plafond de 218 jours pour le forfait jours).
+11. FFG (agence autrichienne de promotion de la recherche), « Horizon Europe: indirect costs » (forfait de 25 % des coûts directs éligibles). <https://www.ffg.at/en/europe/heu/legal-financial/theme_indirect-costs>
+12. impots.gouv.fr, notice du formulaire 2069-A-SD (Crédit d'impôt recherche), édition 2026 : frais de fonctionnement fixés à 40 % des dépenses de personnel de R&D. <https://www.impots.gouv.fr/sites/default/files/formulaires/2069-a-sd/2026/2069-a-sd_5270.pdf>
+13. Hays, TJM freelance 2026, relayé par le Blog du Modérateur, 29 janvier 2026. <https://www.blogdumoderateur.com/freelance-tech-taux-journaliers-moyens-metier-2026/>
+14. Malt, TJM affichés par les freelances actifs sur la plateforme, relevés en août–septembre 2026 (pas d'URL stable).
+15. Institute for Defense Analyses, Document D-8367 (2017), citant une étude du DoD américain de 2006 : maintenance annuelle ≈ 20 % de l'effort de développement du parc installé (source secondaire).
+16. B. W. Boehm, *Software Engineering Economics*, Prentice Hall, 1981 (COCOMO 81 ; trafic annuel de changements).
+17. R. L. Glass, *Facts and Fallacies of Software Engineering*, Addison-Wesley, 2002 (la règle des 60/60).
+18. B. Boehm et al., *COCOMO II Model Definition Manual*, version 2.1, USC, 2000 (driver RUSE, modèle de réutilisation, modèle de maintenance). Version livre : *Software Cost Estimation with COCOMO II*, Prentice Hall, 2000. <https://www.rose-hulman.edu/class/csse/csse372/201310/Homework/CII_modelman2000.pdf>
+19. B. P. Lientz, E. B. Swanson, G. E. Tompkins, « Characteristics of application software maintenance », *Communications of the ACM* 21(6), 1978. DOI 10.1145/359511.359522. <https://doi.org/10.1145/359511.359522>
+20. B. P. Lientz, E. B. Swanson, *Software Maintenance Management*, Addison-Wesley, 1980.
+21. S. R. Schach, B. Jin, L. Yu, G. Z. Heller, J. Offutt, « Determining the distribution of maintenance categories: survey versus measurement », *Empirical Software Engineering* 8(4), 2003. DOI 10.1023/A:1025368318006. <https://doi.org/10.1023/A:1025368318006>
+22. R. Zarnekow, W. Brenner, « Distribution of cost over the application lifecycle – a multi-case study », ECIS 2005. <https://aisel.aisnet.org/ecis2005/26>
+23. RTI pour le NIST, *The Economic Impacts of Inadequate Infrastructure for Software Testing*, Planning Report 02-3, 2002 (tableau 5-1, « Example Only »). <https://www.nist.gov/system/files/documents/director/planning/report02-3.pdf>
+24. The Register, « Everyone cites that 'bugs are 100x more expensive to fix in production' research, but the study might not even exist », 22 juillet 2021. <https://www.theregister.com/2021/07/22/bugs_expense_bs/>
+25. L. Bossavit, *The Leprechauns of Software Engineering*, Leanpub, 2012–2015. <https://leanpub.com/leprechauns>
+26. B. Boehm, V. R. Basili, « Software defect reduction top 10 list », *IEEE Computer* 34(1), 2001. DOI 10.1109/2.962984. <https://doi.org/10.1109/2.962984>
+27. T. Menzies, W. Nichols, F. Shull, L. Layman, « Are delayed issues harder to resolve? Revisiting cost-to-fix of defects throughout the lifecycle », *Empirical Software Engineering* 22, 2017. DOI 10.1007/s10664-016-9469-x. Prépublication arXiv:1609.04886. <https://arxiv.org/abs/1609.04886>
+28. W. C. Lim, « Effects of reuse on quality, productivity, and economics », *IEEE Software* 11(5), 1994. DOI 10.1109/52.311048 (non lu ; chiffre repris de la revue de Mohagheghi & Conradi). <https://doi.org/10.1109/52.311048>
+29. P. Mohagheghi, R. Conradi, « Quality, productivity and economic benefits of software reuse: a review of industrial studies », *Empirical Software Engineering* 12(5), 2007. DOI 10.1007/s10664-007-9040-x. <https://doi.org/10.1007/s10664-007-9040-x>
+30. J. S. Poulin, *Measuring Software Reuse*, Addison-Wesley, 1997 ; valeurs RCWR et RCR recommandées telles qu'indiquées dans le calculateur de réutilisation en ligne de l'auteur. <http://jeffreypoulin.info/html/reucalc_basic.html>
+31. J. Krüger, T. Berger, « An empirical analysis of the costs of clone- and platform-oriented software reuse », ESEC/FSE 2020. DOI 10.1145/3368089.3409684. <https://www.cse.chalmers.se/~bergert/paper/2020-fse-reusecosts.pdf>
+32. F. P. Brooks, *The Mythical Man-Month*, Addison-Wesley, 1975, chap. 2.
+33. A. Begel, N. Nagappan, C. Poile, L. Layman, « Coordination in large-scale software teams », CHASE 2009 (atelier ICSE). DOI 10.1109/CHASE.2009.5071401. <https://andrewbegel.com/papers/coordination-chase09.pdf>
+34. L. Xavier, A. Brito, A. Hora, M. T. Valente, « Historical and impact analysis of API breaking changes: a large-scale study », SANER 2017. DOI 10.1109/SANER.2017.7884616. <https://repositorio.ufmg.br/handle/1843/JCES-ARMPK6>
+35. R. G. Kula, D. M. German, A. Ouni, T. Ishio, K. Inoue, « Do developers update their library dependencies? », *Empirical Software Engineering* 23(1), 2018. DOI 10.1007/s10664-017-9521-5. <https://doi.org/10.1007/s10664-017-9521-5>
+36. B. Boehm et al., « Cost models for future software life cycle processes: COCOMO 2.0 », *Annals of Software Engineering* 1, 1995 ; la fig. 6 reproduit R. W. Selby, « Empirically analyzing software reuse in a production environment » (1988), 2 954 modules NASA. <https://staff.emu.edu.tr/alexanderchefranov/Documents/CMPE412/Boehm1995%20COCOMO%202%20.pdf>
+37. B. Ray, M. Kim, « A case study of cross-system porting in forked projects », FSE 2012. DOI 10.1145/2393596.2393659. <https://baishakhir.github.io/uploads/fse2012-bsd.pdf>
+38. M. Mondal, C. K. Roy, K. A. Schneider, « Bug propagation through code cloning: an empirical study », ICSME 2017. <https://clones.usask.ca/pubfiles/articles/MondalICSME2017BugPropagation.pdf>
+39. M. Mondal, B. Roy, C. K. Roy, K. A. Schneider, « An empirical study on bug propagation through code cloning », *Journal of Systems and Software* 158, 2019. DOI 10.1016/j.jss.2019.110407. <https://clones.usask.ca/pubfiles/articles/MMondalBugProposationJSS.pdf>
+40. E. Juergens, F. Deissenboeck, B. Hummel, S. Wagner, « Do code clones matter? », ICSE 2009. DOI 10.1109/ICSE.2009.5070547. Prépublication arXiv:1701.05472. <https://arxiv.org/abs/1701.05472>
+41. M. R. Islam, M. F. Zibran, A. Nagpal, « Security vulnerabilities in categories of clones and non-cloned code: an empirical study », ESEM 2017. DOI 10.1109/ESEM.2017.9. <https://doi.org/10.1109/ESEM.2017.9>
+42. S. Zhou, B. Vasilescu, C. Kästner, « How has forking changed in the last 20 years? A study of hard forks on GitHub », ICSE 2020. <https://www.cs.cmu.edu/~shuruiz/paper/icse20-hardfork.pdf>
+43. J. Businge, M. Openja, S. Nadi, T. Berger, « Reuse and maintenance practices among divergent forks in three software ecosystems », *Empirical Software Engineering* 27, 2022. DOI 10.1007/s10664-021-10078-2. <https://doi.org/10.1007/s10664-021-10078-2>
+44. C. J. Kapser, M. W. Godfrey, « 'Cloning considered harmful' considered harmful: patterns of cloning in software », *Empirical Software Engineering* 13(6), 2008. DOI 10.1007/s10664-008-9076-6. <https://doi.org/10.1007/s10664-008-9076-6>
+45. M. Kim, V. Sazawal, D. Notkin, G. C. Murphy, « An empirical study of code clone genealogies », ESEC/FSE 2005 (version rapport technique UW-CSE-05-04-01). <https://dada.cs.washington.edu/research/tr/2005/04/UW-CSE-05-04-01.pdf>
+46. F. Rahman, C. Bird, P. Devanbu, « Clones: what is that smell? », *Empirical Software Engineering* 17, 2012. DOI 10.1007/s10664-011-9195-3. <https://doi.org/10.1007/s10664-011-9195-3>
+47. S. Metz, « The wrong abstraction », billet de blog, 20 janvier 2016 (opinion). <https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction>
+48. K. Pohl, G. Böckle, F. van der Linden, *Software Product Line Engineering*, Springer, 2005, fig. 1.1. DOI 10.1007/3-540-28901-1. <https://doi.org/10.1007/3-540-28901-1>
+49. GitClear, rapport *AI Copilot Code Quality*, 2025 (analyse d'éditeur portant sur 211 M de lignes modifiées, 2020–2024 ; lu via la couverture presse).
+50. M. Borg et al., « Echoes of AI: investigating the downstream effects of AI assistants on software maintainability », *Empirical Software Engineering* 31, 2026. DOI 10.1007/s10664-026-10889-1. Prépublication arXiv:2507.00788. <https://arxiv.org/abs/2507.00788>
+51. S. Pan et al., « Automating zero-shot patch porting for hard forks » (PPatHF), 2024, arXiv:2404.17964. <https://arxiv.org/abs/2404.17964>

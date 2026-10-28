@@ -32,18 +32,21 @@ year by year, and when sharing starts paying for itself.
 
 ## ✨ Features
 
-- **Standalone cost estimate** — what one feature really costs, including
-  organizational overhead (PM, design, QA, onboarding), not just dev hours.
+- **Standalone cost estimate** — what one feature costs to build once and
+  keep alive over the horizon.
 - **Shared vs duplicated comparison** — cumulative cost curves for both
-  approaches over 1, 3, 5 or 10 years, with a **break-even point**.
+  approaches over 1, 3, 5 or 10 years, with a **break-even point** read from
+  the same curves (including "from the start" and "not within the horizon").
 - **Team composition** — headcount per seniority level (Junior, Mid, Senior,
   Lead) with editable hourly rates based on the French market.
 - **Two sizing modes** — story points (with velocity and sprint length) or
   direct hours / days.
 - **Multiple consuming codebases** — see how the gap widens as more apps
   copy the same feature.
-- **Advanced parameters** — tune every model constant (generalization factor,
-  porting factor, divergence rate, maintenance rates, bug duplication factor).
+- **New or existing library** — an existing library drops the setup and
+  running costs.
+- **Assumptions** — tune every model assumption, each labelled
+  *Measured* or *Assumption* with its source.
 - **Shareable links** — the whole state lives in the URL hash: copy the link,
   send it, the other person sees exactly your scenario.
 - **Built-in documentation** — the full research behind every formula,
@@ -55,23 +58,37 @@ All formulas are pure TypeScript functions in
 [`src/engine/formulas.ts`](src/engine/formulas.ts), each traceable to §7 of the
 [research document](docs/feature-cost-shared-vs-duplicated.md).
 
-| Approach | Up-front cost | Recurring cost |
+Every cost is a multiple of **C0**, the cost of building the feature once for
+one app (person-hours × the team's average loaded rate), except the library's
+setup and running time, which are fixed hours. With N apps:
+
+| Approach | Up-front cost | Yearly cost |
 |---|---|---|
-| **Shared code** | Feature × *generalization factor* + library setup | Maintenance, versioning, consumer support, cross-team coordination |
-| **Duplicated code** | Feature + porting to each extra codebase × *porting factor* | Maintenance ×N, sync of evolving features, duplicated bug fixes, growing divergence |
+| **Shared code** | G·C0 + i·C0·(N−1) + library setup (280 h) | m·G·C0 + k·C0·(N−1) + library running (100 h) |
+| **Duplicated code** | C0 + p·C0·(N−1) | m·C0 + m·C0·(N−1)·e(y), with e(y) = min(1.5, e0 + δ·(y−1)) |
 
-Default parameters come from industry research (COCOMO II, IEEE studies) and
-French labor market data (35 h/week, 7 h/day):
+Because every term is hours × rate, the hourly rate scales the gap but never
+flips the verdict. Bugs are not priced separately: they are part of upkeep.
 
-| Parameter | Default |
-|---|---|
-| Generalization factor (shared) | `1.3` |
-| Porting factor (duplicated) | `0.65` |
-| Divergence rate / year | `20 %` |
-| Annual maintenance — shared | `18 %` |
-| Annual maintenance — duplicated | `22 %` |
-| Bug duplication factor | `2.0` |
-| Hourly rate — Junior / Mid / Senior / Lead | `32 / 40 / 51 / 67 €` |
+Defaults come from the software-engineering literature (COCOMO II, Krüger &
+Berger FSE 2020, Ray & Kim FSE 2012…) and French labour-market data for 2026
+(35 h/week, 7 h/day, 1,607 h/year):
+
+| Parameter | Default | Evidence |
+|---|---|---|
+| G — extra work to make it reusable | `1.20` | Measured |
+| p — effort to copy it into another app | `0.65` | Measured |
+| i — effort to plug the library into another app | `0.20` | Measured |
+| m — yearly upkeep of one copy | `0.20` | Measured (order of magnitude) |
+| e0 — upkeep of each extra copy vs the first | `1.00` | Assumption |
+| δ — yearly drift of the copies (capped at 1.5×) | `0.05` | Assumption |
+| k — coordination and upgrades per extra app, per year | `0.04` | Assumption |
+| Hourly rate — Junior / Mid / Senior / Lead | `32 / 40 / 50 / 62 €` | Loaded (salary + employer contributions), national |
+
+At the defaults the case is close: for the example scenario (4-person team,
+1,120 person-hours, 2 apps, 5 years, new library) the up-front costs tie and
+sharing comes out about 11.5 k€ cheaper, entirely on recurring costs. See §7.5
+of the research document for the full worked example and a sensitivity table.
 
 ## 🚀 Getting started
 

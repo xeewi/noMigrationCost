@@ -6,14 +6,13 @@
  */
 
 /**
- * Formula Engine — All cost calculation functions.
+ * Formula engine — pure functions, no React. Every formula is documented in
+ * docs/feature-cost-shared-vs-duplicated.md §7.
  *
- * All functions are PURE TypeScript — no React imports, no side effects.
- * Each formula is directly traceable to docs/feature-cost-shared-vs-duplicated.md §7.
- *
- * Constants from French labor law and research doc:
- *   - 35h/week (HOURS_PER_WEEK) — legal basis France
- *   - 7h/day (HOURS_PER_DAY) — 35h / 5 days
+ * Every cost is a multiple of C0 = devHours × rate (the cost of building the
+ * feature once, for one app), except the running cost of a new library, which
+ * is a fixed number of hours. So the sign of the verdict never depends on the
+ * hourly rate, only on the effort and the assumptions.
  */
 
 import type {
@@ -21,445 +20,160 @@ import type {
   SizingInputs,
   EngineInputs,
   StandaloneOutputs,
-  SharedCostOutputs,
-  DuplicatedCostOutputs,
-  BreakEvenResult,
-  YearCost,
+  ComparisonOutputs,
+  MonthCostPoint,
 } from './types';
-import { HOURS_PER_WEEK, HOURS_PER_DAY, ENGINE_DEFAULTS } from './types';
+import {
+  HOURS_PER_WEEK,
+  HOURS_PER_DAY,
+  LIB_SETUP_HOURS,
+  LIB_RUN_HOURS_PER_YEAR,
+  EXTRA_COPY_UPKEEP_MAX,
+} from './types';
 
-// ---------------------------------------------------------------------------
-// Internal constants derived from research doc examples
-// ---------------------------------------------------------------------------
-
-/**
- * Lib setup duration in weeks (§7.1: typical 8-week setup).
- * Used in libSetupCost and break-even calculations.
- */
-const LIB_SETUP_WEEKS = 8;
-
-/**
- * Annual versioning cost per year (§7.1: 12 releases × 3h × 65€ = 2340€).
- * This is embedded in the research doc example with the senior rate.
- * We scale it with the team's hourly rate.
- */
-const VERSIONING_RELEASES_PER_YEAR = 12;
-const VERSIONING_HOURS_PER_RELEASE = 3;
-
-/**
- * Annual consumer support cost (§7.1: 7.5h × 52 × 65 = 25350€).
- * Scale with team's hourly rate.
- */
-const SUPPORT_HOURS_PER_WEEK = 7.5;
-const WEEKS_PER_YEAR = 52;
-
-/**
- * Coordination hours per week per team (§7.1: 3h/week/team).
- */
-const COORDINATION_HOURS_PER_WEEK_PER_TEAM = 3;
-
-/**
- * Annual onboarding cost constants (§7.1: 3 new devs, 60h training + 20h mentoring).
- */
-const NEW_DEVS_PER_YEAR = 3;
-const ONBOARDING_TRAINING_HOURS = 60;
-const ONBOARDING_TRAINING_RATE_FACTOR = 50 / 65; // mid-level rate as fraction of senior rate
-const ONBOARDING_MENTORING_HOURS = 20;
-
-/**
- * Duplicated code maintenance factor model (§7.2).
- * Starts at 1.8 year 1, increases 0.05 per year.
- */
-const DOUBLE_MAINTENANCE_FACTOR_BASE = 1.8;
-const DOUBLE_MAINTENANCE_FACTOR_INCREMENT = 0.05;
-
-/**
- * Sync parameters used in §7.2 worked example.
- */
-const EVOLVED_FEATURES_PER_YEAR = 8;
-const SYNC_HOURS_PER_FEATURE_BASE = 16;
-
-/**
- * Additional bug cost used in §7.2 worked example.
- * This is the total annual cost of additional bugs from duplication.
- */
-const ADDITIONAL_BUGS_ANNUAL_COST = 50_600;
-
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
-
-/**
- * Calculates the weighted average hourly rate across the team.
- * Only rows with headcount > 0 are included.
- * Returns 0 if all headcounts are 0 (no division by zero).
- *
- * Formula: sum(headcount × rate) / sum(headcount)
- */
+/** Weighted average hourly rate. 0 when the team is empty. */
 export function calcTeamAvgRate(team: SeniorityRow[]): number {
   const totalHeadcount = team.reduce((sum, row) => sum + row.headcount, 0);
   if (totalHeadcount === 0) return 0;
-
-  const weightedSum = team.reduce(
-    (sum, row) => sum + row.headcount * row.hourlyRate,
-    0,
-  );
+  const weightedSum = team.reduce((sum, row) => sum + row.headcount * row.hourlyRate, 0);
   return weightedSum / totalHeadcount;
 }
 
 /**
- * Converts sizing inputs to development hours.
- *
- * Story-points mode: (storyPoints / velocity) × sprintWeeks × HOURS_PER_WEEK
- * Direct-hours mode: directValue (hours) or directValue × HOURS_PER_DAY (days)
- * Guards division by zero: returns 0 when velocity is 0 in SP mode.
+ * Person-hours to build the feature once.
+ * Story points: velocity is the whole team's, so each sprint costs headcount × weeks × 35 h.
+ * Direct mode: the value is already person-hours (or person-days × 7 h).
  */
-export function calcDevHours(sizing: SizingInputs): number {
+export function calcDevHours(sizing: SizingInputs, headcount: number): number {
   if (sizing.mode === 'story-points') {
-    if (sizing.velocity === 0) return 0;
+    if (sizing.velocity <= 0) return 0;
     const sprints = sizing.storyPoints / sizing.velocity;
-    return sprints * sizing.sprintWeeks * HOURS_PER_WEEK;
+    return sprints * sizing.sprintWeeks * HOURS_PER_WEEK * headcount;
   }
-
-  // direct-hours mode
-  if (sizing.directUnit === 'days') {
-    return sizing.directValue * HOURS_PER_DAY;
-  }
-  return sizing.directValue;
+  return sizing.directUnit === 'days' ? sizing.directValue * HOURS_PER_DAY : sizing.directValue;
 }
 
-/**
- * Calculates the total standalone cost of a feature, including organizational costs.
- *
- * Formulas (§7.1 standalone variant):
- *   initialDevCost = devHours × teamAvgHourlyRate × generalizationFactor
- *   annualMaintenanceCost = initialDevCost × maintenanceRate
- *   totalMaintenanceCost = annualMaintenanceCost × horizonYears
- *   annualVersioningCost = VERSIONING_RELEASES_PER_YEAR × VERSIONING_HOURS_PER_RELEASE × rate
- *   annualSupportCost = SUPPORT_HOURS_PER_WEEK × WEEKS_PER_YEAR × rate
- *   annualCoordinationCost = nbConsumingCodebases × COORDINATION_HOURS_PER_WEEK_PER_TEAM × WEEKS_PER_YEAR × rate
- *   annualOnboardingCost = NEW_DEVS_PER_YEAR × (ONBOARDING_TRAINING_HOURS × midRate + ONBOARDING_MENTORING_HOURS × rate)
- *   totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts
- */
+/** Feature built once, for one app: build + yearly upkeep (docs §7.1). */
 export function calcStandaloneCost(inputs: EngineInputs): StandaloneOutputs {
-  const {
-    teamAvgHourlyRate,
-    devHours,
-    horizonYears,
-    maintenanceRate,
-    generalizationFactor,
-    nbConsumingCodebases,
-  } = inputs;
-
-  const rate = teamAvgHourlyRate;
-
-  const initialDevCost = devHours * rate * generalizationFactor;
+  const { teamAvgHourlyRate: rate, devHours, horizonYears, maintenanceRate } = inputs;
+  const initialDevCost = devHours * rate;
   const annualMaintenanceCost = initialDevCost * maintenanceRate;
   const totalMaintenanceCost = annualMaintenanceCost * horizonYears;
-
-  // Organizational cost computations (mirror calcSharedCost pattern)
-  const annualVersioningCost = VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * rate;
-  const annualSupportCost = SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * rate;
-  const annualCoordinationCost = nbConsumingCodebases * COORDINATION_HOURS_PER_WEEK_PER_TEAM * WEEKS_PER_YEAR * rate;
-  const midRate = rate * ONBOARDING_TRAINING_RATE_FACTOR;
-  const annualOnboardingCost = NEW_DEVS_PER_YEAR * (ONBOARDING_TRAINING_HOURS * midRate + ONBOARDING_MENTORING_HOURS * rate);
-  const annualOrgCosts = annualVersioningCost + annualSupportCost + annualCoordinationCost + annualOnboardingCost;
-  const totalOrgCosts = annualOrgCosts * horizonYears;
-
-  // Compute total BEFORE percentages (avoids circular dependency)
-  const totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts;
-
-  const breakdown = [
-    {
-      category: 'Initial Development',
-      hours: devHours,
-      cost: initialDevCost,
-      percentage: (initialDevCost / totalStandaloneCost) * 100,
-    },
-    {
-      category: `Annual Maintenance (x${horizonYears} years)`,
-      hours: 0, // maintenance hours not directly tracked
-      cost: totalMaintenanceCost,
-      percentage: (totalMaintenanceCost / totalStandaloneCost) * 100,
-    },
-    {
-      category: 'Versioning',
-      hours: VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * horizonYears,
-      cost: annualVersioningCost * horizonYears,
-      percentage: (annualVersioningCost * horizonYears / totalStandaloneCost) * 100,
-    },
-    {
-      category: 'Consumer Support',
-      hours: SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * horizonYears,
-      cost: annualSupportCost * horizonYears,
-      percentage: (annualSupportCost * horizonYears / totalStandaloneCost) * 100,
-    },
-    {
-      category: 'Coordination',
-      hours: nbConsumingCodebases * COORDINATION_HOURS_PER_WEEK_PER_TEAM * WEEKS_PER_YEAR * horizonYears,
-      cost: annualCoordinationCost * horizonYears,
-      percentage: (annualCoordinationCost * horizonYears / totalStandaloneCost) * 100,
-    },
-    {
-      category: 'Onboarding',
-      hours: NEW_DEVS_PER_YEAR * (ONBOARDING_TRAINING_HOURS + ONBOARDING_MENTORING_HOURS) * horizonYears,
-      cost: annualOnboardingCost * horizonYears,
-      percentage: (annualOnboardingCost * horizonYears / totalStandaloneCost) * 100,
-    },
-  ];
+  const totalStandaloneCost = initialDevCost + totalMaintenanceCost;
+  const pct = (c: number) => (totalStandaloneCost > 0 ? (c / totalStandaloneCost) * 100 : 0);
 
   return {
-    teamAvgHourlyRate,
+    teamAvgHourlyRate: rate,
     initialDevCost,
     initialDevHours: devHours,
     annualMaintenanceCost,
     totalMaintenanceCost,
     totalStandaloneCost,
-    annualVersioningCost,
-    annualSupportCost,
-    annualCoordinationCost,
-    annualOnboardingCost,
-    breakdown,
+    breakdown: [
+      { category: 'Initial development', hours: devHours, cost: initialDevCost, percentage: pct(initialDevCost) },
+      {
+        category: `Upkeep (${horizonYears} y)`,
+        hours: devHours * maintenanceRate * horizonYears,
+        cost: totalMaintenanceCost,
+        percentage: pct(totalMaintenanceCost),
+      },
+    ],
   };
 }
 
-/**
- * Calculates the total cost of the shared code approach over the horizon.
- *
- * Formulas (§7.1):
- *   initialDevCost = devHours × rate × generalizationFactor
- *   libSetupCost = LIB_SETUP_WEEKS × HOURS_PER_WEEK × rate
- *   annualMaintenanceCost = (initialDevCost × maintenanceRate) + versioningCost + supportCost
- *   annualCoordinationCost = nbConsumingCodebases × COORDINATION_HOURS_PER_WEEK × 52 × rate
- *   annualOnboardingCost = NEW_DEVS × (trainingHours × midRate + mentoringHours × rate)
- *
- * Cumulative yearly breakdown starts at Year 0 (setup year).
- */
-export function calcSharedCost(inputs: EngineInputs): SharedCostOutputs {
-  const {
-    teamAvgHourlyRate: rate,
-    devHours,
-    horizonYears,
-    maintenanceRate,
-    generalizationFactor,
-    nbConsumingCodebases,
-  } = inputs;
-
-  const initialDevCost = devHours * rate * generalizationFactor;
-  const libSetupCost = LIB_SETUP_WEEKS * HOURS_PER_WEEK * rate;
-
-  // Annual maintenance = base maintenance + versioning + consumer support
-  const baseMaintenance = initialDevCost * maintenanceRate;
-  const versioningCost = VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * rate;
-  const supportCost = SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * rate;
-  const annualMaintenanceCost = baseMaintenance + versioningCost + supportCost;
-
-  // Annual coordination cost (§7.1: nbTeams × 3h/week × 52 × rate)
-  const annualCoordinationCost =
-    nbConsumingCodebases * COORDINATION_HOURS_PER_WEEK_PER_TEAM * WEEKS_PER_YEAR * rate;
-
-  // Annual onboarding cost (§7.1: 3 new devs × (60h×midRate + 20h×seniorRate))
-  const midRate = rate * ONBOARDING_TRAINING_RATE_FACTOR;
-  const annualOnboardingCost =
-    NEW_DEVS_PER_YEAR *
-    (ONBOARDING_TRAINING_HOURS * midRate + ONBOARDING_MENTORING_HOURS * rate);
-
-  const annualRecurringCost = annualMaintenanceCost + annualCoordinationCost + annualOnboardingCost;
-
-  // Build cumulative yearly breakdown
-  // Year 0: setup costs only (initialDev + libSetup)
-  // Year N (N >= 1): previous cumulative + all annual costs
-  const yearlyBreakdown: YearCost[] = [];
-  const year0Cost = initialDevCost + libSetupCost;
-  yearlyBreakdown.push({ year: 0, cumulativeCost: year0Cost });
-
-  for (let year = 1; year <= horizonYears; year++) {
-    const prev = yearlyBreakdown[yearlyBreakdown.length - 1].cumulativeCost;
-    yearlyBreakdown.push({ year, cumulativeCost: prev + annualRecurringCost });
-  }
-
-  const totalCost = yearlyBreakdown[yearlyBreakdown.length - 1].cumulativeCost;
-
-  return {
-    initialDevCost,
-    libSetupCost,
-    annualMaintenanceCost,
-    annualCoordinationCost,
-    annualOnboardingCost,
-    totalCost,
-    yearlyBreakdown,
-  };
+/** Yearly upkeep ratio of one extra copy in year y (1-based): starts at e0, drifts by δ a year, capped. */
+export function extraCopyRatio(e0: number, divergenceRate: number, year: number): number {
+  return Math.min(EXTRA_COPY_UPKEEP_MAX, e0 + divergenceRate * (year - 1));
 }
 
 /**
- * Calculates the total cost of the duplicated code approach over the horizon.
+ * Shared library vs one copy per app, over the horizon (docs §7.2-7.3).
  *
- * Formulas (§7.2):
- *   baseDev = devHours × rate  (no generalization — specific implementation)
- *   duplicatedDevCost = baseDev × (1 + portingFactor)
- *   baseMaintenance = baseDev × maintenanceRate
- *   yearN_maintenance = baseMaintenance × (1.8 + 0.05 × year)
- *   yearN_sync = EVOLVED_FEATURES × SYNC_HOURS × (1 + divergenceRate)^year × rate
- *   yearN_bugs = ADDITIONAL_BUGS_ANNUAL_COST (fixed from research doc example)
+ *   Shared     build  = G·C0 + i·C0·(N−1) + setupHours·w
+ *              yearly = m·G·C0 + k·C0·(N−1) + runHours·w
+ *   Duplicated build  = C0 + p·C0·(N−1)
+ *              yearly = m·C0 · (1 + (N−1)·min(eMax, e0 + δ·(y−1)))
+ *
+ * Builds are paid at month 0, yearly costs accrue evenly month by month.
+ * The break-even month is read from these same curves.
  */
-export function calcDuplicatedCost(inputs: EngineInputs): DuplicatedCostOutputs {
+export function calcComparison(inputs: EngineInputs): ComparisonOutputs {
   const {
-    teamAvgHourlyRate: rate,
+    teamAvgHourlyRate: w,
     devHours,
     horizonYears,
-    maintenanceRate,
-    portingFactor,
+    nbCodebases,
+    newLibrary,
+    generalizationFactor: G,
+    portingFactor: p,
+    integrationFactor: i,
+    maintenanceRate: m,
+    extraCopyUpkeep: e0,
     divergenceRate,
+    coordinationRate: k,
   } = inputs;
 
-  const baseDev = devHours * rate;
-  const duplicatedDevCost = baseDev * (1 + portingFactor);
-  const baseMaintenance = baseDev * maintenanceRate;
+  const C0 = devHours * w;
+  const extra = Math.max(0, nbCodebases - 1);
+  const months = horizonYears * 12;
 
-  const yearlyBreakdown: YearCost[] = [];
-  yearlyBreakdown.push({ year: 0, cumulativeCost: duplicatedDevCost });
+  // Shared
+  const sharedBuild = G * C0;
+  const integration = i * C0 * extra;
+  const setup = newLibrary ? LIB_SETUP_HOURS * w : 0;
+  const sharedUpkeepYear = m * G * C0;
+  const coordinationYear = k * C0 * extra;
+  const runningYear = newLibrary ? LIB_RUN_HOURS_PER_YEAR * w : 0;
+  const sharedYear = sharedUpkeepYear + coordinationYear + runningYear;
 
-  let totalBugsCost = 0;
-  let totalSyncCost = 0;
+  // Duplicated
+  const porting = p * C0 * extra;
+  const firstCopyUpkeepYear = m * C0;
+  const extraCopiesYear = (year: number) => m * C0 * extra * extraCopyRatio(e0, divergenceRate, year);
 
-  for (let year = 1; year <= horizonYears; year++) {
-    const prev = yearlyBreakdown[yearlyBreakdown.length - 1].cumulativeCost;
-
-    // Maintenance grows over time as copies diverge.
-    // Year 1 = 1.80, Year 2 = 1.85, Year 3 = 1.90, ...
-    const maintenanceFactor =
-      DOUBLE_MAINTENANCE_FACTOR_BASE + DOUBLE_MAINTENANCE_FACTOR_INCREMENT * (year - 1);
-    const yearMaintenance = baseMaintenance * maintenanceFactor;
-
-    // Sync cost uses exponential divergence model
-    const yearSync =
-      EVOLVED_FEATURES_PER_YEAR *
-      SYNC_HOURS_PER_FEATURE_BASE *
-      Math.pow(1 + divergenceRate, year) *
-      rate;
-
-    // Additional bugs cost (fixed from research doc)
-    const yearBugs = ADDITIONAL_BUGS_ANNUAL_COST;
-
-    totalBugsCost += yearBugs;
-    totalSyncCost += yearSync;
-
-    yearlyBreakdown.push({
-      year,
-      cumulativeCost: prev + yearMaintenance + yearSync + yearBugs,
+  const monthly: MonthCostPoint[] = [{ month: 0, shared: sharedBuild + integration + setup, duplicated: C0 + porting }];
+  let extraCopiesTotal = 0;
+  for (let t = 1; t <= months; t++) {
+    const year = Math.ceil(t / 12);
+    const extraMonth = extraCopiesYear(year) / 12;
+    extraCopiesTotal += extraMonth;
+    const prev = monthly[t - 1];
+    monthly.push({
+      month: t,
+      shared: prev.shared + sharedYear / 12,
+      duplicated: prev.duplicated + (firstCopyUpkeepYear / 12 + extraMonth),
     });
   }
 
-  const totalCost = yearlyBreakdown[yearlyBreakdown.length - 1].cumulativeCost;
+  // Break-even: earliest month from which shared stays at or below duplicated to the horizon.
+  // Relative tolerance so exact ties (e.g. equal build costs) don't flip on float noise.
+  const notWorse = (pt: MonthCostPoint) => pt.shared <= pt.duplicated + 1e-9 * Math.max(1, pt.duplicated);
+  let breakEvenMonth: number | null = null;
+  for (let t = months; t >= 0 && notWorse(monthly[t]); t--) breakEvenMonth = t;
 
+  const last = monthly[months];
   return {
-    duplicatedDevCost,
-    yearlyBreakdown,
-    totalCost,
-    totalBugsCost,
-    totalSyncCost,
+    shared: {
+      total: last.shared,
+      lines: [
+        { label: 'Build it once, made to share', cost: sharedBuild },
+        { label: 'Plug it into the other apps', cost: integration },
+        { label: 'Set up the library', cost: setup },
+        { label: 'Upkeep of the shared code', cost: sharedUpkeepYear * horizonYears },
+        { label: 'Coordination and upgrades', cost: coordinationYear * horizonYears },
+        { label: 'Running the library', cost: runningYear * horizonYears },
+      ],
+    },
+    duplicated: {
+      total: last.duplicated,
+      lines: [
+        { label: 'Build it for the first app', cost: C0 },
+        { label: 'Copy it into the other apps', cost: porting },
+        { label: 'Upkeep of the first copy', cost: firstCopyUpkeepYear * horizonYears },
+        { label: 'Upkeep of the extra copies', cost: extraCopiesTotal },
+      ],
+    },
+    monthly,
+    breakEvenMonth,
   };
-}
-
-/**
- * Calculates the break-even point where shared code becomes more cost-effective.
- *
- * Formula (§7.3):
- *   upfrontCost = generalizationOverhead + libSetupCost
- *     where generalizationOverhead = baseDev × (genFactor - 1)
- *   annualDuplicatedCosts = year1Maintenance + year1Sync + bugsCost
- *   annualSharedMaintenance uses ENGINE_DEFAULTS.maintenanceRateShared (0.18)
- *     because break-even compares shared vs duplicated approaches
- *   monthlySavings = (annualDuplicatedCosts - annualSharedMaintenance) / 12
- *   monthlyCoordination = annualCoordination / 12
- *   netMonthlySavings = monthlySavings - monthlyCoordination
- *   months = upfrontCost / netMonthlySavings
- *   Returns { exists: false, months: null } when netMonthlySavings <= 0
- *
- * Note: inputs.maintenanceRate is the duplicated rate (typically 0.22).
- */
-export function calcBreakEven(inputs: EngineInputs): BreakEvenResult {
-  const {
-    teamAvgHourlyRate: rate,
-    devHours,
-    maintenanceRate,
-    generalizationFactor,
-    divergenceRate,
-    nbConsumingCodebases,
-  } = inputs;
-
-  const baseDev = devHours * rate;
-  const initialDevCost = baseDev * generalizationFactor;
-  const libSetupCost = LIB_SETUP_WEEKS * HOURS_PER_WEEK * rate;
-
-  const generalizationOverhead = initialDevCost - baseDev;
-  const upfrontCost = generalizationOverhead + libSetupCost;
-
-  // Year 1 duplicated costs
-  const baseMaintenance = baseDev * maintenanceRate;
-  const year1Maintenance = baseMaintenance * DOUBLE_MAINTENANCE_FACTOR_BASE;
-  const year1Sync =
-    EVOLVED_FEATURES_PER_YEAR *
-    SYNC_HOURS_PER_FEATURE_BASE *
-    Math.pow(1 + divergenceRate, 1) *
-    rate;
-  const annualDuplicatedCosts = year1Maintenance + year1Sync + ADDITIONAL_BUGS_ANNUAL_COST;
-
-  // Annual shared maintenance (§7.3 uses only the 33774 maintenance term, not onboarding)
-  // Matches the research doc: Monthly_Maintenance_Savings = (dup_costs - shared_maintenance) / 12
-  // The shared maintenance uses the shared rate (0.18), not the duplicated rate from inputs.
-  const sharedRate = inputs.maintenanceRateShared ?? ENGINE_DEFAULTS.maintenanceRateShared;
-  const sharedBaseMaintenance = initialDevCost * sharedRate;
-  const versioningCost = VERSIONING_RELEASES_PER_YEAR * VERSIONING_HOURS_PER_RELEASE * rate;
-  const supportCost = SUPPORT_HOURS_PER_WEEK * WEEKS_PER_YEAR * rate;
-  const annualSharedMaintenance = sharedBaseMaintenance + versioningCost + supportCost;
-
-  // Monthly savings = (all year-1 duplicated costs - shared maintenance) / 12
-  const annualSavings = annualDuplicatedCosts - annualSharedMaintenance;
-  const monthlySavings = annualSavings / 12;
-
-  // Monthly coordination cost (ongoing cost of sharing)
-  const annualCoordination =
-    nbConsumingCodebases * COORDINATION_HOURS_PER_WEEK_PER_TEAM * WEEKS_PER_YEAR * rate;
-  const monthlyCoordination = annualCoordination / 12;
-
-  const netMonthlySavings = monthlySavings - monthlyCoordination;
-
-  if (netMonthlySavings <= 0) {
-    return { exists: false, months: null };
-  }
-
-  const months = upfrontCost / netMonthlySavings;
-  return { exists: true, months };
-}
-
-/**
- * Calculates the advantage ratio of shared vs duplicated code for N codebases.
- * Returns totalDuplicatedCost / totalSharedCost.
- *
- * Formula (§7.4): Advantage_Ratio(N) = Total_Duplicated_Cost(N) / Total_Shared_Cost(N)
- */
-export function calcScaleFactor(inputs: EngineInputs): number {
-  const duplicated = calcDuplicatedCost(inputs);
-  const shared = calcSharedCost(inputs);
-
-  if (shared.totalCost === 0) return 0;
-  return duplicated.totalCost / shared.totalCost;
-}
-
-/**
- * Calculates the divergence cost at time t using an exponential growth model.
- *
- * Formula (§7.5): Divergence_Cost(t) = baseSyncCost × e^(divergenceRate × t)
- *
- * @param baseSyncCost - Synchronization cost at t=0
- * @param divergenceRate - Annual divergence rate (typically 0.15-0.30)
- * @param t - Time in years
- */
-export function calcDivergence(
-  baseSyncCost: number,
-  divergenceRate: number,
-  t: number,
-): number {
-  return baseSyncCost * Math.exp(divergenceRate * t);
 }

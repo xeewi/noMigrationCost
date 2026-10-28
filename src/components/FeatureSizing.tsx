@@ -88,7 +88,7 @@ export function FeatureSizing({
               value={storyPoints === 0 ? '' : storyPoints} placeholder="0"
               onChange={(e) => onStoryPointsChange(toInt(e.target.value))} />
           </Field>
-          <Field id="velocity-input" label="Points per sprint">
+          <Field id="velocity-input" label="Team points per sprint">
             <Input id="velocity-input" type="number" min={0} className="text-right"
               value={velocity === 0 ? '' : velocity} placeholder="1"
               onChange={(e) => onVelocityChange(toInt(e.target.value))} />
@@ -127,7 +127,7 @@ export function FeatureSizing({
       )}
 
       <p className="mt-3 text-[13px] text-muted-foreground">
-        About <span className="font-semibold text-foreground">{devHours > 0 ? Math.round(devHours) : '—'}</span> hours of development
+        About <span className="font-semibold text-foreground">{devHours > 0 ? Math.round(devHours) : '—'}</span> person-hours of development
       </p>
     </RailStep>
   );

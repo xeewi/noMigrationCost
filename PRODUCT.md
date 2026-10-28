@@ -20,7 +20,7 @@ Success: the person who opens the link leaves with one clear sentence ("over 5 y
 
 ## Positioning
 
-Not a generic estimation tool: it quantifies the cost of *not* migrating, which is normally invisible because it is spread over years. Every formula is traceable to a research document (COCOMO II, IEEE studies, French labor market data) readable inside the app.
+Not a generic estimation tool: it quantifies the cost of *not* migrating, which is normally invisible because it is spread over years. Every formula is traceable to a research document (COCOMO II reuse model, empirical reuse and fork studies, French labor market data) readable inside the app.
 
 ## Operating Context
 
@@ -33,8 +33,8 @@ Not a generic estimation tool: it quantifies the cost of *not* migrating, which 
 - Standalone cost estimate and shared-vs-duplicated comparison over 1, 3, 5 or 10 years, with break-even.
 - Team composition by seniority (Junior, Mid, Senior, Lead) with editable rates.
 - Sizing in story points (velocity, sprint length) or direct hours/days.
-- Number of consuming codebases.
-- Advanced model constants: generalization factor, porting factor, divergence rate, maintenance rates, bug duplication factor.
+- Number of apps that need the feature, and whether the shared library already exists.
+- Model assumptions, each marked measured or assumption: generalization, porting, integration, yearly upkeep, extra-copy upkeep, drift, coordination and upgrades.
 - Built-in documentation of the research behind every formula.
 - Stack: React 19 + Vite + TypeScript + shadcn/ui + Tailwind 4 + Recharts. Static build, deployed on GitHub Pages.
 

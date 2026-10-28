@@ -27,9 +27,7 @@ import {
   calcTeamAvgRate,
   calcDevHours,
   calcStandaloneCost,
-  calcSharedCost,
-  calcDuplicatedCost,
-  calcBreakEven,
+  calcComparison,
 } from '@/engine/formulas';
 import { ENGINE_DEFAULTS } from '@/engine/types';
 import type { SeniorityRow, SizingMode, DirectHoursUnit, EngineInputs } from '@/engine/types';
@@ -41,7 +39,8 @@ const EXAMPLE = {
   velocity: 10,
   sprintWeeks: 2,
   horizonYears: 5,
-  nbConsumingCodebases: 2,
+  nbCodebases: 2,
+  newLibrary: true,
 } as const;
 
 function exampleTeam(): SeniorityRow[] {
@@ -62,16 +61,10 @@ function App() {
   const [horizonYears, setHorizonYears] = useState<number>(EXAMPLE.horizonYears);
 
   // Advanced parameters state — all formula constants lifted to App.tsx
-  const [advancedParams, setAdvancedParams] = useState<AdvancedParamsState>({
-    generalizationFactor: ENGINE_DEFAULTS.generalizationFactor,
-    portingFactor: ENGINE_DEFAULTS.portingFactor,
-    divergenceRate: ENGINE_DEFAULTS.divergenceRate,
-    maintenanceRateShared: ENGINE_DEFAULTS.maintenanceRateShared,
-    maintenanceRateDuplicated: ENGINE_DEFAULTS.maintenanceRateDuplicated,
-    bugDuplicationFactor: ENGINE_DEFAULTS.bugDuplicationFactor,
-  });
+  const [advancedParams, setAdvancedParams] = useState<AdvancedParamsState>(getDefaultAdvancedParams);
 
-  const [nbConsumingCodebases, setNbConsumingCodebases] = useState<number>(EXAMPLE.nbConsumingCodebases);
+  const [nbCodebases, setNbCodebases] = useState<number>(EXAMPLE.nbCodebases);
+  const [newLibrary, setNewLibrary] = useState<boolean>(EXAMPLE.newLibrary);
 
   const [activeTab, setActiveTab] = useState<string>('comparison');
 
@@ -84,7 +77,7 @@ function App() {
     applyStateToSetters(state, {
       setTeam, setSizingMode, setStoryPoints, setVelocity,
       setSprintWeeks, setDirectValue, setDirectUnit,
-      setHorizonYears, setAdvancedParams, setNbConsumingCodebases,
+      setHorizonYears, setAdvancedParams, setNbCodebases, setNewLibrary,
       setActiveTab,
     });
   }, []);
@@ -96,13 +89,13 @@ function App() {
       window.location.hash = encodeAppState(
         team, sizingMode, storyPoints, velocity, sprintWeeks,
         directValue, directUnit, horizonYears, advancedParams,
-        nbConsumingCodebases, activeTab,
+        nbCodebases, newLibrary, activeTab,
       );
     }, 300);
     return () => clearTimeout(id);
   }, [view, team, sizingMode, storyPoints, velocity, sprintWeeks,
       directValue, directUnit, horizonYears, advancedParams,
-      nbConsumingCodebases, activeTab]);
+      nbCodebases, newLibrary, activeTab]);
 
   // Reset handler — clears all inputs to defaults and clears hash (D-04)
   const handleReset = useCallback(() => {
@@ -115,34 +108,33 @@ function App() {
     setDirectUnit('hours');
     setHorizonYears(EXAMPLE.horizonYears);
     setAdvancedParams(getDefaultAdvancedParams());
-    setNbConsumingCodebases(EXAMPLE.nbConsumingCodebases);
+    setNbCodebases(EXAMPLE.nbCodebases);
+    setNewLibrary(EXAMPLE.newLibrary);
     setActiveTab('comparison');
   }, []);
 
   const isExample = useMemo(() => {
     const current = encodeAppState(team, sizingMode, storyPoints, velocity, sprintWeeks,
-      directValue, directUnit, horizonYears, advancedParams, nbConsumingCodebases, 'comparison');
+      directValue, directUnit, horizonYears, advancedParams, nbCodebases, newLibrary, 'comparison');
     const example = encodeAppState(exampleTeam(), 'story-points', EXAMPLE.storyPoints, EXAMPLE.velocity,
       EXAMPLE.sprintWeeks, 0, 'hours', EXAMPLE.horizonYears, getDefaultAdvancedParams(),
-      EXAMPLE.nbConsumingCodebases, 'comparison');
+      EXAMPLE.nbCodebases, EXAMPLE.newLibrary, 'comparison');
     return current === example;
   }, [team, sizingMode, storyPoints, velocity, sprintWeeks, directValue, directUnit,
-      horizonYears, advancedParams, nbConsumingCodebases]);
+      horizonYears, advancedParams, nbCodebases, newLibrary]);
 
   // Derived state — all via useMemo, never useState
   const teamAvgRate = useMemo(() => calcTeamAvgRate(team), [team]);
 
+  const headcount = useMemo(() => team.reduce((sum, row) => sum + row.headcount, 0), [team]);
+
   const devHours = useMemo(
     () =>
-      calcDevHours({
-        mode: sizingMode,
-        storyPoints,
-        velocity,
-        sprintWeeks,
-        directValue,
-        directUnit,
-      }),
-    [sizingMode, storyPoints, velocity, sprintWeeks, directValue, directUnit],
+      calcDevHours(
+        { mode: sizingMode, storyPoints, velocity, sprintWeeks, directValue, directUnit },
+        headcount,
+      ),
+    [sizingMode, storyPoints, velocity, sprintWeeks, directValue, directUnit, headcount],
   );
 
   const emptyReason = useMemo(() => {
@@ -152,69 +144,26 @@ function App() {
   }, [teamAvgRate, devHours]);
 
   // Detect whether any advanced param differs from defaults (with fp tolerance)
-  const isAdvancedModified = useMemo(() => {
-    const eps = 0.001;
-    return (
-      Math.abs(advancedParams.generalizationFactor - ENGINE_DEFAULTS.generalizationFactor) > eps ||
-      Math.abs(advancedParams.portingFactor - ENGINE_DEFAULTS.portingFactor) > eps ||
-      Math.abs(advancedParams.divergenceRate - ENGINE_DEFAULTS.divergenceRate) > eps ||
-      Math.abs(advancedParams.maintenanceRateShared - ENGINE_DEFAULTS.maintenanceRateShared) > eps ||
-      Math.abs(advancedParams.maintenanceRateDuplicated - ENGINE_DEFAULTS.maintenanceRateDuplicated) > eps ||
-      Math.abs(advancedParams.bugDuplicationFactor - ENGINE_DEFAULTS.bugDuplicationFactor) > eps
-    );
-  }, [advancedParams]);
+  const isAdvancedModified = useMemo(
+    () => (Object.keys(ENGINE_DEFAULTS) as (keyof AdvancedParamsState)[])
+      .some((k) => Math.abs(advancedParams[k] - ENGINE_DEFAULTS[k]) > 0.001),
+    [advancedParams],
+  );
 
-  const resetAdvancedParams = () => {
-    setAdvancedParams({
-      generalizationFactor: ENGINE_DEFAULTS.generalizationFactor,
-      portingFactor: ENGINE_DEFAULTS.portingFactor,
-      divergenceRate: ENGINE_DEFAULTS.divergenceRate,
-      maintenanceRateShared: ENGINE_DEFAULTS.maintenanceRateShared,
-      maintenanceRateDuplicated: ENGINE_DEFAULTS.maintenanceRateDuplicated,
-      bugDuplicationFactor: ENGINE_DEFAULTS.bugDuplicationFactor,
-    });
-  };
+  const resetAdvancedParams = () => setAdvancedParams(getDefaultAdvancedParams());
 
-  // Two separate EngineInputs objects — shared vs duplicated (Research Pitfall 3)
-  const sharedEngineInputs: EngineInputs = useMemo(() => ({
+  const engineInputs: EngineInputs = useMemo(() => ({
+    ...advancedParams,
     teamAvgHourlyRate: teamAvgRate,
     devHours,
     horizonYears,
-    maintenanceRate: advancedParams.maintenanceRateShared,
-    generalizationFactor: advancedParams.generalizationFactor,
-    portingFactor: advancedParams.portingFactor,
-    divergenceRate: advancedParams.divergenceRate,
-    bugDuplicationFactor: advancedParams.bugDuplicationFactor,
-    nbConsumingCodebases,
-    maintenanceRateShared: advancedParams.maintenanceRateShared,
-  }), [teamAvgRate, devHours, horizonYears, advancedParams, nbConsumingCodebases]);
+    nbCodebases,
+    newLibrary,
+  }), [advancedParams, teamAvgRate, devHours, horizonYears, nbCodebases, newLibrary]);
 
-  const duplicatedEngineInputs: EngineInputs = useMemo(() => ({
-    ...sharedEngineInputs,
-    maintenanceRate: advancedParams.maintenanceRateDuplicated,
-  }), [sharedEngineInputs, advancedParams.maintenanceRateDuplicated]);
-
-  // Standalone cost uses shared maintenance rate
-  const costOutput = useMemo(() => {
-    if (teamAvgRate === 0 || devHours === 0) return null;
-    return calcStandaloneCost(sharedEngineInputs);
-  }, [teamAvgRate, devHours, sharedEngineInputs]);
-
-  // Comparison engine outputs — ready for Plan 03
-  const sharedCostOutput = useMemo(() => {
-    if (teamAvgRate === 0 || devHours === 0) return null;
-    return calcSharedCost(sharedEngineInputs);
-  }, [teamAvgRate, devHours, sharedEngineInputs]);
-
-  const duplicatedCostOutput = useMemo(() => {
-    if (teamAvgRate === 0 || devHours === 0) return null;
-    return calcDuplicatedCost(duplicatedEngineInputs);
-  }, [teamAvgRate, devHours, duplicatedEngineInputs]);
-
-  const breakEvenResult = useMemo(() => {
-    if (teamAvgRate === 0 || devHours === 0) return null;
-    return calcBreakEven(duplicatedEngineInputs);
-  }, [teamAvgRate, devHours, duplicatedEngineInputs]);
+  const ready = teamAvgRate > 0 && devHours > 0;
+  const costOutput = useMemo(() => (ready ? calcStandaloneCost(engineInputs) : null), [ready, engineInputs]);
+  const comparison = useMemo(() => (ready ? calcComparison(engineInputs) : null), [ready, engineInputs]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -250,17 +199,20 @@ function App() {
               onChange={setAdvancedParams}
               isModified={isAdvancedModified}
               onReset={resetAdvancedParams}
-              nbConsumingCodebases={nbConsumingCodebases}
-              onNbConsumingCodebasesChange={setNbConsumingCodebases}
+              nbCodebases={nbCodebases}
+              onNbCodebasesChange={setNbCodebases}
+              newLibrary={newLibrary}
+              onNewLibraryChange={setNewLibrary}
             />
           </aside>
 
           <main className="order-first lg:order-none min-w-0 px-4 py-6 sm:px-8 sm:py-8">
-            {sharedCostOutput && duplicatedCostOutput && breakEvenResult && (
+            {comparison && (
               <VerdictPanel
-                sharedTotal={sharedCostOutput.totalCost}
-                duplicatedTotal={duplicatedCostOutput.totalCost}
-                breakEvenMonths={breakEvenResult.exists ? breakEvenResult.months : null}
+                sharedTotal={comparison.shared.total}
+                duplicatedTotal={comparison.duplicated.total}
+                breakEvenMonth={comparison.breakEvenMonth}
+                startTie={Math.abs(comparison.monthly[0].shared - comparison.monthly[0].duplicated) < 1}
                 horizonYears={horizonYears}
               />
             )}
@@ -286,11 +238,9 @@ function App() {
               <CostOutput output={costOutput} emptyReason={emptyReason} />
             ) : (
               <ComparisonTab
-                sharedCost={sharedCostOutput}
-                duplicatedCost={duplicatedCostOutput}
-                breakEven={breakEvenResult}
+                comparison={comparison}
                 horizonYears={horizonYears}
-                portingFactor={advancedParams.portingFactor}
+                nbCodebases={nbCodebases}
                 emptyReason={emptyReason}
               />
             )}

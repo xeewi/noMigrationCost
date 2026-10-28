@@ -11,7 +11,10 @@ import { formatEuro } from '@/lib/utils';
 interface VerdictPanelProps {
   sharedTotal: number;
   duplicatedTotal: number;
-  breakEvenMonths: number | null;
+  /** 0 = sharing cheaper from day one, null = not within the horizon. Read from the same curves as the totals. */
+  breakEvenMonth: number | null;
+  /** Both options cost the same to build (month 0). */
+  startTie: boolean;
   horizonYears: number;
 }
 
@@ -45,22 +48,22 @@ function useTally(target: number, duration = 650): number {
   return shown;
 }
 
-function formatMonths(months: number): string {
-  const m = Math.max(1, Math.round(months));
+function formatMonths(m: number): string {
   return m === 1 ? '1 month' : `${m} months`;
 }
 
 export function VerdictPanel({
   sharedTotal,
   duplicatedTotal,
-  breakEvenMonths,
+  breakEvenMonth,
+  startTie,
   horizonYears,
 }: VerdictPanelProps) {
   const gap = duplicatedTotal - sharedTotal;
+  const tie = Math.abs(gap) < 1;
   const sharedWins = gap > 0;
   const tallied = useTally(Math.abs(gap));
   const years = horizonYears === 1 ? '1 year' : `${horizonYears} years`;
-  const paysOffInHorizon = breakEvenMonths !== null && breakEvenMonths <= horizonYears * 12;
 
   return (
     <section
@@ -74,7 +77,7 @@ export function VerdictPanel({
       <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr_1fr] lg:gap-8">
         <div>
           <h2 id="verdict-heading" className="font-sign text-[22px] sm:text-[24px] font-semibold leading-tight text-panel-soft">
-            {sharedWins ? 'Duplicating this feature costs you' : 'Sharing this feature costs you'}
+            {tie ? 'Sharing and duplicating cost you the same' : sharedWins ? 'Duplicating this feature costs you' : 'Sharing this feature costs you'}
           </h2>
           <p
             className="mt-2 font-sign text-[56px] sm:text-[76px] font-extrabold leading-none tracking-[-0.01em]"
@@ -83,7 +86,9 @@ export function VerdictPanel({
             +&thinsp;{formatEuro(tallied)}
           </p>
           <p className="mt-3 max-w-[38ch] text-[15px] text-[#dfe5fa]">
-            {sharedWins
+            {tie
+              ? 'over this horizon, in this scenario.'
+              : sharedWins
               ? 'more than building it once in a shared library.'
               : 'more than copying it into each app, in this scenario.'}
           </p>
@@ -91,15 +96,19 @@ export function VerdictPanel({
 
         <div>
           <h3 className="font-sign text-[22px] sm:text-[24px] font-semibold leading-tight text-panel-soft">
-            Sharing pays off after
+            Sharing pays off
           </h3>
           <p className="mt-1 font-sign text-[44px] font-bold leading-none">
-            {paysOffInHorizon ? formatMonths(breakEvenMonths!) : 'Never'}
+            {breakEvenMonth === null ? 'Not yet' : breakEvenMonth === 0 ? (startTie ? 'From the start' : 'From day one') : `After ${formatMonths(breakEvenMonth)}`}
           </p>
           <p className="mt-3 max-w-[30ch] text-[15px] text-[#dfe5fa]">
-            {paysOffInHorizon
-              ? 'Before that, the shared library costs more.'
-              : `Not within ${years}. Try more teams or a longer horizon.`}
+            {breakEvenMonth === null
+              ? `Copying stays cheaper over ${years}.`
+              : breakEvenMonth === 0
+                ? startTie
+                  ? 'Both cost the same to build; sharing is never dearer after that.'
+                  : 'Building it once costs less than building it for each app.'
+                : 'Before that, the shared library costs more.'}
           </p>
         </div>
 

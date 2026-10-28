@@ -13,25 +13,22 @@ import { Input } from '@/components/ui/input';
 import { RailStep } from '@/components/RailStep';
 import { Segmented } from '@/components/Segmented';
 
-export interface AdvancedParamsState {
-  generalizationFactor: number;
-  portingFactor: number;
-  divergenceRate: number;
-  maintenanceRateShared: number;
-  maintenanceRateDuplicated: number;
-  bugDuplicationFactor: number;
-}
+import type { ModelParams } from '@/engine/types';
+
+export type AdvancedParamsState = ModelParams;
 
 interface AdvancedParametersProps {
   params: AdvancedParamsState;
   onChange: (params: AdvancedParamsState) => void;
   isModified: boolean;
   onReset: () => void;
-  nbConsumingCodebases: number;
-  onNbConsumingCodebasesChange: (value: number) => void;
+  nbCodebases: number;
+  onNbCodebasesChange: (value: number) => void;
+  newLibrary: boolean;
+  onNewLibraryChange: (value: boolean) => void;
 }
 
-interface ParamConfig {
+export interface ParamConfig {
   key: keyof AdvancedParamsState;
   label: string;
   hint: string;
@@ -39,56 +36,67 @@ interface ParamConfig {
   max: number;
   step: number;
   decimalPlaces: number;
+  evidence: 'Measured' | 'Assumption';
   citation: string;
 }
 
-const PARAM_CONFIGS: ParamConfig[] = [
+export const MIN_CODEBASES = 2;
+export const MAX_CODEBASES = 10;
+
+export const PARAM_CONFIGS: ParamConfig[] = [
   {
     key: 'generalizationFactor',
     label: 'Extra work to make it reusable',
-    hint: '1.30 = shared code takes 30 % more effort to build.',
-    min: 1.0, max: 2.0, step: 0.05, decimalPlaces: 2,
-    citation: 'Research doc §3.2: Shared code requires 20–40% more code than a specific implementation to be generic enough for multiple consumers. Default 1.3 reflects the conservative end of the estimate.',
+    hint: '1.20 = building it to be shared takes 20 % more effort.',
+    min: 1.0, max: 1.6, step: 0.05, decimalPlaces: 2, evidence: 'Measured',
+    citation: 'Docs §3 and §7.4: COCOMO II "develop for reuse" multiplier 1.07–1.24; HP 1.11; median +20 % across five studies (Krüger & Berger, FSE 2020).',
   },
   {
     key: 'portingFactor',
     label: 'Effort to copy it into another app',
-    hint: '0.65 = porting costs 65 % of building it the first time.',
-    min: 0.3, max: 1.0, step: 0.05, decimalPlaces: 2,
-    citation: 'Research doc §4.1: Adapting a feature to a second codebase costs 50–80% of the initial effort. Default 0.65 is the midpoint of the range.',
+    hint: '0.65 = each copy costs 65 % of building it the first time.',
+    min: 0.3, max: 1.0, step: 0.05, decimalPlaces: 2, evidence: 'Measured',
+    citation: 'Docs §4 and §7.4: COCOMO II reuse model gives 0.55–0.8 for copy-and-adapt; NASA data (Selby) reaches 0.55 once about 12 % of the code is modified.',
+  },
+  {
+    key: 'integrationFactor',
+    label: 'Effort to plug the library into another app',
+    hint: '0.20 = each extra app costs 20 % of the first build to integrate.',
+    min: 0, max: 0.5, step: 0.05, decimalPlaces: 2, evidence: 'Measured',
+    citation: 'Docs §3 and §7.4: relative cost of reuse about 0.2 (Poulin); platform variants about 0.33 of a new build (Krüger & Berger, FSE 2020).',
+  },
+  {
+    key: 'maintenanceRate',
+    label: 'Yearly upkeep of one copy',
+    hint: '0.20 = each year, keeping one copy working costs 20 % of its build.',
+    min: 0.1, max: 0.4, step: 0.01, decimalPlaces: 2, evidence: 'Measured',
+    citation: 'Docs §2 and §7.4: order of magnitude only — about 20 % a year (US DoD rule of thumb, Boehm annual change traffic). Same rate on both sides.',
+  },
+  {
+    key: 'extraCopyUpkeep',
+    label: 'Upkeep of each extra copy',
+    hint: '1.00 = an extra copy costs as much to keep as the first, syncing and repeated fixes included.',
+    min: 0.5, max: 1.5, step: 0.05, decimalPlaces: 2, evidence: 'Assumption',
+    citation: 'Docs §4 and §7.4: forked BSD systems port 11–16 % of their changes from each other, at a steady rate (Ray & Kim, FSE 2012). No direct measurement of the ratio.',
   },
   {
     key: 'divergenceRate',
     label: 'How fast the copies drift apart',
-    hint: '0.20 = keeping copies in sync gets 20 % harder each year.',
-    min: 0.05, max: 0.5, step: 0.01, decimalPlaces: 2,
-    citation: 'Research doc §7.5: Duplicated code diverges exponentially over time. Default 0.20 reflects moderate active development.',
+    hint: '0.05 = each year, an extra copy gets 5 % dearer to keep (capped at 1.5×).',
+    min: 0, max: 0.2, step: 0.01, decimalPlaces: 2, evidence: 'Assumption',
+    citation: 'Docs §4 and §7.4: no study measures this. Copies that drift far tend to stop syncing, hence the cap.',
   },
   {
-    key: 'maintenanceRateShared',
-    label: 'Yearly upkeep, shared library',
-    hint: '0.18 = each year costs 18 % of the build cost.',
-    min: 0.1, max: 0.3, step: 0.01, decimalPlaces: 2,
-    citation: 'Research doc §7.1: Annual maintenance as % of initial dev cost. Industry average 15–25% (§2.1).',
-  },
-  {
-    key: 'maintenanceRateDuplicated',
-    label: 'Yearly upkeep, duplicated copies',
-    hint: '0.22 = each year costs 22 % of the build cost, per copy.',
-    min: 0.15, max: 0.4, step: 0.01, decimalPlaces: 2,
-    citation: 'Research doc §7.2: Duplicated code maintenance is higher due to double effort on bug fixes and feature evolution (§4.2).',
-  },
-  {
-    key: 'bugDuplicationFactor',
-    label: 'Bugs fixed more than once',
-    hint: '2.0 = every bug fix is done twice.',
-    min: 1.0, max: 3.0, step: 0.1, decimalPlaces: 1,
-    citation: 'Research doc §7.4 / IEEE study (§2.3): Up to 33% of bug fixes in cloned code contain propagated bugs.',
+    key: 'coordinationRate',
+    label: 'Coordination and upgrades per extra app',
+    hint: '0.04 = each extra app adds 4 % of the build a year in meetings and library upgrades.',
+    min: 0, max: 0.15, step: 0.01, decimalPlaces: 2, evidence: 'Assumption',
+    citation: 'Docs §3 and §7.4: coordination about 7 % of effort on a shared platform vs 5 % with copies (Krüger & Berger); 15 % of API changes break compatibility (Xavier et al., SANER 2017).',
   },
 ];
 
 function ParamRow({ config, value, onValueChange }: { config: ParamConfig; value: number; onValueChange: (v: number) => void }) {
-  const { key, label, hint, min, max, step, decimalPlaces, citation } = config;
+  const { key, label, hint, min, max, step, decimalPlaces, evidence, citation } = config;
   const [inputStr, setInputStr] = useState(value.toFixed(decimalPlaces));
 
   useEffect(() => {
@@ -119,6 +127,7 @@ function ParamRow({ config, value, onValueChange }: { config: ParamConfig; value
           </PopoverTrigger>
           <PopoverContent side="top" className="text-sm">{citation}</PopoverContent>
         </Popover>
+        <span className="ml-auto text-[12px] uppercase tracking-[0.08em] text-muted-foreground">{evidence}</span>
       </div>
       <div className="flex items-center gap-3">
         <div className="flex-1">
@@ -142,27 +151,43 @@ export function AdvancedParameters({
   onChange,
   isModified,
   onReset,
-  nbConsumingCodebases,
-  onNbConsumingCodebasesChange,
+  nbCodebases,
+  onNbCodebasesChange,
+  newLibrary,
+  onNewLibraryChange,
 }: AdvancedParametersProps) {
   const [mode, setMode] = useState<'simple' | 'detailed'>(isModified ? 'detailed' : 'simple');
-  const teams = nbConsumingCodebases;
+  const apps = nbCodebases;
 
   return (
     <>
-      <RailStep number={3} title="Who would share it">
+      <RailStep number={3} title="Who needs it">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm">Teams using the shared library</p>
-          <div className="flex items-center gap-1.5" role="group" aria-label="Teams using the shared library">
-            <button type="button" className={stepBtn} aria-label="One team fewer" disabled={teams <= 1}
-              onClick={() => onNbConsumingCodebasesChange(Math.max(1, teams - 1))}><Minus size={14} /></button>
-            <span className="w-6 text-center font-semibold" aria-live="polite">{teams}</span>
-            <button type="button" className={stepBtn} aria-label="One team more" disabled={teams >= 10}
-              onClick={() => onNbConsumingCodebasesChange(Math.min(10, teams + 1))}><Plus size={14} /></button>
+          <p className="text-sm">Apps that need this feature</p>
+          <div className="flex items-center gap-1.5" role="group" aria-label="Apps that need this feature">
+            <button type="button" className={stepBtn} aria-label="One app fewer" disabled={apps <= MIN_CODEBASES}
+              onClick={() => onNbCodebasesChange(Math.max(MIN_CODEBASES, apps - 1))}><Minus size={14} /></button>
+            <span className="w-6 text-center font-semibold" aria-live="polite">{apps}</span>
+            <button type="button" className={stepBtn} aria-label="One app more" disabled={apps >= MAX_CODEBASES}
+              onClick={() => onNbCodebasesChange(Math.min(MAX_CODEBASES, apps + 1))}><Plus size={14} /></button>
           </div>
         </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-sm">Shared library</p>
+          <Segmented
+            label="Shared library"
+            value={newLibrary ? 'new' : 'existing'}
+            onChange={(v) => onNewLibraryChange(v === 'new')}
+            options={[
+              { value: 'new', label: 'To create' },
+              { value: 'existing', label: 'Already exists' },
+            ]}
+          />
+        </div>
         <p className="mt-2 text-[13px] text-muted-foreground">
-          Each team adds about 3 hours a week of coordination to the shared path.
+          {newLibrary
+            ? 'Creating it costs about 8 weeks of setup, then 100 hours a year to run, all charged to this feature.'
+            : 'No setup or running cost: the library is already paid for.'}
         </p>
       </RailStep>
 
@@ -180,7 +205,7 @@ export function AdvancedParameters({
           <p className="mt-3 text-sm text-muted-foreground">
             {isModified
               ? 'You changed some of the research figures. Open Detailed to see which.'
-              : 'Figures from industry research (COCOMO II, IEEE studies) and French salary data. Open Detailed to adjust them.'}
+              : 'Figures from software-engineering studies (COCOMO II, reuse and fork studies) and 2026 French salary data. Open Detailed to see which are measured and which are assumptions.'}
           </p>
         ) : (
           <div className="mt-4 space-y-5">

@@ -2,7 +2,7 @@
 
 **Feature Cost Calculator**
 
-An interactive dashboard that calculates and visualizes the real cost of software features — both as standalone cost estimation and as a comparison between shared code vs duplicated code approaches. Built with React and shadcn/ui for internal use and stakeholder presentations, with data models based on industry research (COCOMO II, IEEE studies, French labor market data).
+An interactive dashboard that calculates and visualizes the real cost of software features — both as standalone cost estimation and as a comparison between shared code vs duplicated code approaches. Built with React and shadcn/ui for internal use and stakeholder presentations, with data models based on industry research (COCOMO II reuse model, empirical reuse and fork studies, French labor market data).
 
 **Core Value:** Make the hidden long-term costs of code duplication visible and quantifiable, so teams can make informed build-vs-duplicate decisions backed by real numbers.
 
