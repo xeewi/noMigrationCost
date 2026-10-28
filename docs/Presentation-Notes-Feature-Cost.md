@@ -69,7 +69,7 @@
 
 ### Slide conclusion
 - Yearly cost in the reference scenario:
-  - Shared: €10,886 upkeep + €1,814 coordination + €4,050 running = **€16,750/yr**
+  - Shared: €10,886 upkeep + €1,814 coordination + €4,050 running = **€16,751/yr**
   - Duplicated: €9,072 first copy + €9,072 → €10,886 extra copy = **€18,144 → €19,958/yr**
 - The difference is small per year, but it is paid every year and grows with the number of apps
 
@@ -87,10 +87,10 @@
 
 ### Key takeaways
 - **Year 0**: same up-front cost
-- Sharing is never more expensive, so **it pays off from day one**
+- Sharing is never more expensive, so **it pays off from the start (equal build cost, cheaper every month after)**
 - The gap grows a little faster each year as copies drift: **€11,502 after 5 years (7 % of the duplicated cost)**
 - **With an existing library**: shared €127,008 vs duplicated €170,100 → **gap €43,092**
-- The margin is thin for 2 apps: a costlier generalization (G ≥ 1.33) or cheaper copy upkeep (e0 ≤ 0.75) flips the verdict
+- The margin is thin for 2 apps: a costlier generalization (G ≥ 1.33) or cheaper copy upkeep (e0 < 0.75, threshold ≈ 0.746) flips the verdict
 
 ---
 
@@ -184,7 +184,7 @@
 | Bug fixes | Once, in one place | In every copy (inside upkeep) |
 | Consistency | Same code, same behavior | Can drift (sometimes on purpose) |
 | Each extra app | Cheap | Expensive |
-| Break-even (ref.) | From day one | Wins for small or short-lived features |
+| Break-even (ref.) | From the start (tie at build) | Wins for small or short-lived features |
 | Main risk | Wrong abstraction, breaking changes | Missed fixes, drift |
 
 (Percentages are shares of C0, the cost of building the feature once.)
@@ -223,7 +223,7 @@
 | Up-front cost, 2 apps, new library | €74,844 each (equal) |
 | 5-year gap, reference scenario | €11,502 in favour of sharing (7 %) |
 | Same, existing library | €43,092 |
-| Break-even, reference scenario | From day one |
+| Break-even, reference scenario | From the start (tie at build) |
 | Duplicated / shared at 3 / 5 apps (5 yrs) | 1.41× / 1.92× |
 | Minimum size for sharing to win (2 apps, new lib, 5 yrs) | ~820 h |
 | Small feature (140 h, new lib) | Copying is 2.2× cheaper |

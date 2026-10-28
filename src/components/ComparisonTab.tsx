@@ -78,7 +78,7 @@ export function ComparisonTab({ comparison, horizonYears, nbCodebases, emptyReas
           Full breakdown
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {nbCodebases} apps, over {years}. Every line is a share of the cost of building the feature once (docs §7).
+          {nbCodebases} apps, over {years}. Every line is a share of the cost of building the feature once, except library setup and running, which are fixed hours (docs §7).
         </p>
         <div className="mt-3 grid gap-4 xl:grid-cols-2">
           <SideTable title="Shared library" lines={comparison.shared.lines} total={comparison.shared.total} tone="text-panel" />

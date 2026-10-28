@@ -58,7 +58,7 @@ Let's look at what it costs to get started. Our reference scenario: a team of fo
 
 With shared code, you build the feature once, but made to share — that costs about 20 percent more, a figure well supported by the research. You plug it into the second app for about 20 percent of the build. And because the library doesn't exist yet, you spend about 280 hours setting it up. Total: 74,844 euros.
 
-With duplicated code, you build it for the first app, then copy and adapt it into the second. The copy costs about 65 percent of the original effort — the design is done, but it has to fit the other app's conventions. That's also a well-measured figure. Total: 74,844 euros.
+With duplicated code, you build it for the first app, then copy and adapt it into the second. The copy costs about 65 percent of the original effort — the design is done, but it has to fit the other app's conventions. That figure sits inside the measured range, 0.55 to 0.8. Total: 74,844 euros.
 
 `[Pause]`
 
@@ -94,7 +94,7 @@ At year zero, both approaches cost 74,844 euros.
 
 After one year, duplication costs about 1,400 euros more. After three years, 5,500 more. After five years, 11,500 more — 158,600 versus 170,100. That's about 7 percent.
 
-Because sharing is never more expensive at any point, it pays off from day one.
+Both cost the same to build, and sharing is cheaper every month after — so it pays off from the start.
 
 If the shared library already exists, the gap jumps to 43,000 euros, because there's no setup and no extra running cost.
 
@@ -184,7 +184,7 @@ Consistency: same code, same behavior — versus copies that can drift, sometime
 
 Each extra app: cheap with sharing, expensive with copies.
 
-Break-even: from day one in our scenario — but copying wins for small or short-lived features.
+Break-even: from the start in our scenario — but copying wins for small or short-lived features.
 
 And the main risks: the wrong abstraction and breaking changes on one side; missed fixes and drift on the other.
 

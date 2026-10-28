@@ -115,6 +115,12 @@ describe('calcComparison', () => {
           }
   });
 
+  it('an exact tie at month 0 stays a tie whatever the rate (float noise)', () => {
+    // 1120 h: 1.2 + 0.2 + 280/1120 = 1.65 = 1 + 0.65, so builds tie exactly
+    for (const teamAvgHourlyRate of [40.5, 46.888888888888886, 51.3, 77.7])
+      expect(calcComparison({ ...base, devHours: 1120, teamAvgHourlyRate }).breakEvenMonth).toBe(0);
+  });
+
   it('gap is proportional to the hourly rate, so the rate never flips the verdict', () => {
     expect(gap({ teamAvgHourlyRate: 100 })).toBeCloseTo(2 * gap());
   });

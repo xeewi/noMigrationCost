@@ -36,7 +36,7 @@ year by year, and when sharing starts paying for itself.
   keep alive over the horizon.
 - **Shared vs duplicated comparison** — cumulative cost curves for both
   approaches over 1, 3, 5 or 10 years, with a **break-even point** read from
-  the same curves (including "from day one" and "not within the horizon").
+  the same curves (including "from the start" and "not within the horizon").
 - **Team composition** — headcount per seniority level (Junior, Mid, Senior,
   Lead) with editable hourly rates based on the French market.
 - **Two sizing modes** — story points (with velocity and sprint length) or

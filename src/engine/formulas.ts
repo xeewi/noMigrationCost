@@ -146,8 +146,10 @@ export function calcComparison(inputs: EngineInputs): ComparisonOutputs {
   }
 
   // Break-even: earliest month from which shared stays at or below duplicated to the horizon.
+  // Relative tolerance so exact ties (e.g. equal build costs) don't flip on float noise.
+  const notWorse = (pt: MonthCostPoint) => pt.shared <= pt.duplicated + 1e-9 * Math.max(1, pt.duplicated);
   let breakEvenMonth: number | null = null;
-  for (let t = months; t >= 0 && monthly[t].shared <= monthly[t].duplicated; t--) breakEvenMonth = t;
+  for (let t = months; t >= 0 && notWorse(monthly[t]); t--) breakEvenMonth = t;
 
   const last = monthly[months];
   return {

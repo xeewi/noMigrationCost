@@ -212,6 +212,7 @@ function App() {
                 sharedTotal={comparison.shared.total}
                 duplicatedTotal={comparison.duplicated.total}
                 breakEvenMonth={comparison.breakEvenMonth}
+                startTie={Math.abs(comparison.monthly[0].shared - comparison.monthly[0].duplicated) < 1}
                 horizonYears={horizonYears}
               />
             )}

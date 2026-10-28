@@ -69,7 +69,7 @@
 
 ### Conclusion de la slide
 - Coût annuel dans le scénario de référence :
-  - Partagé : 10 886 € d'entretien + 1 814 € de coordination + 4 050 € de fonctionnement = **16 750 €/an**
+  - Partagé : 10 886 € d'entretien + 1 814 € de coordination + 4 050 € de fonctionnement = **16 751 €/an**
   - Dupliqué : 9 072 € pour la première copie + 9 072 € → 10 886 € pour la copie supplémentaire = **18 144 € → 19 958 €/an**
 - L'écart annuel est petit, mais il se paie chaque année et grandit avec le nombre d'apps
 
@@ -87,10 +87,10 @@
 
 ### Points clés à retenir
 - **Année 0** : même coût initial
-- Le partage n'est jamais plus cher, donc **il est rentable dès le jour 0**
+- Le partage n'est jamais plus cher, donc **il est rentable dès le départ (même coût de construction, moins cher chaque mois ensuite)**
 - L'écart grandit un peu plus vite chaque année à mesure que les copies dérivent : **11 502 € après 5 ans (7 % du coût dupliqué)**
 - **Avec une lib existante** : partagé 127 008 € vs dupliqué 170 100 € → **écart de 43 092 €**
-- La marge est mince pour 2 apps : une généralisation plus chère (G ≥ 1,33) ou un entretien des copies moins cher (e0 ≤ 0,75) fait basculer le verdict
+- La marge est mince pour 2 apps : une généralisation plus chère (G ≥ 1,33) ou un entretien des copies moins cher (e0 < 0,75, seuil ≈ 0,746) fait basculer le verdict
 
 ---
 
@@ -184,7 +184,7 @@
 | Corrections de bugs | Une fois, à un seul endroit | Dans chaque copie (inclus dans l'entretien) |
 | Cohérence | Même code, même comportement | Peut dériver (parfois voulu) |
 | Chaque app en plus | Peu coûteuse | Coûteuse |
-| Seuil (réf.) | Dès le jour 0 | Gagne pour les petites features ou à court terme |
+| Seuil (réf.) | Dès le départ (égalité au build) | Gagne pour les petites features ou à court terme |
 | Risque principal | Mauvaise abstraction, breaking changes | Corrections oubliées, dérive |
 
 (Les pourcentages sont des parts de C0, le coût de construire la feature une fois.)
@@ -223,7 +223,7 @@
 | Coût initial, 2 apps, nouvelle lib | 74 844 € chacun (égaux) |
 | Écart sur 5 ans, scénario de référence | 11 502 € en faveur du partage (7 %) |
 | Idem, lib existante | 43 092 € |
-| Seuil, scénario de référence | Dès le jour 0 |
+| Seuil, scénario de référence | Dès le départ (égalité au build) |
 | Dupliqué / partagé à 3 / 5 apps (5 ans) | 1,41× / 1,92× |
 | Taille minimale pour que le partage gagne (2 apps, nouvelle lib, 5 ans) | ~820 h |
 | Petite feature (140 h, nouvelle lib) | La copie est 2,2× moins chère |
