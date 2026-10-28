@@ -5,13 +5,6 @@
  * @project Feature Cost Calculator
  */
 
-import { cn } from '@/lib/utils';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -20,13 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { RailStep } from '@/components/RailStep';
+import { Segmented } from '@/components/Segmented';
 import type { DirectHoursUnit, SizingMode } from '@/engine/types';
 
 interface FeatureSizingProps {
@@ -52,6 +40,20 @@ const SPRINT_WEEK_OPTIONS = [
   { value: '4', label: '4 weeks' },
 ] as const;
 
+function toInt(value: string): number {
+  const v = parseInt(value, 10);
+  return isNaN(v) || v < 0 ? 0 : v;
+}
+
+function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <label htmlFor={id} className="text-sm">{label}</label>
+      <div className="w-28 shrink-0">{children}</div>
+    </div>
+  );
+}
+
 export function FeatureSizing({
   sizingMode,
   onSizingModeChange,
@@ -68,126 +70,65 @@ export function FeatureSizing({
   devHours,
 }: FeatureSizingProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold">Feature Sizing</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs
-          value={sizingMode}
-          onValueChange={(v) => onSizingModeChange(v as SizingMode)}
-        >
-          <TabsList>
-            <TabsTrigger value="story-points">Story Points</TabsTrigger>
-            <TabsTrigger value="direct-hours">Direct Hours</TabsTrigger>
-          </TabsList>
+    <RailStep number={2} title="How big is the feature">
+      <Segmented
+        label="Size the feature in"
+        value={sizingMode}
+        onChange={onSizingModeChange}
+        options={[
+          { value: 'story-points', label: 'Story points' },
+          { value: 'direct-hours', label: 'Time' },
+        ]}
+      />
 
-          <TabsContent value="story-points" className="mt-4 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="story-points-input">
-                Story points
-              </label>
-              <Input
-                id="story-points-input"
-                type="number"
-                min={0}
-                value={storyPoints === 0 ? '' : storyPoints}
-                placeholder="0"
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  onStoryPointsChange(isNaN(v) || v < 0 ? 0 : v);
-                }}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="velocity-input">
-                Team velocity (SP/sprint)
-              </label>
-              <Input
-                id="velocity-input"
-                type="number"
-                min={0}
-                value={velocity === 0 ? '' : velocity}
-                placeholder="1"
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  onVelocityChange(isNaN(v) || v < 0 ? 0 : v);
-                }}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="sprint-duration-trigger">
-                Sprint duration
-              </label>
-              <Select
-                value={String(sprintWeeks)}
-                onValueChange={(v) => { if (v !== null) onSprintWeeksChange(Number(v)); }}
-              >
-                <SelectTrigger id="sprint-duration-trigger">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SPRINT_WEEK_OPTIONS.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="direct-hours" className="mt-4 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="direct-value-input">
-                {directUnit === 'hours' ? 'Hours' : 'Days'}
-              </label>
-              <div className="flex gap-2 items-center">
-                <Input
-                  id="direct-value-input"
-                  type="number"
-                  min={0}
-                  value={directValue === 0 ? '' : directValue}
-                  placeholder="0"
-                  onChange={(e) => {
-                    const v = parseFloat(e.target.value);
-                    onDirectValueChange(isNaN(v) || v < 0 ? 0 : v);
-                  }}
-                />
-                <div className="flex gap-1">
-                  <Button
-                    variant={directUnit === 'hours' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => onDirectUnitChange('hours')}
-                    type="button"
-                  >
-                    Hours
-                  </Button>
-                  <Button
-                    variant={directUnit === 'days' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => onDirectUnitChange('days')}
-                    type="button"
-                  >
-                    Days
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className={cn('mt-4 flex items-baseline gap-2 text-sm')}>
-          <span className="text-muted-foreground font-medium">
-            Estimated development hours
-          </span>
-          <span className={cn('font-semibold', devHours > 0 ? 'text-primary' : 'text-foreground')}>
-            {devHours > 0 ? Math.round(devHours) : '\u2014'}
-          </span>
+      {sizingMode === 'story-points' ? (
+        <div className="mt-3 space-y-2">
+          <Field id="story-points-input" label="Size">
+            <Input id="story-points-input" type="number" min={0} className="text-right"
+              value={storyPoints === 0 ? '' : storyPoints} placeholder="0"
+              onChange={(e) => onStoryPointsChange(toInt(e.target.value))} />
+          </Field>
+          <Field id="velocity-input" label="Points per sprint">
+            <Input id="velocity-input" type="number" min={0} className="text-right"
+              value={velocity === 0 ? '' : velocity} placeholder="1"
+              onChange={(e) => onVelocityChange(toInt(e.target.value))} />
+          </Field>
+          <Field id="sprint-duration-trigger" label="Sprint length">
+            <Select value={String(sprintWeeks)} onValueChange={(v) => { if (v !== null) onSprintWeeksChange(Number(v)); }}>
+              <SelectTrigger id="sprint-duration-trigger" className="w-full"><SelectValue>{(v: string) => `${v} week${v === '1' ? '' : 's'}`}</SelectValue></SelectTrigger>
+              <SelectContent>
+                {SPRINT_WEEK_OPTIONS.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
         </div>
-      </CardContent>
-    </Card>
+      ) : (
+        <div className="mt-3 space-y-2">
+          <Field id="direct-value-input" label={directUnit === 'hours' ? 'Hours of work' : 'Days of work'}>
+            <Input id="direct-value-input" type="number" min={0} className="text-right"
+              value={directValue === 0 ? '' : directValue} placeholder="0"
+              onChange={(e) => {
+                const v = parseFloat(e.target.value);
+                onDirectValueChange(isNaN(v) || v < 0 ? 0 : v);
+              }} />
+          </Field>
+          <Segmented
+            label="Unit"
+            value={directUnit}
+            onChange={onDirectUnitChange}
+            options={[
+              { value: 'hours', label: 'Hours' },
+              { value: 'days', label: 'Days' },
+            ]}
+          />
+        </div>
+      )}
+
+      <p className="mt-3 text-[13px] text-muted-foreground">
+        About <span className="font-semibold text-foreground">{devHours > 0 ? Math.round(devHours) : '—'}</span> hours of development
+      </p>
+    </RailStep>
   );
 }

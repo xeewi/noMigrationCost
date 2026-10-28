@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#16181D;--p:#1C1F25;--seam:#2C3039;--tx:#E0E3EA;--mut:#9AA1AE;--sh:#7AA2F7;--dup:#F7768E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bg);font:14px/1.5 Geist,sans-serif;color:var(--tx)}
+header{height:48px;border-bottom:1px solid var(--seam);display:flex;align-items:center;padding:0 20px;gap:20px}
+.sp{flex:1}.btn{background:var(--sh);color:#0E1220;padding:6px 12px;border-radius:4px;font-weight:600}
+.grid{display:grid;grid-template-columns:320px 1fr 1fr;grid-template-rows:auto 1fr;height:852px}
+.pn{border-right:1px solid var(--seam);border-bottom:1px solid var(--seam);padding:18px 20px;background:var(--p)}
+.pn h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:12px}
+.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--seam)}.row b{font:500 14px 'Geist Mono'}
+.in{grid-row:span 2}
+.big{font:500 48px 'Geist Mono';margin-top:4px}.sub{color:var(--mut)}
+.c{grid-column:span 2}
+.ln{display:flex;justify-content:space-between;font-family:'Geist Mono';padding:6px 0;border-bottom:1px solid var(--seam)}
+</style></head><body>
+<header><b>feature-cost</b><span style="color:var(--mut)">shared vs duplicated · example scenario</span><span class="sp"></span><span>docs</span><span class="btn">Copy link</span></header>
+<div class="grid">
+<div class="pn in"><h3>Inputs</h3>
+<div class="row"><span>Junior</span><b>1</b></div><div class="row"><span>Mid</span><b>2</b></div><div class="row"><span>Senior</span><b>1</b></div><div class="row"><span>Feature</span><b>40 pts</b></div><div class="row"><span>Apps</span><b>3</b></div><div class="row"><span>Horizon</span><b>5 y</b></div>
+<h3 style="margin-top:20px">Model</h3><div class="row"><span>generalization</span><b>1.30</b></div><div class="row"><span>divergence / y</span><b>0.20</b></div></div>
+<div class="pn"><h3>Extra cost of duplicating</h3><div class="big" style="color:var(--dup)">+83 400 €</div><div class="sub">over 5 years, 3 apps</div></div>
+<div class="pn"><h3>Break-even</h3><div class="big" style="color:var(--sh)">14 mo</div><div class="sub">shared becomes cheaper</div></div>
+<div class="pn c"><h3>Cumulative cost</h3>
+<svg width="1040" height="380"><g stroke="#2C3039"><line x1="0" y1="60" x2="1040" y2="60"/><line x1="0" y1="180" x2="1040" y2="180"/><line x1="0" y1="300" x2="1040" y2="300"/></g>
+<path d="M0 300 L208 270 L416 240 L624 210 L832 185 L1040 160" stroke="#7AA2F7" stroke-width="2" fill="none"/><path d="M0 320 L208 260 L416 200 L624 140 L832 90 L1040 40" stroke="#F7768E" stroke-width="2" fill="none"/></svg>
+<div class="ln"><span>duplicated bug fixes</span><span>38 200 €</span></div><div class="ln"><span>sync between copies</span><span>27 900 €</span></div></div>
+</div></body></html>

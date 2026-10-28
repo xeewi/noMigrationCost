@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1D1D1B;--red:#C8001A;--blue:#0B5FA5;--mut:#555;--line:#E0E0E0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#fff;font:16px/1.5 'Source Sans 3',sans-serif;color:var(--ink)}
+header{height:56px;border-bottom:4px solid var(--red);display:flex;align-items:center;padding:0 32px;gap:24px}
+.logo{font-weight:800;font-size:18px}nav a{color:var(--mut);margin-right:14px}nav a.on{color:var(--ink);font-weight:700}.sp{flex:1}
+.btn{border:1px solid var(--ink);padding:6px 12px;font-weight:600}
+main{display:grid;grid-template-columns:300px 1fr;height:840px}
+aside{background:#F5F5F3;padding:24px;border-right:1px solid var(--line)}
+aside h3{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin:16px 0 6px}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.row b{font-variant-numeric:tabular-nums}
+article{padding:32px 56px;max-width:1000px}
+.kick{font-weight:700;color:var(--red);font-size:14px;text-transform:uppercase;letter-spacing:.06em}
+h1{font-size:40px;line-height:1.15;font-weight:800;margin-top:8px}
+.chapo{font-size:19px;margin-top:14px;font-weight:600;color:#333;max-width:820px}
+.fig{margin-top:26px;border-top:2px solid var(--ink);padding-top:10px}
+.fig h4{font-size:15px;font-weight:700}.fig small{color:var(--mut)}
+.src{font-size:13px;color:var(--mut);margin-top:6px;border-top:1px solid var(--line);padding-top:6px}
+.key{display:flex;gap:18px;font-size:14px;margin:8px 0}.key i{display:inline-block;width:16px;height:4px;margin-right:6px;vertical-align:middle}
+</style></head><body>
+<header><span class="logo">Feature Cost</span><nav><a class="on">Calculator</a><a>Method & sources</a></nav><span class="sp"></span><span class="btn">Copy link</span></header>
+<main><aside>
+<h3>Scenario (example)</h3>
+<div class="row"><span>Team</span><b>1 Jr · 2 Mid · 1 Sr</b></div>
+<div class="row"><span>Feature</span><b>40 pts ≈ 320 h</b></div>
+<div class="row"><span>Apps using it</span><b>3</b></div>
+<div class="row"><span>Horizon</span><b>5 years</b></div>
+<h3>Assumptions</h3>
+<div class="row"><span>Generalising effort</span><b>+30 %</b></div>
+<div class="row"><span>Drift between copies</span><b>20 % / yr</b></div>
+</aside><article>
+<div class="kick">Shared vs duplicated · 5 years</div>
+<h1>Copying this feature into 3 apps costs 83 400 € more than sharing it</h1>
+<p class="chapo">Sharing costs more up front — about 30 % extra to make the code reusable. It pays for itself after 14 months, mainly because bugs are fixed once and copies no longer drift apart.</p>
+<div class="fig"><h4>Figure 1 — Cumulative cost of each approach</h4><small>in thousands of euros</small>
+<div class="key"><span><i style="background:var(--blue)"></i>Shared library</span><span><i style="background:var(--red)"></i>Duplicated copies</span></div>
+<svg width="880" height="300"><g stroke="#E6E6E6"><line x1="40" y1="20" x2="880" y2="20"/><line x1="40" y1="100" x2="880" y2="100"/><line x1="40" y1="180" x2="880" y2="180"/><line x1="40" y1="260" x2="880" y2="260"/></g>
+<g font-size="12" fill="#555"><text x="0" y="24">240</text><text x="0" y="104">160</text><text x="0" y="184">80</text><text x="10" y="264">0</text></g>
+<path d="M40 230 L208 205 L376 180 L544 155 L712 130 L880 112" stroke="#0B5FA5" stroke-width="3" fill="none"/>
+<path d="M40 245 L208 205 L376 160 L544 112 L712 65 L880 28" stroke="#C8001A" stroke-width="3" fill="none"/>
+<circle cx="212" cy="205" r="5" fill="#1D1D1B"/><text x="222" y="226" font-size="13" font-weight="700">Break-even · 14 months</text></svg>
+<p class="src">Source: model based on COCOMO II, IEEE maintenance studies, French labour market data 2025. Example scenario.</p></div>
+</article></main></body></html>

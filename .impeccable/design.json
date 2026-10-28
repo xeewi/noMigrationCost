@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T15:00:00Z",
+  "title": "Design System: Feature Cost Calculator",
+  "extensions": {
+    "colorMeta": {
+      "panel": { "role": "primary", "displayName": "Notice-Board Blue", "canonical": "#1f3a93", "tonalRamp": ["#0c1a45", "#14266a", "#1f3a93", "#3653b0", "#5c75c6", "#8c9fdc", "#c9d3f5", "#eef1fc"] },
+      "panel-soft": { "role": "primary", "displayName": "Board Lettering Blue", "canonical": "#c9d3f5", "tonalRamp": ["#0c1a45", "#14266a", "#1f3a93", "#3653b0", "#5c75c6", "#8c9fdc", "#c9d3f5", "#eef1fc"] },
+      "panel-text-soft": { "role": "primary", "displayName": "Board Body Text", "canonical": "#dfe5fa", "tonalRamp": ["#0c1a45", "#14266a", "#1f3a93", "#3653b0", "#5c75c6", "#8c9fdc", "#dfe5fa", "#f4f6fd"] },
+      "signal": { "role": "secondary", "displayName": "Signal Yellow", "canonical": "#f7c600", "tonalRamp": ["#3d3100", "#665200", "#947600", "#c49d00", "#f7c600", "#ffd633", "#ffe680", "#fff5cc"] },
+      "signal-hover": { "role": "secondary", "displayName": "Signal Yellow Lit", "canonical": "#ffd633", "tonalRamp": ["#3d3100", "#665200", "#947600", "#c49d00", "#f7c600", "#ffd633", "#ffe680", "#fff5cc"] },
+      "signal-wash": { "role": "secondary", "displayName": "Signal Wash", "canonical": "#fff5cc", "tonalRamp": ["#3d3100", "#665200", "#947600", "#c49d00", "#f7c600", "#ffd633", "#ffe680", "#fff5cc"] },
+      "hazard": { "role": "tertiary", "displayName": "Hazard Red", "canonical": "#c8221b", "tonalRamp": ["#3a0907", "#62110d", "#931913", "#c8221b", "#de4f48", "#ea8580", "#f3c9c6", "#fcefee"] },
+      "hazard-wash": { "role": "tertiary", "displayName": "Hazard Wash", "canonical": "#f3c9c6", "tonalRamp": ["#3a0907", "#62110d", "#931913", "#c8221b", "#de4f48", "#ea8580", "#f3c9c6", "#fcefee"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#14171a", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#c3c8d1", "#e3e6eb", "#f5f6f8"] },
+      "ink-text-soft": { "role": "neutral", "displayName": "Ink Soft Lettering", "canonical": "#b9bec8", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#b9bec8", "#e3e6eb", "#f5f6f8"] },
+      "ground": { "role": "neutral", "displayName": "Site Grey", "canonical": "#edeff2", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#c3c8d1", "#edeff2", "#ffffff"] },
+      "card": { "role": "neutral", "displayName": "Card White", "canonical": "#ffffff", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#c3c8d1", "#edeff2", "#ffffff"] },
+      "muted": { "role": "neutral", "displayName": "Muted Grey", "canonical": "#e3e6eb", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#c3c8d1", "#e3e6eb", "#f5f6f8"] },
+      "muted-foreground": { "role": "neutral", "displayName": "Muted Text", "canonical": "#4a4f58", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#c3c8d1", "#e3e6eb", "#f5f6f8"] },
+      "border": { "role": "neutral", "displayName": "Hairline", "canonical": "#d3d7de", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#d3d7de", "#e3e6eb", "#f5f6f8"] },
+      "input": { "role": "neutral", "displayName": "Input Stroke", "canonical": "#c3c8d1", "tonalRamp": ["#14171a", "#2a2e34", "#4a4f58", "#6b717c", "#9aa1ad", "#c3c8d1", "#e3e6eb", "#f5f6f8"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The verdict gap figure only; 56px below sm. One per view." },
+      "headline": { "displayName": "Headline", "purpose": "The break-even answer on the board." },
+      "figure": { "displayName": "Figure", "purpose": "Board totals and hidden-cost tile amounts." },
+      "title": { "displayName": "Title", "purpose": "The board's question lines, sentence case; 22px below sm." },
+      "heading": { "displayName": "Heading", "purpose": "Uppercase section headings in the main column; chart caption at 17px / 0.08em." },
+      "label": { "displayName": "Label", "purpose": "Uppercase rail-step titles; board tag 13px / 0.14em, chart flag 13px / 0.06em." },
+      "body": { "displayName": "Body", "purpose": "Labels, controls, table cells; 15px on the board." },
+      "caption": { "displayName": "Caption", "purpose": "Hints, legends, example note. Chart ticks 12px." }
+    },
+    "shadows": [
+      { "name": "mounting-ring", "value": "0 0 0 6px #ffffff, 0 0 0 7px #d3d7de", "purpose": "The verdict board's frame: 6px white ring plus 1px hairline outline offset 6px. Not a shadow; the board's only depth." },
+      { "name": "overlay-lift", "value": "0 6px 20px -8px rgba(20,23,26,0.35)", "purpose": "Transient floating layers (chart tooltip) only." }
+    ],
+    "motion": [
+      { "name": "tally", "value": "650ms ease-out-expo (1 - 2^(-10t)) via requestAnimationFrame", "purpose": "Verdict gap figure re-tallies to its new value; snaps under prefers-reduced-motion." },
+      { "name": "control-color", "value": "150ms ease color/background", "purpose": "Segmented option and hover state transitions." },
+      { "name": "reduced-motion", "value": "0.01ms", "purpose": "All animation and transition durations collapse under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Signal Button",
+      "kind": "button",
+      "refersTo": "button-signal",
+      "description": "The single primary action (Copy link): yellow on ink header.",
+      "html": "<button class=\"ds-btn-signal\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/></svg>Copy link</button>",
+      "css": ".ds-btn-signal { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: none; border-radius: 2.4px; background: var(--signal, #f7c600); color: var(--ink, #14171a); font-family: 'Barlow', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; } .ds-btn-signal:hover { background: #ffd633; } .ds-btn-signal:focus-visible { outline: 2px solid var(--panel, #1f3a93); outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button on Ink",
+      "kind": "button",
+      "refersTo": "button-outline-on-ink",
+      "description": "Secondary header action (Start over).",
+      "html": "<div style=\"background:#14171a;padding:12px\"><button class=\"ds-btn-ink-outline\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/></svg>Start over</button></div>",
+      "css": ".ds-btn-ink-outline { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid rgba(255,255,255,0.25); border-radius: 2.4px; background: transparent; color: #fff; font-family: 'Barlow', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; } .ds-btn-ink-outline:hover { background: rgba(255,255,255,0.1); } .ds-btn-ink-outline:focus-visible { outline: 2px solid var(--panel, #1f3a93); outline-offset: 2px; }"
+    },
+    {
+      "name": "Segmented Switch",
+      "kind": "chip",
+      "refersTo": "segmented-option-active",
+      "description": "Every mutually exclusive choice: horizon, sizing mode, Simple/Detailed.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"Time horizon\"><button aria-pressed=\"false\">1 yr</button><button aria-pressed=\"false\">3 yrs</button><button aria-pressed=\"true\">5 yrs</button><button aria-pressed=\"false\">10 yrs</button></div>",
+      "css": ".ds-seg { display: flex; padding: 2px; border: 1px solid var(--input, #c3c8d1); border-radius: 2.4px; background: #fff; font-family: 'Barlow', system-ui, sans-serif; } .ds-seg button { flex: 1; white-space: nowrap; padding: 6px 12px; border: none; border-radius: 3px; background: transparent; color: var(--muted-foreground, #4a4f58); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-seg button:hover { background: var(--muted, #e3e6eb); color: var(--ink, #14171a); } .ds-seg button[aria-pressed=true] { background: var(--ink, #14171a); color: #fff; } .ds-seg button:focus-visible { outline: 2px solid var(--panel, #1f3a93); outline-offset: 2px; }"
+    },
+    {
+      "name": "Stepper",
+      "kind": "input",
+      "refersTo": "stepper-button",
+      "description": "Headcount and team-count control.",
+      "html": "<div class=\"ds-stepper\" role=\"group\" aria-label=\"Mid headcount\"><button aria-label=\"Remove one\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M5 12h14\"/></svg></button><span>2</span><button aria-label=\"Add one\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg></button></div>",
+      "css": ".ds-stepper { display: flex; align-items: center; gap: 6px; font-family: 'Barlow', system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-stepper span { width: 24px; text-align: center; font-weight: 600; } .ds-stepper button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--input, #c3c8d1); border-radius: 2.4px; background: #fff; color: var(--ink, #14171a); cursor: pointer; } .ds-stepper button:hover { background: var(--muted, #e3e6eb); } .ds-stepper button:disabled { opacity: 0.4; cursor: default; } .ds-stepper button:focus-visible { outline: 2px solid var(--panel, #1f3a93); outline-offset: 2px; }"
+    },
+    {
+      "name": "Number Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Right-aligned numeric input in the rail.",
+      "html": "<label class=\"ds-field\"><span>Points per sprint</span><input type=\"number\" value=\"10\"></label>",
+      "css": ".ds-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-family: 'Barlow', system-ui, sans-serif; font-size: 14px; color: var(--ink, #14171a); } .ds-field input { width: 112px; height: 32px; padding: 4px 10px; border: 1px solid var(--input, #c3c8d1); border-radius: 4px; background: #fff; font: inherit; text-align: right; font-variant-numeric: tabular-nums; outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-field input:focus-visible { border-color: var(--panel, #1f3a93); box-shadow: 0 0 0 3px rgba(31,58,147,0.5); }"
+    },
+    {
+      "name": "Header Navigation",
+      "kind": "nav",
+      "description": "Ink header with condensed wordmark and yellow-underlined current link.",
+      "html": "<header class=\"ds-header\"><span class=\"ds-wordmark\"><svg viewBox=\"0 0 24 22\" width=\"20\" height=\"20\"><path d=\"M12 1 23 21H1Z\" fill=\"#f7c600\" stroke=\"#14171a\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><rect x=\"11\" y=\"8\" width=\"2\" height=\"7\" fill=\"#14171a\"/><rect x=\"11\" y=\"16.5\" width=\"2\" height=\"2\" fill=\"#14171a\"/></svg>Feature Cost</span><nav><a href=\"#\" aria-current=\"page\">Calculator</a><a href=\"#\">How it works</a></nav></header>",
+      "css": ".ds-header { display: flex; align-items: center; gap: 28px; height: 56px; padding: 0 24px; background: var(--ink, #14171a); color: #fff; } .ds-wordmark { display: flex; align-items: center; gap: 8px; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; } .ds-header nav { display: flex; gap: 16px; } .ds-header a { padding: 4px 2px; border-bottom: 2px solid transparent; color: #b9bec8; font-family: 'Barlow', system-ui, sans-serif; font-size: 14px; font-weight: 500; text-decoration: none; transition: color 150ms; } .ds-header a:hover { color: #fff; } .ds-header a[aria-current=page] { color: #fff; border-bottom-color: var(--signal, #f7c600); } .ds-header a:focus-visible { outline: 2px solid var(--signal, #f7c600); outline-offset: 2px; }"
+    },
+    {
+      "name": "Rail Step",
+      "kind": "card",
+      "refersTo": "step-number",
+      "description": "Numbered input section in the 340px rail.",
+      "html": "<section class=\"ds-step\"><h2><span>1</span>Who builds it</h2><p>Step content</p></section>",
+      "css": ".ds-step { padding: 20px; background: #fff; border-bottom: 1px solid var(--border, #d3d7de); font-family: 'Barlow', system-ui, sans-serif; color: var(--ink, #14171a); } .ds-step h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; } .ds-step h2 span { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 2.4px; background: var(--ink, #14171a); color: #fff; font-size: 13px; } .ds-step p { margin: 12px 0 0; font-size: 14px; }"
+    },
+    {
+      "name": "Verdict Board",
+      "kind": "custom",
+      "refersTo": "verdict-panel",
+      "description": "The site notice: blue board, mounted, carrying the conclusion at display size.",
+      "html": "<section class=\"ds-verdict\"><span class=\"ds-verdict-tag\">Verdict over 5 years</span><h2>Duplicating this feature costs you</h2><p class=\"ds-verdict-gap\">+&thinsp;111 855 €</p><p class=\"ds-verdict-note\">more than building it once in a shared library.</p></section>",
+      "css": ".ds-verdict { position: relative; margin: 20px 14px 14px; padding: 32px 32px 24px; border-radius: 3.2px; background: var(--panel, #1f3a93); color: #fff; box-shadow: 0 0 0 6px #fff; outline: 1px solid var(--border, #d3d7de); outline-offset: 6px; font-family: 'Barlow', system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-verdict-tag { position: absolute; top: -12px; left: 32px; padding: 2px 10px; border-radius: 2.4px; background: var(--signal, #f7c600); color: var(--ink, #14171a); font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; } .ds-verdict h2 { margin: 0; color: var(--panel-soft, #c9d3f5); font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 24px; font-weight: 600; line-height: 1.25; } .ds-verdict-gap { margin: 8px 0 0; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 76px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; } .ds-verdict-note { margin: 12px 0 0; max-width: 38ch; color: #dfe5fa; font-size: 15px; }"
+    },
+    {
+      "name": "Hidden-Cost Tile",
+      "kind": "card",
+      "refersTo": "cost-tile",
+      "description": "Ranked cost item with a hatched hazard magnitude bar.",
+      "html": "<div class=\"ds-tile\"><p class=\"ds-tile-label\">Fixing the same bugs in each copy</p><p class=\"ds-tile-figure\">253 000 €</p><div class=\"ds-tile-track\"><div class=\"ds-tile-bar\" style=\"width:100%\"></div></div></div>",
+      "css": ".ds-tile { max-width: 240px; padding: 12px 16px; border: 1px solid var(--border, #d3d7de); border-radius: 3.2px; background: #fff; font-family: 'Barlow', system-ui, sans-serif; color: var(--ink, #14171a); font-variant-numeric: tabular-nums; } .ds-tile-label { margin: 0; font-size: 14px; color: var(--muted-foreground, #4a4f58); } .ds-tile-figure { margin: 2px 0 0; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.25; } .ds-tile-track { margin-top: 8px; height: 8px; border-radius: 2.4px; background: var(--muted, #e3e6eb); } .ds-tile-bar { height: 100%; border-radius: 2.4px; background: repeating-linear-gradient(135deg, var(--hazard, #c8221b) 0 4px, #f3c9c6 4px 7px); }"
+    },
+    {
+      "name": "Break-Even Flag",
+      "kind": "custom",
+      "description": "Yellow flag on the chart's dashed break-even line.",
+      "html": "<div class=\"ds-flagwrap\"><span class=\"ds-flag\">Break-even · 6 mo</span></div>",
+      "css": ".ds-flagwrap { padding: 8px 0 40px 6px; border-left: 1px dashed var(--ink, #14171a); } .ds-flag { display: inline-block; padding: 3px 8px; border-radius: 2px; background: var(--signal, #f7c600); color: var(--ink, #14171a); font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Site Notice",
+    "overview": "The page is posted like a French public-works notice (panneau de chantier): a blue board with white condensed lettering states what is being built, what it costs and when it pays off. The verdict panel is the page; everything else is the working that backs it up. A cold reader gets the sentence first, then the chart, then the inputs to argue with.\n\nThe world is flat, cool and municipal. An ink header bar, a light grey ground, white work surfaces with hairline borders, and one saturated blue board. Colour is signage, not decoration: blue is the notice and the shared path, yellow is a tag or a flag that points at something, red is reserved for the cost of duplication and is drawn as red/white chevron hatching like a road barrier. Density is tabular; every figure uses tabular numerals so columns of euros line up.\n\nThe default shadcn look (grey pills, soft shadows, rounded cards, neutral greys as the only voice) is what this world replaced.",
+    "keyCharacteristics": [
+      "One dominant blue board per view, carrying the conclusion at display size.",
+      "Barlow Condensed for anything posted (figures, headings, tags); Barlow for working text.",
+      "Tabular numerals everywhere, set once on `html`.",
+      "Hazard red only means \"cost of duplication\", and its fill form is hatching.",
+      "Flat: hairline borders and a white mounting ring instead of shadows.",
+      "Square-ish corners, 2.4–4px."
+    ],
+    "rules": [
+      { "name": "The Hazard Reservation Rule", "body": "Hazard red marks the cost of duplication and nothing else: the duplicated series, its total, the gap, the hidden-cost bars. Never use it for generic errors in the calculator view, emphasis, or decoration.", "section": "colors" },
+      { "name": "The Hatch Is The Fill Rule", "body": "When hazard red fills an area (the chart gap, a magnitude bar, a legend swatch), it is drawn as 45° red/white stripes, not a flat tint. Lines and text may be solid red.", "section": "colors" },
+      { "name": "The Signal Points Rule", "body": "Signal Yellow is used at tag, flag, underline or single-button scale. One yellow action per view.", "section": "colors" },
+      { "name": "The Tabular Rule", "body": "`font-variant-numeric: tabular-nums` is set on `html` and never overridden. Euro figures use `formatEuro` (space-grouped, trailing €).", "section": "typography" },
+      { "name": "The Condensed Means Posted Rule", "body": "Barlow Condensed is for things posted on the board or used as signage: figures, headings, tags, flags, step titles. Running text, labels and control text stay in Barlow.", "section": "typography" },
+      { "name": "The Mounting Ring Rule", "body": "Resting surfaces never cast shadows. The verdict board is set apart by its white ring and offset hairline; cards and tiles by a 1px hairline.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do put the conclusion on the Notice-Board Blue board above everything else, with the gap at Display size.",
+      "Do draw any area filled with Hazard Red as 45° red/white hatching.",
+      "Do use Barlow Condensed for figures, headings, tags and flags, and Barlow for labels and running text.",
+      "Do use the Segmented switch (Ink selected state) for every mutually exclusive choice.",
+      "Do sort cost lists and tiles by magnitude, biggest first, with a bar showing relative size.",
+      "Do separate surfaces with 1px hairlines (#d3d7de) and tone, keeping corners at 2.4–4px."
+    ],
+    "donts": [
+      "Don't use Hazard Red for anything other than the cost of duplication.",
+      "Don't add shadows to resting cards, tiles or the board; the only shadow is the transient tooltip lift.",
+      "Don't use Signal Yellow as a background fill for a region or more than one action per view.",
+      "Don't use pill-shaped buttons, grey pill tab bars or rounded-xl cards (the replaced shadcn default look).",
+      "Don't set figures in proportional numerals."
+    ]
+  }
+}

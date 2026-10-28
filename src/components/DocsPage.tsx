@@ -48,7 +48,7 @@ export function DocsPage() {
   }, []);
 
   return (
-    <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16 flex gap-8">
+    <div className="max-w-[1280px] mx-auto px-6 py-8 flex gap-8">
       <aside className="w-60 flex-shrink-0">
         <div className="sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto">
           <DocsSidebar markdown={researchMd} activeId={activeId} />

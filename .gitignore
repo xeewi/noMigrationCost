@@ -30,3 +30,6 @@ yarn-error.log*
 
 # Claude Code worktrees
 .claude/worktrees/
+
+# Browser automation logs
+.playwright-cli/

@@ -51,8 +51,8 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 export function AppFooter() {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background">
-      <div className="max-w-[1280px] mx-auto px-6 py-3 flex items-center justify-between">
+    <footer className="border-t border-border bg-background">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         <a
           href="https://www.linkedin.com/in/gautierg"
           target="_blank"

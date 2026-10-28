@@ -1,39 +1,27 @@
 /**
  * @file TimeHorizon.tsx
  * @author Guillaume Gautier (xeewi)
- * @created 2026-03-23
+ * @created 2026-03-24
  * @project Feature Cost Calculator
  */
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Segmented } from '@/components/Segmented';
 
 interface TimeHorizonProps {
   horizonYears: number;
   onHorizonChange: (years: number) => void;
 }
 
-const HORIZON_OPTIONS = [1, 3, 5, 10] as const;
-
-function formatYearLabel(years: number): string {
-  return years === 1 ? '1 yr' : `${years} yrs`;
-}
+const HORIZON_OPTIONS = ['1', '3', '5', '10'] as const;
 
 export function TimeHorizon({ horizonYears, onHorizonChange }: TimeHorizonProps) {
   return (
-    <div className="flex items-center gap-1.5">
-      {HORIZON_OPTIONS.map((years) => (
-        <Button
-          key={years}
-          variant={horizonYears === years ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => onHorizonChange(years)}
-          type="button"
-          className={cn('min-w-[48px] h-8 text-xs')}
-        >
-          {formatYearLabel(years)}
-        </Button>
-      ))}
-    </div>
+    <Segmented
+      label="Time horizon in years"
+      value={String(horizonYears)}
+      onChange={(v) => onHorizonChange(Number(v))}
+      options={HORIZON_OPTIONS.map((y) => ({ value: y, label: y === '1' ? '1 yr' : `${y} yrs` }))}
+      className="w-full sm:w-auto"
+    />
   );
 }

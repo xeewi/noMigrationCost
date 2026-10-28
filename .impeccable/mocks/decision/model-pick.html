@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#2340A0;--red:#C8102E;--ink:#1B1B1B;--rule:#D9DCE3;--mut:#6A6F7B}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#E9EBF0;font:15px/1.45 Archivo,sans-serif;color:var(--ink)}
+header{height:56px;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 28px;gap:26px}
+.logo{font-weight:800;font-size:18px;color:var(--blue)}nav a{color:var(--mut);margin-right:16px}nav a.on{color:var(--ink);font-weight:600}
+.sp{flex:1}.btn{background:var(--blue);color:#fff;padding:8px 14px;border-radius:4px;font-weight:600}
+.head{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:18px 28px;background:#fff;border-bottom:1px solid var(--rule)}
+.f label{display:block;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+.f div{border:1px solid var(--rule);border-radius:4px;padding:7px 10px;margin-top:4px;font-family:'Courier Prime';font-weight:700;color:var(--blue)}
+.wrap{display:grid;grid-template-columns:1fr 1fr 300px;gap:24px;padding:24px 28px}
+.sheet{background:#fff;padding:26px 30px;box-shadow:0 1px 2px rgba(0,0,0,.08);position:relative;height:650px}
+.sheet h2{font-weight:800;font-size:22px}.sheet .no{font-family:'Courier Prime';color:var(--mut);font-size:13px}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+td{padding:9px 0;border-bottom:1px solid var(--rule)}td:last-child{text-align:right;font-family:'Courier Prime';font-weight:700;color:var(--blue)}
+th{text-align:left;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid var(--ink);padding-bottom:6px}th:last-child{text-align:right}
+.tot{display:flex;justify-content:space-between;margin-top:18px;padding-top:12px;border-top:2px solid var(--ink);font-weight:800;font-size:20px}
+.tot span:last-child{font-family:'Courier Prime';color:var(--blue);font-size:26px}
+.stamp{position:absolute;right:40px;top:120px;transform:rotate(-12deg);border:4px solid var(--red);color:var(--red);padding:8px 16px;font-weight:800;font-size:22px;letter-spacing:.06em;opacity:.85;text-align:center;line-height:1.1}
+.stamp small{display:block;font-size:12px;letter-spacing:.1em}
+.sign{position:absolute;bottom:26px;left:30px;right:30px;border:1px dashed var(--mut);height:80px;padding:8px 12px;font-size:12px;color:var(--mut)}
+.side{background:#fff;padding:22px;height:650px}
+.side h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+.gap{font-size:44px;font-weight:800;color:var(--red);margin-top:6px}
+.side p{color:var(--mut);font-size:14px;margin-top:6px}
+.mini{margin-top:24px;height:160px;border-left:1px solid var(--rule);border-bottom:1px solid var(--rule);position:relative}
+</style></head><body>
+<header><span class="logo">Feature Cost</span><nav><a class="on">Quote</a><a>How it works</a></nav><span class="sp"></span><span class="btn">Copy link</span></header>
+<div class="head">
+<div class="f"><label>Team</label><div>1 Jr · 2 Mid · 1 Sr</div></div>
+<div class="f"><label>Feature size</label><div>40 pts ≈ 320 h</div></div>
+<div class="f"><label>Apps using it</label><div>3</div></div>
+<div class="f"><label>Horizon</label><div>5 years</div></div>
+<div class="f"><label>Assumptions</label><div>Research defaults</div></div>
+</div>
+<div class="wrap">
+<div class="sheet"><span class="no">QUOTE A · Example scenario</span><h2>Build it once, share it</h2>
+<table><tr><th>Line item</th><th>Amount</th></tr>
+<tr><td>Initial development (×1.3 to generalise)</td><td>16 640 €</td></tr>
+<tr><td>Library setup</td><td>6 400 €</td></tr>
+<tr><td>Maintenance, 5 years</td><td>74 900 €</td></tr>
+<tr><td>Cross-team coordination</td><td>31 200 €</td></tr>
+<tr><td>Onboarding</td><td>18 860 €</td></tr></table>
+<div class="tot"><span>TOTAL</span><span>148 000 €</span></div>
+<div class="stamp">RECOMMENDED<small>SAVES 83 400 €</small></div>
+<div class="sign">Bon pour accord — date & signature</div></div>
+<div class="sheet"><span class="no">QUOTE B · Example scenario</span><h2>Copy it into each app</h2>
+<table><tr><th>Line item</th><th>Amount</th></tr>
+<tr><td>Initial development</td><td>12 800 €</td></tr>
+<tr><td>Porting to 2 other apps</td><td>21 400 €</td></tr>
+<tr><td>Maintenance ×3, 5 years</td><td>130 700 €</td></tr>
+<tr><td>Duplicated bug fixes</td><td>38 200 €</td></tr>
+<tr><td>Keeping copies in sync</td><td>27 900 €</td></tr></table>
+<div class="tot"><span>TOTAL</span><span>231 000 €</span></div>
+<div class="sign">Bon pour accord — date & signature</div></div>
+<div class="side"><h3>Difference</h3><div class="gap">+83 400 €</div><p>Quote B costs more over 5 years. Quote A pays for itself after <b>14 months</b>.</p>
+<div class="mini"><svg width="256" height="160"><path d="M0 110 L64 100 L128 112 L192 96 L256 82" stroke="#2340A0" stroke-width="3" fill="none"/><path d="M0 120 L64 96 L128 72 L192 48 L256 24" stroke="#C8102E" stroke-width="3" fill="none"/></svg></div></div>
+</div></body></html>

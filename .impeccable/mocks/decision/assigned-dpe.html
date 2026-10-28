@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Archivo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1A1A1A;--mut:#5A5A5A;--line:#DADADA}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#F4F4F2;font:15px/1.45 Archivo,sans-serif;color:var(--ink)}
+header{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;gap:24px}
+.logo{font-weight:800}nav a{color:var(--mut);margin-right:14px}nav a.on{color:var(--ink);font-weight:700}.sp{flex:1}
+.btn{background:var(--ink);color:#fff;padding:8px 14px;border-radius:3px;font-weight:600}
+main{display:grid;grid-template-columns:320px 1fr;height:844px}
+aside{background:#fff;border-right:1px solid var(--line);padding:22px 24px}
+aside h3{font:700 12px 'Archivo Narrow';letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:16px 0 8px}
+.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #EEE}.row span:last-child{font-weight:700;font-variant-numeric:tabular-nums}
+section{padding:26px 32px}
+.labels{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.lab{background:#fff;border:2px solid var(--ink);padding:18px 20px}
+.lab h2{font:700 20px 'Archivo Narrow';text-transform:uppercase;letter-spacing:.04em}.lab p{color:var(--mut);font-size:13px}
+.sc{margin-top:12px}.b{display:flex;align-items:center;height:30px;margin-bottom:4px;position:relative}
+.b span{height:100%;display:flex;align-items:center;padding-left:10px;font:700 18px 'Archivo Narrow';color:var(--ink);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%)}
+.b.dk span{color:var(--ink)}
+.ptr{position:absolute;right:0;height:38px;top:-4px;background:var(--ink);color:#fff;font:800 22px 'Archivo Narrow';padding:0 16px 0 22px;display:flex;align-items:center;gap:10px;clip-path:polygon(14px 0,100% 0,100% 100%,14px 100%,0 50%)}
+.ptr small{font:500 13px Archivo}
+.sum{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;margin-top:24px}
+.card{background:#fff;border:1px solid var(--line);padding:18px 22px}
+.k{font:700 12px 'Archivo Narrow';letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.big{font:800 54px/1 Archivo;margin-top:6px}.sub{color:var(--mut);margin-top:6px}
+</style></head><body>
+<header><span class="logo">Feature Cost</span><nav><a class="on">Calculator</a><a>How it works</a></nav><span class="sp"></span><span class="btn">Copy link</span></header>
+<main><aside>
+<h3>Team (example)</h3><div class="row"><span>Junior</span><span>1</span></div><div class="row"><span>Mid</span><span>2</span></div><div class="row"><span>Senior</span><span>1</span></div>
+<h3>Feature</h3><div class="row"><span>Size</span><span>40 pts ≈ 320 h</span></div>
+<h3>Apps using it</h3><div class="row"><span>Codebases</span><span>3</span></div>
+<h3>Horizon</h3><div class="row"><span>Years</span><span>5</span></div>
+</aside><section>
+<div class="labels">
+<div class="lab"><h2>Shared library</h2><p>Cost per app per year, 5-year horizon</p><div class="sc">
+<div class="b"><span style="width:30%;background:#009036">A</span></div>
+<div class="b"><span style="width:38%;background:#55AB26">B</span><div class="ptr">B <small>9 900 € / app / yr</small></div></div>
+<div class="b dk"><span style="width:46%;background:#C8D200">C</span></div>
+<div class="b dk"><span style="width:54%;background:#FFED00">D</span></div>
+<div class="b dk"><span style="width:62%;background:#FBBA00">E</span></div>
+<div class="b"><span style="width:70%;background:#EB6909">F</span></div>
+<div class="b"><span style="width:78%;background:#E2001A">G</span></div></div></div>
+<div class="lab"><h2>Duplicated copies</h2><p>Cost per app per year, 5-year horizon</p><div class="sc">
+<div class="b"><span style="width:30%;background:#009036">A</span></div>
+<div class="b"><span style="width:38%;background:#55AB26">B</span></div>
+<div class="b dk"><span style="width:46%;background:#C8D200">C</span></div>
+<div class="b dk"><span style="width:54%;background:#FFED00">D</span></div>
+<div class="b dk"><span style="width:62%;background:#FBBA00">E</span></div>
+<div class="b"><span style="width:70%;background:#EB6909">F</span><div class="ptr">F <small>15 400 € / app / yr</small></div></div>
+<div class="b"><span style="width:78%;background:#E2001A">G</span></div></div></div>
+</div>
+<div class="sum">
+<div class="card"><div class="k">Over 5 years</div><div class="big">+83 400 €</div><div class="sub">is what copying this feature into 3 apps costs, compared to sharing it.</div></div>
+<div class="card"><div class="k">Sharing pays off after</div><div class="big">14 mo</div><div class="sub">Before that, the shared library costs more.</div></div>
+</div>
+</section></main></body></html>

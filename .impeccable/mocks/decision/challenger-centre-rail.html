@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter+Tight:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bone:#EFEAE0;--ink:#1A1A1A;--ver:#B42A12;--mut:#5A5448}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--bone);font:17px/1.5 'Source Serif 4',serif;color:var(--ink)}
+header{height:52px;border-bottom:1px solid var(--ink);display:flex;align-items:center;padding:0 40px;gap:24px;font:600 13px 'Inter Tight';letter-spacing:.08em;text-transform:uppercase}
+.sp{flex:1}.btn{border:1px solid var(--ink);padding:6px 12px}
+.page{display:grid;grid-template-columns:260px 1fr 260px;height:848px}
+.margin{padding:28px 24px;font-size:13px;color:var(--mut)}
+.margin h4{font:600 11px 'Inter Tight';letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin:18px 0 6px}
+.field{display:flex;justify-content:space-between;border-bottom:1px solid #CFC7B6;padding:5px 0;color:var(--ink)}
+.gl{border-left:1px solid var(--ver);padding-left:10px;margin-bottom:14px}.gl b{color:var(--ver);font-weight:600}
+.block{padding:28px 0}
+.verdict{text-align:center;border-bottom:1px solid var(--ink);padding-bottom:18px}
+.verdict small{font:600 11px 'Inter Tight';letter-spacing:.14em;text-transform:uppercase;color:var(--ver)}
+.verdict h1{font-weight:400;font-size:40px;line-height:1.15;margin-top:6px}.verdict h1 em{color:var(--ver)}
+.twin{display:grid;grid-template-columns:1fr 84px 1fr;margin-top:20px}
+.col h3{font:600 12px 'Inter Tight';letter-spacing:.12em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.col.r h3,.col.r .ln{text-align:right}
+.ln{padding:9px 0;border-bottom:1px solid #D8D0C0;font-variant-numeric:tabular-nums;font-size:16px}
+.rail{border-left:1px solid var(--ink);border-right:1px solid var(--ink);text-align:center}
+.rail div{height:42px;line-height:42px;font:600 13px 'Inter Tight';border-bottom:1px solid #D8D0C0}
+.rail .be{background:var(--ver);color:var(--bone)}
+.rail h3{height:31px;border-bottom:1px solid var(--ink)}
+.sum{display:grid;grid-template-columns:1fr 84px 1fr;margin-top:6px;font-weight:600;font-size:22px}.sum div:last-child{text-align:right}
+</style></head><body>
+<header>Feature Cost · <span style="font-weight:500">Shared vs duplicated</span><span class="sp"></span><span>How it works</span><span class="btn">Copy link</span></header>
+<div class="page">
+<div class="margin"><h4>Scenario (example)</h4>
+<div class="field"><span>Team</span><span>1 Jr · 2 Mid · 1 Sr</span></div>
+<div class="field"><span>Feature</span><span>40 pts ≈ 320 h</span></div>
+<div class="field"><span>Apps using it</span><span>3</span></div>
+<div class="field"><span>Horizon</span><span>5 years</span></div>
+<h4>Assumptions</h4>
+<div class="field"><span>Generalising effort</span><span>+30 %</span></div>
+<div class="field"><span>Copies drift / year</span><span>20 %</span></div></div>
+<div class="block">
+<div class="verdict"><small>Verdict · 5 years</small><h1>Copying this feature into 3 apps costs <em>83 400 € more</em>.<br>A shared library pays off after 14 months.</h1></div>
+<div class="twin">
+<div class="col"><h3>Shared library</h3><div class="ln">Build once, generalised · 23 040 €</div><div class="ln">Year 1 · 24 980 €</div><div class="ln">Year 2 · 24 980 €</div><div class="ln">Year 3 · 24 980 €</div><div class="ln">Year 4 · 24 980 €</div><div class="ln">Year 5 · 24 980 €</div></div>
+<div class="rail"><h3></h3><div>Y0</div><div class="be">14 mo</div><div>Y2</div><div>Y3</div><div>Y4</div><div>Y5</div></div>
+<div class="col r"><h3>Duplicated copies</h3><div class="ln">12 800 € · Build + port ×2 · 34 200 €</div><div class="ln">27 120 € · Year 1</div><div class="ln">33 480 € · Year 2</div><div class="ln">39 840 € · Year 3</div><div class="ln">46 200 € · Year 4</div><div class="ln">50 160 € · Year 5</div></div>
+</div>
+<div class="sum"><div>148 000 €</div><div></div><div>231 000 €</div></div>
+</div>
+<div class="margin"><h4>Notes</h4>
+<div class="gl"><b>Generalising effort.</b> Making code reusable by several apps takes about 30 % more work than writing it for one. (COCOMO II, RUSE)</div>
+<div class="gl"><b>Drift.</b> Each year, copies diverge by ~20 %, so every later change costs more to apply everywhere.</div>
+<div class="gl"><b>Bug duplication.</b> A bug in copied code is usually fixed twice — or not everywhere.</div></div>
+</div></body></html>

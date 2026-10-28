@@ -8,11 +8,6 @@
 import { BarChart2 } from 'lucide-react';
 import { CostChart } from '@/components/CostChart';
 import { EmptyState } from '@/components/EmptyState';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -30,7 +25,7 @@ interface ComparisonTabProps {
   duplicatedCost: DuplicatedCostOutputs | null;
   breakEven: BreakEvenResult | null;
   horizonYears: number;
-  standaloneTotalCost: number;
+  portingFactor: number;
   emptyReason: 'zero-team' | 'zero-hours' | null;
 }
 
@@ -45,115 +40,48 @@ export function ComparisonTab({
   duplicatedCost,
   breakEven,
   horizonYears,
-  standaloneTotalCost,
+  portingFactor,
   emptyReason,
 }: ComparisonTabProps) {
-  // Empty state — show when inputs are missing
   if (emptyReason !== null || sharedCost === null || duplicatedCost === null || breakEven === null) {
     return (
       <EmptyState
         icon={BarChart2}
-        title="Configure your team and feature size to compare approaches"
-        description="Add at least one team member and set a feature size to see the shared vs duplicated cost comparison."
+        title="Add a team member and a feature size"
+        description="The verdict needs at least one person on the team and a feature size above zero."
       />
     );
   }
 
-  const savings = duplicatedCost.totalCost - sharedCost.totalCost;
-  const sharedWins = savings > 0;
+  const portingCost = (duplicatedCost.duplicatedDevCost * portingFactor) / (1 + portingFactor);
+  const duplicatedMaintenance =
+    duplicatedCost.totalCost -
+    duplicatedCost.duplicatedDevCost -
+    duplicatedCost.totalBugsCost -
+    duplicatedCost.totalSyncCost;
+
+  // What copying the feature keeps costing you, biggest first
+  const hiddenCosts = [
+    { label: 'Fixing the same bugs in each copy', value: duplicatedCost.totalBugsCost },
+    { label: 'Keeping the copies in sync', value: duplicatedCost.totalSyncCost },
+    { label: 'Porting it to the second app', value: portingCost },
+    { label: 'Maintaining two copies', value: duplicatedMaintenance },
+  ].sort((a, b) => b.value - a.value);
+  const maxHidden = Math.max(...hiddenCosts.map((c) => c.value), 1);
 
   const rows: BreakdownRowData[] = [
-    {
-      category: 'Initial Development',
-      sharedCost: sharedCost.initialDevCost,
-      duplicatedCost: duplicatedCost.duplicatedDevCost,
-    },
-    {
-      category: 'Library Setup',
-      sharedCost: sharedCost.libSetupCost,
-      duplicatedCost: null,
-    },
-    {
-      category: `Maintenance (${horizonYears}y)`,
-      sharedCost: sharedCost.annualMaintenanceCost * horizonYears,
-      duplicatedCost:
-        duplicatedCost.totalCost -
-        duplicatedCost.duplicatedDevCost -
-        duplicatedCost.totalBugsCost -
-        duplicatedCost.totalSyncCost,
-    },
-    {
-      category: `Coordination (${horizonYears}y)`,
-      sharedCost: sharedCost.annualCoordinationCost * horizonYears,
-      duplicatedCost: null,
-    },
-    {
-      category: `Onboarding (${horizonYears}y)`,
-      sharedCost: sharedCost.annualOnboardingCost * horizonYears,
-      duplicatedCost: null,
-    },
-    {
-      category: 'Bug Propagation',
-      sharedCost: null,
-      duplicatedCost: duplicatedCost.totalBugsCost,
-    },
-    {
-      category: 'Sync/Divergence',
-      sharedCost: null,
-      duplicatedCost: duplicatedCost.totalSyncCost,
-    },
+    { category: 'Initial development', sharedCost: sharedCost.initialDevCost, duplicatedCost: duplicatedCost.duplicatedDevCost },
+    { category: 'Library setup', sharedCost: sharedCost.libSetupCost, duplicatedCost: null },
+    { category: `Maintenance (${horizonYears} y)`, sharedCost: sharedCost.annualMaintenanceCost * horizonYears, duplicatedCost: duplicatedMaintenance },
+    { category: `Coordination between teams (${horizonYears} y)`, sharedCost: sharedCost.annualCoordinationCost * horizonYears, duplicatedCost: null },
+    { category: `Onboarding on the library (${horizonYears} y)`, sharedCost: sharedCost.annualOnboardingCost * horizonYears, duplicatedCost: null },
+    { category: 'Bugs fixed twice', sharedCost: null, duplicatedCost: duplicatedCost.totalBugsCost },
+    { category: 'Syncing copies that drift', sharedCost: null, duplicatedCost: duplicatedCost.totalSyncCost },
   ];
-
-  const dash = '\u2014';
+  const dash = '—';
 
   return (
-    <div className="space-y-6">
-      {/* Standalone reference badge (D-04) */}
-      <div>
-        <Badge variant="outline">Standalone: {formatEuro(standaloneTotalCost)}</Badge>
-      </div>
-
-      {/* Summary cards (D-06) */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="border-l-4 border-l-green-600">
-          <CardContent className="py-4">
-            <p className="text-xl font-semibold">Shared Path</p>
-            <p className="text-[28px] font-semibold leading-tight mt-1">
-              {formatEuro(sharedCost.totalCost)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-red-600">
-          <CardContent className="py-4">
-            <p className="text-xl font-semibold">Duplicated Path</p>
-            <p className="text-[28px] font-semibold leading-tight mt-1">
-              {formatEuro(duplicatedCost.totalCost)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Delta/savings */}
-      <p className={`text-sm font-medium ${sharedWins ? 'text-green-700' : 'text-amber-700'}`}>
-        {sharedWins
-          ? `You save ${formatEuro(savings)}`
-          : `Shared costs more by ${formatEuro(Math.abs(savings))}`}
-      </p>
-
-      {/* Break-even callout (D-07) */}
-      {breakEven.exists ? (
-        <div className="rounded-md bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-sm">
-          Break-even at {Math.round(breakEven.months!)} months &mdash; you save{' '}
-          {formatEuro(savings)} over {horizonYears} years
-        </div>
-      ) : (
-        <div className="rounded-md bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 text-sm">
-          No break-even within {horizonYears} years &mdash; shared code costs more in this
-          scenario. Try increasing the number of consuming teams or extending the time horizon.
-        </div>
-      )}
-
-      {/* Chart (D-08 — hero element) */}
+    <div className="space-y-7">
       <CostChart
         sharedYearly={sharedCost.yearlyBreakdown}
         duplicatedYearly={duplicatedCost.yearlyBreakdown}
@@ -161,40 +89,56 @@ export function ComparisonTab({
         horizonYears={horizonYears}
       />
 
-      {/* Side-by-side breakdown table (D-09) */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Category</TableHead>
-            <TableHead className="text-right">Shared Cost</TableHead>
-            <TableHead className="text-right">Duplicated Cost</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.category}>
-              <TableCell>{row.category}</TableCell>
-              <TableCell className="text-right">
-                {row.sharedCost !== null ? formatEuro(row.sharedCost) : dash}
-              </TableCell>
-              <TableCell className="text-right">
-                {row.duplicatedCost !== null ? formatEuro(row.duplicatedCost) : dash}
-              </TableCell>
-            </TableRow>
+      <section aria-labelledby="hidden-costs-heading">
+        <h2 id="hidden-costs-heading" className="font-sign text-[20px] font-bold uppercase tracking-[0.06em]">
+          What copying keeps costing you
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">Over {horizonYears === 1 ? '1 year' : `${horizonYears} years`}, biggest first.</p>
+        <ol className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {hiddenCosts.map((c) => (
+            <li key={c.label} className="rounded-md border border-border bg-card px-4 py-3">
+              <p className="text-sm text-muted-foreground">{c.label}</p>
+              <p className="mt-0.5 font-sign text-[28px] font-bold leading-tight">{formatEuro(c.value)}</p>
+              <div className="mt-2 h-2 rounded-sm bg-muted" aria-hidden="true">
+                <div className="h-full rounded-sm" style={{ background: 'repeating-linear-gradient(135deg, var(--hazard) 0 4px, #f3c9c6 4px 7px)', width: `${Math.max(4, (c.value / maxHidden) * 100)}%` }} />
+              </div>
+            </li>
           ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell className="font-semibold">Total</TableCell>
-            <TableCell className="text-right font-semibold">
-              {formatEuro(sharedCost.totalCost)}
-            </TableCell>
-            <TableCell className="text-right font-semibold">
-              {formatEuro(duplicatedCost.totalCost)}
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+        </ol>
+      </section>
+
+      <section aria-labelledby="breakdown-heading">
+        <h2 id="breakdown-heading" className="font-sign text-[20px] font-bold uppercase tracking-[0.06em]">
+          Full breakdown
+        </h2>
+        <div className="mt-3 rounded-md border border-border bg-card sm:px-2 text-[13px] sm:text-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-normal">Cost item</TableHead>
+                <TableHead className="text-right">Shared</TableHead>
+                <TableHead className="text-right">Duplicated</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.category}>
+                  <TableCell className="whitespace-normal">{row.category}</TableCell>
+                  <TableCell className="text-right">{row.sharedCost !== null ? formatEuro(row.sharedCost) : dash}</TableCell>
+                  <TableCell className="text-right">{row.duplicatedCost !== null ? formatEuro(row.duplicatedCost) : dash}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell className="font-semibold">Total</TableCell>
+                <TableCell className="text-right font-semibold text-panel">{formatEuro(sharedCost.totalCost)}</TableCell>
+                <TableCell className="text-right font-semibold text-hazard">{formatEuro(duplicatedCost.totalCost)}</TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </div>
+      </section>
     </div>
   );
 }

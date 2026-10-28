@@ -33,9 +33,9 @@ export function formatEuro(amount: number): string {
  */
 export function formatEuroAbbrev(amount: number): string {
   if (!isFinite(amount) || isNaN(amount)) return '\u2014';
-  if (amount >= 1_000_000) return `\u20AC${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `\u20AC${Math.round(amount / 1_000)}K`;
-  return `\u20AC${Math.round(amount)}`;
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(1).replace('.', ',')} M€`;
+  if (amount >= 1_000) return `${Math.round(amount / 1_000)} k€`;
+  return `${Math.round(amount)} €`;
 }
 
 /**

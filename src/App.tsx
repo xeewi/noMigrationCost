@@ -12,9 +12,10 @@ import { TimeHorizon } from '@/components/TimeHorizon';
 import { CostOutput } from '@/components/CostOutput';
 import { AdvancedParameters } from '@/components/AdvancedParameters';
 import { ComparisonTab } from '@/components/ComparisonTab';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Segmented } from '@/components/Segmented';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
 import { AppHeader } from '@/components/AppHeader';
+import { VerdictPanel } from '@/components/VerdictPanel';
 import { AppFooter } from '@/components/AppFooter';
 import { DocsPage } from '@/components/DocsPage';
 import { useHashRoute } from '@/hooks/useHashRoute';
@@ -30,29 +31,35 @@ import {
   calcDuplicatedCost,
   calcBreakEven,
 } from '@/engine/formulas';
-import {
-  SENIORITY_DEFAULTS,
-  ENGINE_DEFAULTS,
-} from '@/engine/types';
+import { ENGINE_DEFAULTS } from '@/engine/types';
 import type { SeniorityRow, SizingMode, DirectHoursUnit, EngineInputs } from '@/engine/types';
+
+// Example scenario shown on first visit, so the verdict is readable before any input.
+const EXAMPLE = {
+  team: [1, 2, 1, 0],
+  storyPoints: 40,
+  velocity: 10,
+  sprintWeeks: 2,
+  horizonYears: 5,
+  nbConsumingCodebases: 2,
+} as const;
+
+function exampleTeam(): SeniorityRow[] {
+  return getDefaultTeam().map((row, i) => ({ ...row, headcount: EXAMPLE.team[i] }));
+}
 
 function App() {
   const { view, navigateTo } = useHashRoute();
 
   // Raw input state
-  const [team, setTeam] = useState<SeniorityRow[]>([
-    { label: 'Junior', headcount: 0, hourlyRate: SENIORITY_DEFAULTS.Junior },
-    { label: 'Mid', headcount: 0, hourlyRate: SENIORITY_DEFAULTS.Mid },
-    { label: 'Senior', headcount: 0, hourlyRate: SENIORITY_DEFAULTS.Senior },
-    { label: 'Lead', headcount: 0, hourlyRate: SENIORITY_DEFAULTS.Lead },
-  ]);
+  const [team, setTeam] = useState<SeniorityRow[]>(exampleTeam);
   const [sizingMode, setSizingMode] = useState<SizingMode>('story-points');
-  const [storyPoints, setStoryPoints] = useState(0);
-  const [velocity, setVelocity] = useState(10);
-  const [sprintWeeks, setSprintWeeks] = useState(2);
+  const [storyPoints, setStoryPoints] = useState<number>(EXAMPLE.storyPoints);
+  const [velocity, setVelocity] = useState<number>(EXAMPLE.velocity);
+  const [sprintWeeks, setSprintWeeks] = useState<number>(EXAMPLE.sprintWeeks);
   const [directValue, setDirectValue] = useState(0);
   const [directUnit, setDirectUnit] = useState<DirectHoursUnit>('hours');
-  const [horizonYears, setHorizonYears] = useState(5);
+  const [horizonYears, setHorizonYears] = useState<number>(EXAMPLE.horizonYears);
 
   // Advanced parameters state — all formula constants lifted to App.tsx
   const [advancedParams, setAdvancedParams] = useState<AdvancedParamsState>({
@@ -64,9 +71,7 @@ function App() {
     bugDuplicationFactor: ENGINE_DEFAULTS.bugDuplicationFactor,
   });
 
-  const [nbConsumingCodebases, setNbConsumingCodebases] = useState<number>(
-    ENGINE_DEFAULTS.nbConsumingCodebases,
-  );
+  const [nbConsumingCodebases, setNbConsumingCodebases] = useState<number>(EXAMPLE.nbConsumingCodebases);
 
   const [activeTab, setActiveTab] = useState<string>('comparison');
 
@@ -101,19 +106,28 @@ function App() {
 
   // Reset handler — clears all inputs to defaults and clears hash (D-04)
   const handleReset = useCallback(() => {
-    setTeam(getDefaultTeam());
+    setTeam(exampleTeam());
     setSizingMode('story-points');
-    setStoryPoints(0);
-    setVelocity(10);
-    setSprintWeeks(2);
+    setStoryPoints(EXAMPLE.storyPoints);
+    setVelocity(EXAMPLE.velocity);
+    setSprintWeeks(EXAMPLE.sprintWeeks);
     setDirectValue(0);
     setDirectUnit('hours');
-    setHorizonYears(5);
+    setHorizonYears(EXAMPLE.horizonYears);
     setAdvancedParams(getDefaultAdvancedParams());
-    setNbConsumingCodebases(ENGINE_DEFAULTS.nbConsumingCodebases);
+    setNbConsumingCodebases(EXAMPLE.nbConsumingCodebases);
     setActiveTab('comparison');
-    // Hash will be updated by the state-change effect (encodes defaults — harmless per RESEARCH.md Pitfall 4)
   }, []);
+
+  const isExample = useMemo(() => {
+    const current = encodeAppState(team, sizingMode, storyPoints, velocity, sprintWeeks,
+      directValue, directUnit, horizonYears, advancedParams, nbConsumingCodebases, 'comparison');
+    const example = encodeAppState(exampleTeam(), 'story-points', EXAMPLE.storyPoints, EXAMPLE.velocity,
+      EXAMPLE.sprintWeeks, 0, 'hours', EXAMPLE.horizonYears, getDefaultAdvancedParams(),
+      EXAMPLE.nbConsumingCodebases, 'comparison');
+    return current === example;
+  }, [team, sizingMode, storyPoints, velocity, sprintWeeks, directValue, directUnit,
+      horizonYears, advancedParams, nbConsumingCodebases]);
 
   // Derived state — all via useMemo, never useState
   const teamAvgRate = useMemo(() => calcTeamAvgRate(team), [team]);
@@ -208,68 +222,79 @@ function App() {
 
       {/* Calculator view — always mounted, hidden when on docs (D-07: zero state loss) */}
       <div className={view === 'calculator' ? '' : 'hidden'}>
-        <div className="max-w-[1280px] mx-auto px-6 py-8 pb-16">
-          <div className="flex gap-8 md:flex-row flex-col">
-            {/* Inputs column: 55% */}
-            <div className="flex-[55] space-y-6">
-              <TeamComposition
-                team={team}
-                onTeamChange={setTeam}
-                teamAvgRate={teamAvgRate}
+        <div className="max-w-[1440px] mx-auto flex flex-col lg:grid lg:grid-cols-[340px_minmax(0,1fr)]">
+          <aside aria-label="Scenario" className="bg-card border-b lg:border-b-0 lg:border-r border-border">
+            {isExample && (
+              <p className="hidden lg:block mx-5 mt-5 rounded-sm bg-[#fff5cc] px-3 py-2.5 text-[13px] text-ink">
+                <span className="font-semibold">Example scenario.</span> Change any figure to make it yours: the verdict updates as you type.
+              </p>
+            )}
+            <TeamComposition team={team} onTeamChange={setTeam} teamAvgRate={teamAvgRate} />
+            <FeatureSizing
+              sizingMode={sizingMode}
+              onSizingModeChange={setSizingMode}
+              storyPoints={storyPoints}
+              onStoryPointsChange={setStoryPoints}
+              velocity={velocity}
+              onVelocityChange={setVelocity}
+              sprintWeeks={sprintWeeks}
+              onSprintWeeksChange={setSprintWeeks}
+              directValue={directValue}
+              onDirectValueChange={setDirectValue}
+              directUnit={directUnit}
+              onDirectUnitChange={setDirectUnit}
+              devHours={devHours}
+            />
+            <AdvancedParameters
+              params={advancedParams}
+              onChange={setAdvancedParams}
+              isModified={isAdvancedModified}
+              onReset={resetAdvancedParams}
+              nbConsumingCodebases={nbConsumingCodebases}
+              onNbConsumingCodebasesChange={setNbConsumingCodebases}
+            />
+          </aside>
+
+          <main className="order-first lg:order-none min-w-0 px-4 py-6 sm:px-8 sm:py-8">
+            {sharedCostOutput && duplicatedCostOutput && breakEvenResult && (
+              <VerdictPanel
+                sharedTotal={sharedCostOutput.totalCost}
+                duplicatedTotal={duplicatedCostOutput.totalCost}
+                breakEvenMonths={breakEvenResult.exists ? breakEvenResult.months : null}
+                horizonYears={horizonYears}
               />
-              <FeatureSizing
-                sizingMode={sizingMode}
-                onSizingModeChange={setSizingMode}
-                storyPoints={storyPoints}
-                onStoryPointsChange={setStoryPoints}
-                velocity={velocity}
-                onVelocityChange={setVelocity}
-                sprintWeeks={sprintWeeks}
-                onSprintWeeksChange={setSprintWeeks}
-                directValue={directValue}
-                onDirectValueChange={setDirectValue}
-                directUnit={directUnit}
-                onDirectUnitChange={setDirectUnit}
-                devHours={devHours}
+            )}
+            {isExample && (
+              <p className="lg:hidden mt-4 rounded-sm bg-[#fff5cc] px-3 py-2.5 text-[13px] text-ink">
+                <span className="font-semibold">Example scenario.</span> Your own figures go in the steps below the results.
+              </p>
+            )}
+            <div className="mt-6 mb-5 flex flex-wrap items-center justify-between gap-3">
+              <Segmented
+                label="Result view"
+                value={activeTab === 'standalone' ? 'standalone' : 'comparison'}
+                onChange={setActiveTab}
+                options={[
+                  { value: 'comparison', label: 'Shared vs duplicated' },
+                  { value: 'standalone', label: 'One feature alone' },
+                ]}
+                className="w-full sm:w-auto"
               />
-              <AdvancedParameters
-                params={advancedParams}
-                onChange={setAdvancedParams}
-                isModified={isAdvancedModified}
-                onReset={resetAdvancedParams}
-                nbConsumingCodebases={nbConsumingCodebases}
-                onNbConsumingCodebasesChange={setNbConsumingCodebases}
-              />
+              <TimeHorizon horizonYears={horizonYears} onHorizonChange={setHorizonYears} />
             </div>
-            {/* Output column: 45% */}
-            <div className="flex-[45]">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <div className="flex items-center justify-between gap-4 mb-4">
-                  <TabsList>
-                    <TabsTrigger value="comparison">Comparison</TabsTrigger>
-                    <TabsTrigger value="standalone">Standalone</TabsTrigger>
-                  </TabsList>
-                  <TimeHorizon
-                    horizonYears={horizonYears}
-                    onHorizonChange={setHorizonYears}
-                  />
-                </div>
-                <TabsContent value="comparison">
-                  <ComparisonTab
-                    sharedCost={sharedCostOutput}
-                    duplicatedCost={duplicatedCostOutput}
-                    breakEven={breakEvenResult}
-                    horizonYears={horizonYears}
-                    standaloneTotalCost={costOutput?.totalStandaloneCost ?? 0}
-                    emptyReason={emptyReason}
-                  />
-                </TabsContent>
-                <TabsContent value="standalone">
-                  <CostOutput output={costOutput} emptyReason={emptyReason} />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
+            {activeTab === 'standalone' ? (
+              <CostOutput output={costOutput} emptyReason={emptyReason} />
+            ) : (
+              <ComparisonTab
+                sharedCost={sharedCostOutput}
+                duplicatedCost={duplicatedCostOutput}
+                breakEven={breakEvenResult}
+                horizonYears={horizonYears}
+                portingFactor={advancedParams.portingFactor}
+                emptyReason={emptyReason}
+              />
+            )}
+          </main>
         </div>
       </div>
 

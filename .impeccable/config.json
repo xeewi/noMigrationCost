@@ -1,0 +1,224 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-centre-rail.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.159Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-centre-rail.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.173Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "skipped-heading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-centre-rail.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.186Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-centre-rail.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.198Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned-dpe.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.211Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned-dpe.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.223Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "skipped-heading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned-dpe.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.235Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned-dpe.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.247Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick-insee.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.260Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick-insee.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.272Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "skipped-heading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick-insee.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.284Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick-insee.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.297Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-console.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.309Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-console.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.322Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "skipped-heading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-console.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.336Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-console.html"
+        ],
+        "createdAt": "2026-10-28T13:45:25.350Z",
+        "reason": "spent decision-round sketch, not shipped; direction chosen was chantier"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned-dpe.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.014Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.032Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.049Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-centre-rail.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.065Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-console.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.082Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-transit.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.099Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick-insee.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.116Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-10-28T14:00:32.133Z",
+        "reason": "decision-round sketch, not shipped; each card shows its own direction's fonts by design"
+      }
+    ]
+  }
+}
