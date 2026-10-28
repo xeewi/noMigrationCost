@@ -1,4 +1,3 @@
-<!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
 **Feature Cost Calculator**
@@ -12,9 +11,7 @@ An interactive dashboard that calculates and visualizes the real cost of softwar
 - **Tech stack**: React + Vite + TypeScript + shadcn/ui + Tailwind CSS + Recharts
 - **Data source**: All reference data (salaries, ratios, factors) embedded in the app from the research doc
 - **Deployment**: Static build output, can be served from any static host
-<!-- GSD:project-end -->
 
-<!-- GSD:stack-start source:research/STACK.md -->
 ## Technology Stack
 
 ### Core Technologies
@@ -39,38 +36,3 @@ An interactive dashboard that calculates and visualizes the real cost of softwar
 | Highcharts | Commercial license required for internal business use |
 | CSS-in-JS (styled-components, emotion) | Tailwind covers all styling needs via shadcn/ui |
 | jQuery | Unnecessary with React |
-<!-- GSD:stack-end -->
-
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
-## Conventions
-
-Conventions not yet established. Will populate as patterns emerge during development.
-<!-- GSD:conventions-end -->
-
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
-## Architecture
-
-Architecture not yet mapped. Follow existing patterns found in the codebase.
-<!-- GSD:architecture-end -->
-
-<!-- GSD:workflow-start source:GSD defaults -->
-## GSD Workflow Enforcement
-
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
-
-Use these entry points:
-- `/gsd:quick` for small fixes, doc updates, and ad-hoc tasks
-- `/gsd:debug` for investigation and bug fixing
-- `/gsd:execute-phase` for planned phase work
-
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
-<!-- GSD:workflow-end -->
-
-
-
-<!-- GSD:profile-start -->
-## Developer Profile
-
-> Profile not yet configured. Run `/gsd:profile-user` to generate your developer profile.
-> This section is managed by `generate-claude-profile` -- do not edit manually.
-<!-- GSD:profile-end -->
