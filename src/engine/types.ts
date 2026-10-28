@@ -19,23 +19,29 @@ export type DirectHoursUnit = 'hours' | 'days';
 export interface SizingInputs {
   mode: SizingMode;
   storyPoints: number;
-  velocity: number;       // SP per sprint
+  velocity: number;       // team SP per sprint
   sprintWeeks: number;    // 1-4
-  directValue: number;
+  directValue: number;    // person-hours or person-days
   directUnit: DirectHoursUnit;
 }
 
-export interface EngineInputs {
+/** Model assumptions the user can tune (docs §7). */
+export interface ModelParams {
+  generalizationFactor: number; // G: build cost of the shareable version / specific version
+  portingFactor: number;        // p: cost to copy-adapt into one more app / first build
+  integrationFactor: number;    // i: cost to plug the library into one more app / first build
+  maintenanceRate: number;      // m: yearly upkeep of one copy / its build cost
+  extraCopyUpkeep: number;      // e0: yearly upkeep of an extra copy / upkeep of the first (sync included)
+  divergenceRate: number;       // δ: yearly growth of e0 as copies drift (capped)
+  coordinationRate: number;     // k: yearly coordination + upgrades per extra app / first build
+}
+
+export interface EngineInputs extends ModelParams {
   teamAvgHourlyRate: number;
-  devHours: number;
+  devHours: number;       // person-hours for one specific build
   horizonYears: number;
-  maintenanceRate: number;         // default 0.18 shared, 0.22 duplicated
-  generalizationFactor: number;    // default 1.3
-  portingFactor: number;           // default 0.65
-  divergenceRate: number;          // default 0.20
-  bugDuplicationFactor: number;    // default 2.0
-  nbConsumingCodebases: number;    // default 2
-  maintenanceRateShared?: number;  // optional — overrides ENGINE_DEFAULTS.maintenanceRateShared in calcBreakEven
+  nbCodebases: number;    // apps that need the feature (>= 2 for the comparison)
+  newLibrary: boolean;    // false = the shared library already exists
 }
 
 export interface BreakdownRow {
@@ -52,47 +58,34 @@ export interface StandaloneOutputs {
   annualMaintenanceCost: number;
   totalMaintenanceCost: number;
   totalStandaloneCost: number;
-  annualVersioningCost: number;
-  annualSupportCost: number;
-  annualCoordinationCost: number;
-  annualOnboardingCost: number;
   breakdown: BreakdownRow[];
 }
 
-export interface SharedCostOutputs {
-  initialDevCost: number;
-  libSetupCost: number;
-  annualMaintenanceCost: number;
-  annualCoordinationCost: number;
-  annualOnboardingCost: number;
-  totalCost: number;
-  yearlyBreakdown: YearCost[];
+export interface CostLine {
+  label: string;
+  cost: number;
 }
 
-export interface DuplicatedCostOutputs {
-  duplicatedDevCost: number;
-  yearlyBreakdown: YearCost[];
-  totalCost: number;
-  totalBugsCost: number;   // sum of all yearly bug costs over the horizon
-  totalSyncCost: number;   // sum of all yearly sync costs over the horizon
+export interface MonthCostPoint {
+  month: number;       // 0..horizonYears*12
+  shared: number;      // cumulative
+  duplicated: number;  // cumulative
 }
 
-export interface YearCost {
-  year: number;
-  cumulativeCost: number;
+export interface ComparisonOutputs {
+  shared: { lines: CostLine[]; total: number };
+  duplicated: { lines: CostLine[]; total: number };
+  monthly: MonthCostPoint[];
+  /** First month from which sharing stays cheaper until the horizon. 0 = from day one, null = never within horizon. */
+  breakEvenMonth: number | null;
 }
 
-export interface BreakEvenResult {
-  exists: boolean;
-  months: number | null;
-}
-
-/** Default salary values from docs/feature-cost-shared-vs-duplicated.md section 1.3 */
+/** Loaded hourly cost per seniority, France 2026 national (gross × employer multiplier / 1,607 h). Docs §1.3. */
 export const SENIORITY_DEFAULTS: Record<SeniorityLevel, number> = {
   Junior: 32,
   Mid: 40,
-  Senior: 51,
-  Lead: 67,
+  Senior: 50,
+  Lead: 62,
 } as const;
 
 /** French legal working hours per week */
@@ -101,14 +94,22 @@ export const HOURS_PER_WEEK = 35;
 /** French legal working hours per day */
 export const HOURS_PER_DAY = 7;
 
-/** Default engine parameters from research doc */
-export const ENGINE_DEFAULTS = {
-  generalizationFactor: 1.3,
+/** Default model assumptions (docs §7.4). */
+export const ENGINE_DEFAULTS: ModelParams = {
+  generalizationFactor: 1.2,
   portingFactor: 0.65,
-  divergenceRate: 0.20,
-  maintenanceRateShared: 0.18,
-  maintenanceRateDuplicated: 0.22,
-  bugDuplicationFactor: 2.0,
-  nbConsumingCodebases: 1,
-  defaultHorizonYears: 3,
-} as const;
+  integrationFactor: 0.2,
+  maintenanceRate: 0.2,
+  extraCopyUpkeep: 1.0,
+  divergenceRate: 0.05,
+  coordinationRate: 0.04,
+};
+
+/** One-off effort to stand up a new shared library: 8 weeks × 35 h (docs §3.1, assumption). */
+export const LIB_SETUP_HOURS = 280;
+
+/** Yearly effort to run a shared library: releases, CI, dependency updates (docs §3.2, assumption). */
+export const LIB_RUN_HOURS_PER_YEAR = 100;
+
+/** Ceiling on the extra-copy upkeep ratio: past this, teams stop syncing rather than pay more (docs §7.3). */
+export const EXTRA_COPY_UPKEEP_MAX = 1.5;

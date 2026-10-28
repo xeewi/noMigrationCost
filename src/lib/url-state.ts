@@ -8,9 +8,11 @@
 import type { SeniorityRow, SeniorityLevel, SizingMode, DirectHoursUnit } from '@/engine/types';
 import { SENIORITY_DEFAULTS, ENGINE_DEFAULTS } from '@/engine/types';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
+import { PARAM_CONFIGS, MIN_CODEBASES, MAX_CODEBASES } from '@/components/AdvancedParameters';
 
+/** v2: model rewritten in 2026-10 — v1 links carried parameters that no longer exist and are ignored. */
 export interface ShareableState {
-  v: 1;
+  v: 2;
   th: [number, number, number, number]; // headcounts (Junior/Mid/Senior/Lead)
   tr: [number, number, number, number]; // hourly rates
   sm: 'sp' | 'dh';                      // sizingMode
@@ -20,17 +22,14 @@ export interface ShareableState {
   dv: number;                            // directValue
   du: 'h' | 'd';                         // directUnit
   hy: number;                            // horizonYears
-  gf: number;                            // generalizationFactor
-  pf: number;                            // portingFactor
-  dr: number;                            // divergenceRate
-  mrs: number;                           // maintenanceRateShared
-  mrd: number;                           // maintenanceRateDuplicated
-  bdf: number;                           // bugDuplicationFactor
-  nc: number;                            // nbConsumingCodebases
+  mp: AdvancedParamsState;               // model parameters
+  nc: number;                            // nbCodebases
+  nl: boolean;                           // newLibrary
   tab: 'c' | 's';                        // active tab (comparison/standalone)
 }
 
 const SENIORITY_ORDER: SeniorityLevel[] = ['Junior', 'Mid', 'Senior', 'Lead'];
+const HORIZONS = [1, 3, 5, 10];
 
 export function encodeAppState(
   team: SeniorityRow[],
@@ -42,7 +41,8 @@ export function encodeAppState(
   directUnit: DirectHoursUnit,
   horizonYears: number,
   advancedParams: AdvancedParamsState,
-  nbConsumingCodebases: number,
+  nbCodebases: number,
+  newLibrary: boolean,
   activeTab: string,
 ): string {
   const th: [number, number, number, number] = [0, 0, 0, 0];
@@ -55,7 +55,7 @@ export function encodeAppState(
   });
 
   const state: ShareableState = {
-    v: 1,
+    v: 2,
     th,
     tr,
     sm: sizingMode === 'story-points' ? 'sp' : 'dh',
@@ -65,13 +65,9 @@ export function encodeAppState(
     dv: directValue,
     du: directUnit === 'hours' ? 'h' : 'd',
     hy: horizonYears,
-    gf: advancedParams.generalizationFactor,
-    pf: advancedParams.portingFactor,
-    dr: advancedParams.divergenceRate,
-    mrs: advancedParams.maintenanceRateShared,
-    mrd: advancedParams.maintenanceRateDuplicated,
-    bdf: advancedParams.bugDuplicationFactor,
-    nc: nbConsumingCodebases,
+    mp: advancedParams,
+    nc: nbCodebases,
+    nl: newLibrary,
     tab: activeTab === 'comparison' ? 'c' : 's',
   };
 
@@ -81,15 +77,43 @@ export function encodeAppState(
     .replace(/=+$/, '');
 }
 
+/** Finite number clamped to [min, max], or the fallback. */
+function num(v: unknown, min: number, max: number, fallback: number): number {
+  return typeof v === 'number' && isFinite(v) ? Math.min(max, Math.max(min, v)) : fallback;
+}
+
+/** Decodes a hash and clamps every field to what the UI can produce. Null if unreadable. */
 export function decodeAppState(hash: string): ShareableState | null {
   try {
     const padded = hash
       .replace(/-/g, '+')
       .replace(/_/g, '/')
       .padEnd(hash.length + (4 - (hash.length % 4)) % 4, '=');
-    const parsed = JSON.parse(atob(padded)) as ShareableState;
-    if (parsed.v !== 1) return null;
-    return parsed;
+    const raw = JSON.parse(atob(padded));
+    if (raw?.v !== 2) return null;
+
+    const mp = { ...ENGINE_DEFAULTS };
+    for (const c of PARAM_CONFIGS) mp[c.key] = num(raw.mp?.[c.key], c.min, c.max, ENGINE_DEFAULTS[c.key]);
+
+    const four = (arr: unknown, i: number, max: number, fallback: number) =>
+      num(Array.isArray(arr) ? arr[i] : undefined, 0, max, fallback);
+
+    return {
+      v: 2,
+      th: [0, 1, 2, 3].map((i) => Math.round(four(raw.th, i, 50, 0))) as ShareableState['th'],
+      tr: SENIORITY_ORDER.map((l, i) => four(raw.tr, i, 1000, SENIORITY_DEFAULTS[l])) as ShareableState['tr'],
+      sm: raw.sm === 'dh' ? 'dh' : 'sp',
+      sp: num(raw.sp, 0, 1e6, 0),
+      vel: num(raw.vel, 0, 1e4, 0),
+      sw: Math.round(num(raw.sw, 1, 4, 2)),
+      dv: num(raw.dv, 0, 1e7, 0),
+      du: raw.du === 'd' ? 'd' : 'h',
+      hy: HORIZONS.includes(raw.hy) ? raw.hy : 5,
+      mp,
+      nc: Math.round(num(raw.nc, MIN_CODEBASES, MAX_CODEBASES, MIN_CODEBASES)),
+      nl: raw.nl !== false,
+      tab: raw.tab === 's' ? 's' : 'c',
+    };
   } catch {
     return null;
   }
@@ -105,49 +129,24 @@ interface StateSetters {
   setDirectUnit: (u: DirectHoursUnit) => void;
   setHorizonYears: (n: number) => void;
   setAdvancedParams: (p: AdvancedParamsState) => void;
-  setNbConsumingCodebases: (n: number) => void;
+  setNbCodebases: (n: number) => void;
+  setNewLibrary: (b: boolean) => void;
   setActiveTab: (t: string) => void;
 }
 
-export function applyStateToSetters(state: ShareableState, setters: StateSetters): void {
-  const {
-    setTeam,
-    setSizingMode,
-    setStoryPoints,
-    setVelocity,
-    setSprintWeeks,
-    setDirectValue,
-    setDirectUnit,
-    setHorizonYears,
-    setAdvancedParams,
-    setNbConsumingCodebases,
-    setActiveTab,
-  } = setters;
-
-  const team: SeniorityRow[] = SENIORITY_ORDER.map((level, i) => ({
-    label: level,
-    headcount: state.th[i],
-    hourlyRate: state.tr[i],
-  }));
-
-  setTeam(team);
-  setSizingMode(state.sm === 'sp' ? 'story-points' : 'direct-hours');
-  setStoryPoints(state.sp);
-  setVelocity(state.vel);
-  setSprintWeeks(state.sw);
-  setDirectValue(state.dv);
-  setDirectUnit(state.du === 'h' ? 'hours' : 'days');
-  setHorizonYears(state.hy);
-  setAdvancedParams({
-    generalizationFactor: state.gf,
-    portingFactor: state.pf,
-    divergenceRate: state.dr,
-    maintenanceRateShared: state.mrs,
-    maintenanceRateDuplicated: state.mrd,
-    bugDuplicationFactor: state.bdf,
-  });
-  setNbConsumingCodebases(state.nc);
-  setActiveTab(state.tab === 'c' ? 'comparison' : 'standalone');
+export function applyStateToSetters(state: ShareableState, s: StateSetters): void {
+  s.setTeam(SENIORITY_ORDER.map((level, i) => ({ label: level, headcount: state.th[i], hourlyRate: state.tr[i] })));
+  s.setSizingMode(state.sm === 'sp' ? 'story-points' : 'direct-hours');
+  s.setStoryPoints(state.sp);
+  s.setVelocity(state.vel);
+  s.setSprintWeeks(state.sw);
+  s.setDirectValue(state.dv);
+  s.setDirectUnit(state.du === 'h' ? 'hours' : 'days');
+  s.setHorizonYears(state.hy);
+  s.setAdvancedParams(state.mp);
+  s.setNbCodebases(state.nc);
+  s.setNewLibrary(state.nl);
+  s.setActiveTab(state.tab === 'c' ? 'comparison' : 'standalone');
 }
 
 export function getDefaultTeam(): SeniorityRow[] {
@@ -159,12 +158,5 @@ export function getDefaultTeam(): SeniorityRow[] {
 }
 
 export function getDefaultAdvancedParams(): AdvancedParamsState {
-  return {
-    generalizationFactor: ENGINE_DEFAULTS.generalizationFactor,
-    portingFactor: ENGINE_DEFAULTS.portingFactor,
-    divergenceRate: ENGINE_DEFAULTS.divergenceRate,
-    maintenanceRateShared: ENGINE_DEFAULTS.maintenanceRateShared,
-    maintenanceRateDuplicated: ENGINE_DEFAULTS.maintenanceRateDuplicated,
-    bugDuplicationFactor: ENGINE_DEFAULTS.bugDuplicationFactor,
-  };
+  return { ...ENGINE_DEFAULTS };
 }

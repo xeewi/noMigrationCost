@@ -10,521 +10,144 @@ import {
   calcTeamAvgRate,
   calcDevHours,
   calcStandaloneCost,
-  calcSharedCost,
-  calcDuplicatedCost,
-  calcBreakEven,
-  calcScaleFactor,
-  calcDivergence,
+  calcComparison,
+  extraCopyRatio,
 } from '@/engine/formulas';
-import type { SeniorityRow, SizingInputs, EngineInputs } from '@/engine/types';
+import {
+  ENGINE_DEFAULTS,
+  LIB_SETUP_HOURS,
+  LIB_RUN_HOURS_PER_YEAR,
+  EXTRA_COPY_UPKEEP_MAX,
+} from '@/engine/types';
+import type { EngineInputs, SeniorityRow } from '@/engine/types';
 
-// ---------------------------------------------------------------------------
-// calcTeamAvgRate
-// ---------------------------------------------------------------------------
+const base: EngineInputs = {
+  ...ENGINE_DEFAULTS,
+  teamAvgHourlyRate: 50,
+  devHours: 1000,
+  horizonYears: 5,
+  nbCodebases: 2,
+  newLibrary: true,
+};
+const gap = (o: Partial<EngineInputs> = {}) => {
+  const r = calcComparison({ ...base, ...o });
+  return r.duplicated.total - r.shared.total;
+};
+
 describe('calcTeamAvgRate', () => {
-  it('returns weighted average of active seniority rows (headcount > 0)', () => {
+  it('weights rates by headcount', () => {
     const team: SeniorityRow[] = [
-      { label: 'Junior', headcount: 2, hourlyRate: 32 },
-      { label: 'Mid', headcount: 1, hourlyRate: 40 },
-      { label: 'Senior', headcount: 0, hourlyRate: 51 },
-      { label: 'Lead', headcount: 0, hourlyRate: 67 },
+      { label: 'Junior', headcount: 1, hourlyRate: 32 },
+      { label: 'Mid', headcount: 2, hourlyRate: 40 },
+      { label: 'Senior', headcount: 1, hourlyRate: 50 },
+      { label: 'Lead', headcount: 0, hourlyRate: 62 },
     ];
-    // (2*32 + 1*40) / 3 = 104 / 3 = 34.67
-    expect(calcTeamAvgRate(team)).toBeCloseTo(34.67, 1);
+    expect(calcTeamAvgRate(team)).toBeCloseTo(40.5);
   });
-
-  it('returns 0 when all headcounts are 0 (no division by zero)', () => {
-    const team: SeniorityRow[] = [
-      { label: 'Junior', headcount: 0, hourlyRate: 32 },
-      { label: 'Mid', headcount: 0, hourlyRate: 40 },
-    ];
-    expect(calcTeamAvgRate(team)).toBe(0);
-  });
-
-  it('returns correct result for a single row with headcount > 0', () => {
-    const team: SeniorityRow[] = [
-      { label: 'Senior', headcount: 3, hourlyRate: 51 },
-    ];
-    expect(calcTeamAvgRate(team)).toBeCloseTo(51, 1);
+  it('returns 0 for an empty team', () => {
+    expect(calcTeamAvgRate([{ label: 'Mid', headcount: 0, hourlyRate: 40 }])).toBe(0);
   });
 });
 
-// ---------------------------------------------------------------------------
-// calcDevHours
-// ---------------------------------------------------------------------------
 describe('calcDevHours', () => {
-  it('converts story points to hours using velocity, sprint weeks, and 35h/week', () => {
-    const sizing: SizingInputs = {
-      mode: 'story-points',
-      storyPoints: 20,
-      velocity: 10,       // SP/sprint
-      sprintWeeks: 2,
-      directValue: 0,
-      directUnit: 'hours',
-    };
-    // sprints = 20/10 = 2, hours = 2 * 2 * 35 = 140
-    expect(calcDevHours(sizing)).toBe(140);
+  const sp = { mode: 'story-points' as const, storyPoints: 40, velocity: 10, sprintWeeks: 2, directValue: 0, directUnit: 'hours' as const };
+  it('story points: team velocity, so hours scale with headcount', () => {
+    // 4 sprints × 2 weeks × 35 h × 4 people
+    expect(calcDevHours(sp, 4)).toBe(1120);
   });
-
-  it('returns directValue directly when mode is direct-hours and unit is hours', () => {
-    const sizing: SizingInputs = {
-      mode: 'direct-hours',
-      storyPoints: 0,
-      velocity: 10,
-      sprintWeeks: 2,
-      directValue: 100,
-      directUnit: 'hours',
-    };
-    expect(calcDevHours(sizing)).toBe(100);
+  it('story points: zero velocity gives 0', () => {
+    expect(calcDevHours({ ...sp, velocity: 0 }, 4)).toBe(0);
   });
-
-  it('converts days to hours (7h/day) when mode is direct-hours and unit is days', () => {
-    const sizing: SizingInputs = {
-      mode: 'direct-hours',
-      storyPoints: 0,
-      velocity: 10,
-      sprintWeeks: 2,
-      directValue: 20,
-      directUnit: 'days',
-    };
-    // 20 * 7 = 140
-    expect(calcDevHours(sizing)).toBe(140);
-  });
-
-  it('returns 0 when velocity is 0 (no division by zero in SP mode)', () => {
-    const sizing: SizingInputs = {
-      mode: 'story-points',
-      storyPoints: 20,
-      velocity: 0,
-      sprintWeeks: 2,
-      directValue: 0,
-      directUnit: 'hours',
-    };
-    expect(calcDevHours(sizing)).toBe(0);
+  it('direct mode is already person-hours, headcount ignored', () => {
+    expect(calcDevHours({ ...sp, mode: 'direct-hours', directValue: 300 }, 4)).toBe(300);
+    expect(calcDevHours({ ...sp, mode: 'direct-hours', directValue: 10, directUnit: 'days' }, 4)).toBe(70);
   });
 });
 
-// ---------------------------------------------------------------------------
-// calcStandaloneCost
-// ---------------------------------------------------------------------------
 describe('calcStandaloneCost', () => {
-  const baseInputs: EngineInputs = {
-    teamAvgHourlyRate: 65,
-    devHours: 400,
-    horizonYears: 3,
-    maintenanceRate: 0.18,
-    generalizationFactor: 1.3,
-    portingFactor: 0.65,
-    divergenceRate: 0.20,
-    bugDuplicationFactor: 2.0,
-    nbConsumingCodebases: 2,
-  };
-
-  it('calculates initialDevCost = devHours * rate * generalizationFactor', () => {
-    // 400 * 65 * 1.3 = 33800
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.initialDevCost).toBeCloseTo(33800, 0);
-  });
-
-  it('calculates annualMaintenanceCost = initialDevCost * maintenanceRate', () => {
-    // 33800 * 0.18 = 6084
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.annualMaintenanceCost).toBeCloseTo(6084, 0);
-  });
-
-  it('calculates totalMaintenanceCost = annualMaintenanceCost * horizonYears', () => {
-    // 6084 * 3 = 18252
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.totalMaintenanceCost).toBeCloseTo(18252, 0);
-  });
-
-  it('calculates totalStandaloneCost = initialDevCost + totalMaintenanceCost + totalOrgCosts (nbConsumingCodebases=2)', () => {
-    // initialDevCost = 400 * 65 * 1.3 = 33800
-    // totalMaintenance = 33800 * 0.18 * 3 = 18252
-    // annualOrgCosts = versioning(2340) + support(25350) + coordination(20280) + onboarding(12900) = 60870
-    // totalOrgCosts = 60870 * 3 = 182610
-    // total = 33800 + 18252 + 182610 = 234662
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.totalStandaloneCost).toBeCloseTo(234662, 0);
-  });
-
-  it('returns correct initialDevHours', () => {
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.initialDevHours).toBe(400);
-  });
-
-  it('returns correct teamAvgHourlyRate', () => {
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.teamAvgHourlyRate).toBe(65);
-  });
-
-  it('returns breakdown with 6 rows', () => {
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.breakdown).toHaveLength(6);
-    expect(result.breakdown[0].category).toBe('Initial Development');
-    expect(result.breakdown[1].category).toContain('Annual Maintenance');
-    expect(result.breakdown[2].category).toBe('Versioning');
-    expect(result.breakdown[3].category).toBe('Consumer Support');
-    expect(result.breakdown[4].category).toBe('Coordination');
-    expect(result.breakdown[5].category).toBe('Onboarding');
-  });
-
-  it('breakdown percentages sum to 100', () => {
-    const result = calcStandaloneCost(baseInputs);
-    const total = result.breakdown.reduce((sum, row) => sum + row.percentage, 0);
-    expect(total).toBeCloseTo(100, 1);
-  });
-
-  it('calculates annualVersioningCost = RELEASES * HOURS * rate', () => {
-    // 12 * 3 * 65 = 2340
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.annualVersioningCost).toBeCloseTo(2340, 0);
-  });
-
-  it('calculates annualSupportCost = HOURS_PER_WEEK * WEEKS * rate', () => {
-    // 7.5 * 52 * 65 = 25350
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.annualSupportCost).toBeCloseTo(25350, 0);
-  });
-
-  it('calculates annualCoordinationCost = nbTeams * HOURS * WEEKS * rate', () => {
-    // 2 * 3 * 52 * 65 = 20280
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.annualCoordinationCost).toBeCloseTo(20280, 0);
-  });
-
-  it('coordination is 0 when nbConsumingCodebases = 0', () => {
-    const result = calcStandaloneCost({ ...baseInputs, nbConsumingCodebases: 0 });
-    expect(result.annualCoordinationCost).toBe(0);
-  });
-
-  it('calculates annualOnboardingCost = NEW_DEVS * (training + mentoring)', () => {
-    // midRate = 65 * 50/65 = 50
-    // 3 * (60 * 50 + 20 * 65) = 3 * (3000 + 1300) = 3 * 4300 = 12900
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.annualOnboardingCost).toBeCloseTo(12900, 0);
-  });
-
-  it('totalStandaloneCost with 0 consuming codebases = 173822', () => {
-    // initialDevCost = 33800
-    // totalMaintenance = 6084 * 3 = 18252
-    // versioning: 2340 * 3 = 7020, support: 25350 * 3 = 76050, coordination: 0, onboarding: 12900 * 3 = 38700
-    // total = 33800 + 18252 + 7020 + 76050 + 0 + 38700 = 173822
-    const result = calcStandaloneCost({ ...baseInputs, nbConsumingCodebases: 0 });
-    expect(result.totalStandaloneCost).toBeCloseTo(173822, 0);
-  });
-
-  it('breakdown rows have hours derived from formula constants', () => {
-    // Versioning hours: 12 * 3 * 3 = 108 (releases * hours_per_release * horizonYears)
-    // Support hours: 7.5 * 52 * 3 = 1170
-    // Coordination hours: 2 * 3 * 52 * 3 = 936 (baseInputs has nbConsumingCodebases=2)
-    // Onboarding hours: 3 * (60 + 20) * 3 = 720
-    const result = calcStandaloneCost(baseInputs);
-    expect(result.breakdown[2].hours).toBeCloseTo(108, 0);   // Versioning
-    expect(result.breakdown[3].hours).toBeCloseTo(1170, 0);  // Consumer Support
-    expect(result.breakdown[4].hours).toBeCloseTo(936, 0);   // Coordination
-    expect(result.breakdown[5].hours).toBeCloseTo(720, 0);   // Onboarding
+  it('is build plus yearly upkeep', () => {
+    const r = calcStandaloneCost(base);
+    expect(r.initialDevCost).toBe(50_000);
+    expect(r.totalMaintenanceCost).toBeCloseTo(50_000);
+    expect(r.totalStandaloneCost).toBeCloseTo(100_000);
+    expect(r.breakdown.reduce((s, b) => s + b.percentage, 0)).toBeCloseTo(100);
   });
 });
 
-// ---------------------------------------------------------------------------
-// calcSharedCost — section 7.1 worked example
-// ---------------------------------------------------------------------------
-describe('calcSharedCost', () => {
-  const inputs: EngineInputs = {
-    teamAvgHourlyRate: 65,
-    devHours: 400,
-    horizonYears: 3,
-    maintenanceRate: 0.18,
-    generalizationFactor: 1.3,
-    portingFactor: 0.65,
-    divergenceRate: 0.20,
-    bugDuplicationFactor: 2.0,
-    nbConsumingCodebases: 2,
-  };
-
-  it('calculates initialDevCost = devHours * rate * generalizationFactor (33800)', () => {
-    // 400 * 65 * 1.3 = 33800
-    const result = calcSharedCost(inputs);
-    expect(result.initialDevCost).toBeCloseTo(33800, 0);
+describe('calcComparison', () => {
+  it('matches the hand-computed reference (docs §7.5)', () => {
+    // C0 = 50,000. Shared build = 1.2·C0 + 0.2·C0 + 280 h·50 = 84,000
+    // Shared yearly = 0.2·1.2·C0 + 0.04·C0 + 100 h·50 = 19,000 → 5 y = 95,000
+    // Dup build = 1.65·C0 = 82,500
+    // Dup yearly = 0.2·C0·(1 + e(y)), e = 1.00, 1.05, 1.10, 1.15, 1.20 → 10,000·(5 + 5.5) = 105,000
+    const r = calcComparison(base);
+    expect(r.monthly[0].shared).toBeCloseTo(84_000);
+    expect(r.monthly[0].duplicated).toBeCloseTo(82_500);
+    expect(r.shared.total).toBeCloseTo(179_000);
+    expect(r.duplicated.total).toBeCloseTo(187_500);
+    expect(r.shared.lines.reduce((s, l) => s + l.cost, 0)).toBeCloseTo(r.shared.total);
+    expect(r.duplicated.lines.reduce((s, l) => s + l.cost, 0)).toBeCloseTo(r.duplicated.total);
   });
 
-  it('calculates libSetupCost = 8 weeks * 35h/week * seniorRate (18200)', () => {
-    // 8 * 35 * 65 = 18200
-    const result = calcSharedCost(inputs);
-    expect(result.libSetupCost).toBeCloseTo(18200, 0);
+  it('break-even is read from the curves and agrees with the verdict', () => {
+    const r = calcComparison(base);
+    expect(r.breakEvenMonth).not.toBeNull();
+    const be = r.breakEvenMonth!;
+    expect(be).toBeGreaterThan(0);
+    expect(r.monthly[be].shared).toBeLessThanOrEqual(r.monthly[be].duplicated);
+    expect(r.monthly[be - 1].shared).toBeGreaterThan(r.monthly[be - 1].duplicated);
   });
 
-  it('calculates annualMaintenanceCost = (33800 * 0.18) + versioningCost + supportCost', () => {
-    // (33800 * 0.18) + 2340 + 25350 = 6084 + 2340 + 25350 = 33774
-    const result = calcSharedCost(inputs);
-    expect(result.annualMaintenanceCost).toBeCloseTo(33774, 0);
+  it('break-even is 0 when sharing is cheaper from day one, null when it never wins', () => {
+    expect(calcComparison({ ...base, newLibrary: false }).breakEvenMonth).toBe(0);
+    expect(calcComparison({ ...base, devHours: 35 }).breakEvenMonth).toBeNull();
   });
 
-  it('calculates annualCoordinationCost = nbTeams * 3h * 52 * rate (20280)', () => {
-    // 2 * 3 * 52 * 65 = 20280
-    const result = calcSharedCost(inputs);
-    expect(result.annualCoordinationCost).toBeCloseTo(20280, 0);
+  it('verdict and break-even never contradict each other', () => {
+    for (const devHours of [7, 100, 500, 2000, 10000])
+      for (const nbCodebases of [2, 3, 5, 10])
+        for (const horizonYears of [1, 3, 5, 10])
+          for (const newLibrary of [true, false]) {
+            const r = calcComparison({ ...base, devHours, nbCodebases, horizonYears, newLibrary });
+            const sharedWins = r.duplicated.total > r.shared.total;
+            if (sharedWins) expect(r.breakEvenMonth).not.toBeNull();
+            if (r.duplicated.total < r.shared.total) expect(r.breakEvenMonth).toBeNull();
+          }
   });
 
-  it('has Year 0 cumulative cost of 52000', () => {
-    // initialDev + libSetup = 33800 + 18200 = 52000
-    const result = calcSharedCost(inputs);
-    const year0 = result.yearlyBreakdown.find(y => y.year === 0);
-    expect(year0?.cumulativeCost).toBeCloseTo(52000, 0);
+  it('gap is proportional to the hourly rate, so the rate never flips the verdict', () => {
+    expect(gap({ teamAvgHourlyRate: 100 })).toBeCloseTo(2 * gap());
   });
 
-  it('has Year 1 cumulative cost of 118954', () => {
-    // 52000 + 33774 + 20280 + 12900 = 118954
-    const result = calcSharedCost(inputs);
-    const year1 = result.yearlyBreakdown.find(y => y.year === 1);
-    expect(year1?.cumulativeCost).toBeCloseTo(118954, 0);
+  it('more apps favour sharing', () => {
+    expect(gap({ nbCodebases: 3 })).toBeGreaterThan(gap());
+    expect(gap({ nbCodebases: 10 })).toBeGreaterThan(gap({ nbCodebases: 3 }));
   });
 
-  it('has Year 2 cumulative cost of 185908', () => {
-    const result = calcSharedCost(inputs);
-    const year2 = result.yearlyBreakdown.find(y => y.year === 2);
-    expect(year2?.cumulativeCost).toBeCloseTo(185908, 0);
+  it('a small feature on a new library favours duplicating', () => {
+    expect(gap({ devHours: 35 })).toBeLessThan(0);
   });
 
-  it('has Year 3 cumulative cost of 252862', () => {
-    const result = calcSharedCost(inputs);
-    const year3 = result.yearlyBreakdown.find(y => y.year === 3);
-    expect(year3?.cumulativeCost).toBeCloseTo(252862, 0);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// calcDuplicatedCost — section 7.2 worked example
-// ---------------------------------------------------------------------------
-describe('calcDuplicatedCost', () => {
-  const inputs: EngineInputs = {
-    teamAvgHourlyRate: 65,
-    devHours: 400,
-    horizonYears: 3,
-    maintenanceRate: 0.22,
-    generalizationFactor: 1.3,
-    portingFactor: 0.65,
-    divergenceRate: 0.20,
-    bugDuplicationFactor: 2.0,
-    nbConsumingCodebases: 2,
-  };
-
-  it('calculates duplicatedDevCost = baseDev * (1 + portingFactor) = 42900', () => {
-    // baseDev = 400 * 65 = 26000, duplicatedDevCost = 26000 * 1.65 = 42900
-    const result = calcDuplicatedCost(inputs);
-    expect(result.duplicatedDevCost).toBeCloseTo(42900, 0);
+  it('each assumption moves the verdict the intuitive way', () => {
+    expect(gap({ generalizationFactor: 1.5 })).toBeLessThan(gap());
+    expect(gap({ portingFactor: 0.9 })).toBeGreaterThan(gap());
+    expect(gap({ integrationFactor: 0.4 })).toBeLessThan(gap());
+    expect(gap({ extraCopyUpkeep: 1.3 })).toBeGreaterThan(gap());
+    expect(gap({ divergenceRate: 0.15 })).toBeGreaterThan(gap());
+    expect(gap({ coordinationRate: 0.1 })).toBeLessThan(gap());
   });
 
-  it('has Year 1 maintenance of 10296 (5720 * 1.80)', () => {
-    // baseMaintenance = 26000 * 0.22 = 5720, year1 = 5720 * 1.80 = 10296
-    const result = calcDuplicatedCost(inputs);
-    const year1 = result.yearlyBreakdown.find(y => y.year === 1);
-    // Year 1 cumulative = 42900 + 10296 + 9984 + 50600
-    expect(year1?.cumulativeCost).toBeCloseTo(113780, 0);
-  });
-
-  it('has Year 0 cumulative = 42900 (duplicatedDevCost only)', () => {
-    const result = calcDuplicatedCost(inputs);
-    const year0 = result.yearlyBreakdown.find(y => y.year === 0);
-    expect(year0?.cumulativeCost).toBeCloseTo(42900, 0);
+  it('an existing library removes setup and running costs', () => {
+    const r = calcComparison({ ...base, newLibrary: false });
+    const fixed = (LIB_SETUP_HOURS + LIB_RUN_HOURS_PER_YEAR * base.horizonYears) * base.teamAvgHourlyRate;
+    expect(calcComparison(base).shared.total - r.shared.total).toBeCloseTo(fixed);
   });
 });
 
-// ---------------------------------------------------------------------------
-// calcBreakEven — section 7.3 worked example
-// ---------------------------------------------------------------------------
-describe('calcBreakEven', () => {
-  const inputs: EngineInputs = {
-    teamAvgHourlyRate: 65,
-    devHours: 400,
-    horizonYears: 3,
-    maintenanceRate: 0.22,
-    generalizationFactor: 1.3,
-    portingFactor: 0.65,
-    divergenceRate: 0.20,
-    bugDuplicationFactor: 2.0,
-    nbConsumingCodebases: 2,
-  };
-
-  it('returns approximately 18.5 months for the research doc example', () => {
-    // generalizationOverhead = 7800, libSetup = 18200
-    // monthlySavings = 3092, monthlyCoordination = 1690
-    // months = 26000 / 1402 ≈ 18.5
-    const result = calcBreakEven(inputs);
-    expect(result.exists).toBe(true);
-    expect(result.months).not.toBeNull();
-    expect(result.months!).toBeCloseTo(18.5, 0);
-  });
-
-  it('returns { exists: false, months: null } when savings <= coordination cost', () => {
-    // Set up inputs where monthly savings <= monthly coordination cost
-    const noBreakEvenInputs: EngineInputs = {
-      ...inputs,
-      devHours: 10,          // tiny feature, minimal maintenance savings
-      maintenanceRate: 0.01, // almost no maintenance savings
-      nbConsumingCodebases: 10, // lots of coordination cost
-    };
-    const result = calcBreakEven(noBreakEvenInputs);
-    expect(result.exists).toBe(false);
-    expect(result.months).toBeNull();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// calcDuplicatedCost — sub-total fields (Phase 5 extension)
-// ---------------------------------------------------------------------------
-describe('calcDuplicatedCost sub-totals', () => {
-  const inputs: EngineInputs = {
-    teamAvgHourlyRate: 65,
-    devHours: 400,
-    horizonYears: 5,
-    maintenanceRate: 0.22,
-    generalizationFactor: 1.3,
-    portingFactor: 0.65,
-    divergenceRate: 0.20,
-    bugDuplicationFactor: 2.0,
-    nbConsumingCodebases: 2,
-  };
-
-  it('returns totalBugsCost = ADDITIONAL_BUGS_ANNUAL_COST * horizonYears (50600 * 5 = 253000)', () => {
-    // ADDITIONAL_BUGS_ANNUAL_COST = 50600 (constant from formulas.ts), horizonYears = 5
-    const result = calcDuplicatedCost(inputs);
-    expect(result.totalBugsCost).toBeCloseTo(253000, 0);
-  });
-
-  it('returns totalSyncCost as the sum of all yearly sync costs', () => {
-    // yearSync = 8 * 16 * (1.20)^year * 65
-    // year1: 8 * 16 * 1.20 * 65 = 9984
-    // year2: 8 * 16 * 1.44 * 65 = 11980.8
-    // year3: 8 * 16 * 1.728 * 65 = 14376.96
-    // year4: 8 * 16 * 2.0736 * 65 = 17252.352
-    // year5: 8 * 16 * 2.48832 * 65 = 20702.8224
-    const expected = 9984 + 11980.8 + 14376.96 + 17252.352 + 20702.8224;
-    const result = calcDuplicatedCost(inputs);
-    expect(result.totalSyncCost).toBeCloseTo(expected, 0);
-  });
-
-  it('existing totalCost and yearlyBreakdown are unchanged', () => {
-    // Verify backward compatibility — totalCost should still be correct
-    const result = calcDuplicatedCost(inputs);
-    expect(result.totalCost).toBeGreaterThan(0);
-    expect(result.yearlyBreakdown).toHaveLength(6); // year 0 through 5
-    expect(result.duplicatedDevCost).toBeCloseTo(42900, 0);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// calcBreakEven — flexible maintenanceRateShared (Phase 5 extension)
-// ---------------------------------------------------------------------------
-describe('calcBreakEven flexible maintenanceRateShared', () => {
-  const baseInputs: EngineInputs = {
-    teamAvgHourlyRate: 65,
-    devHours: 400,
-    horizonYears: 3,
-    maintenanceRate: 0.22,
-    generalizationFactor: 1.3,
-    portingFactor: 0.65,
-    divergenceRate: 0.20,
-    bugDuplicationFactor: 2.0,
-    nbConsumingCodebases: 2,
-  };
-
-  it('falls back to ENGINE_DEFAULTS.maintenanceRateShared (0.18) when maintenanceRateShared is undefined', () => {
-    // Same as the existing test — no maintenanceRateShared field
-    const result = calcBreakEven(baseInputs);
-    expect(result.exists).toBe(true);
-    expect(result.months!).toBeCloseTo(18.5, 0);
-  });
-
-  it('uses inputs.maintenanceRateShared when provided, changing the break-even result', () => {
-    // Higher shared maintenance rate means less savings => longer break-even
-    const inputsHighRate: EngineInputs = {
-      ...baseInputs,
-      maintenanceRateShared: 0.30, // much higher than default 0.18
-    };
-    const resultDefault = calcBreakEven(baseInputs);
-    const resultHighRate = calcBreakEven(inputsHighRate);
-    // Higher shared rate means worse savings, so break-even takes longer (more months)
-    // OR it may flip to no break-even — either way it should differ from the default
-    if (resultHighRate.exists && resultDefault.exists) {
-      expect(resultHighRate.months!).toBeGreaterThan(resultDefault.months!);
-    } else {
-      // If high rate has no break-even, that also proves the rate was used
-      expect(resultHighRate.exists).toBe(false);
-    }
-  });
-
-  it('uses inputs.maintenanceRateShared = 0.10 (lower than default), giving shorter break-even', () => {
-    const inputsLowRate: EngineInputs = {
-      ...baseInputs,
-      maintenanceRateShared: 0.10, // lower than default 0.18
-    };
-    const resultDefault = calcBreakEven(baseInputs);
-    const resultLowRate = calcBreakEven(inputsLowRate);
-    // Lower shared rate means more savings => shorter break-even
-    expect(resultLowRate.exists).toBe(true);
-    expect(resultDefault.exists).toBe(true);
-    expect(resultLowRate.months!).toBeLessThan(resultDefault.months!);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// calcScaleFactor — section 7.4
-// ---------------------------------------------------------------------------
-describe('calcScaleFactor', () => {
-  it('returns ratio > 1 when duplicated costs more than shared', () => {
-    const inputs: EngineInputs = {
-      teamAvgHourlyRate: 65,
-      devHours: 400,
-      horizonYears: 3,
-      maintenanceRate: 0.22,
-      generalizationFactor: 1.3,
-      portingFactor: 0.65,
-      divergenceRate: 0.20,
-      bugDuplicationFactor: 2.0,
-      nbConsumingCodebases: 2,
-    };
-    const ratio = calcScaleFactor(inputs);
-    // From table: N=2, ratio ~1.04
-    expect(ratio).toBeGreaterThan(0);
-  });
-
-  it('returns a positive number', () => {
-    const inputs: EngineInputs = {
-      teamAvgHourlyRate: 65,
-      devHours: 400,
-      horizonYears: 3,
-      maintenanceRate: 0.22,
-      generalizationFactor: 1.3,
-      portingFactor: 0.65,
-      divergenceRate: 0.20,
-      bugDuplicationFactor: 2.0,
-      nbConsumingCodebases: 3,
-    };
-    const ratio = calcScaleFactor(inputs);
-    expect(ratio).toBeGreaterThan(0);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// calcDivergence — section 7.5 worked examples
-// ---------------------------------------------------------------------------
-describe('calcDivergence', () => {
-  it('calculates divergence at Year 1: 8500 * e^(0.20 * 1) ≈ 10382', () => {
-    expect(calcDivergence(8500, 0.20, 1)).toBeCloseTo(10382, 0);
-  });
-
-  it('calculates divergence at Year 2: 8500 * e^(0.20 * 2) ≈ 12681', () => {
-    // Research doc shows 12,680 (rounded) — actual value is ~12680.5, within ±1
-    expect(calcDivergence(8500, 0.20, 2)).toBeCloseTo(12681, 0);
-  });
-
-  it('calculates divergence at Year 3: 8500 * e^(0.20 * 3) ≈ 15488', () => {
-    expect(calcDivergence(8500, 0.20, 3)).toBeCloseTo(15488, 0);
-  });
-
-  it('returns baseSyncCost when t = 0', () => {
-    expect(calcDivergence(8500, 0.20, 0)).toBeCloseTo(8500, 0);
+describe('extraCopyRatio', () => {
+  it('drifts by δ a year and is capped', () => {
+    expect(extraCopyRatio(1, 0.05, 1)).toBe(1);
+    expect(extraCopyRatio(1, 0.05, 3)).toBeCloseTo(1.1);
+    expect(extraCopyRatio(1, 0.2, 10)).toBe(EXTRA_COPY_UPKEEP_MAX);
   });
 });

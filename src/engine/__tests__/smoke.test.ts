@@ -12,8 +12,8 @@ describe('engine types smoke test', () => {
   it('exports seniority defaults matching French loaded costs', () => {
     expect(SENIORITY_DEFAULTS.Junior).toBe(32);
     expect(SENIORITY_DEFAULTS.Mid).toBe(40);
-    expect(SENIORITY_DEFAULTS.Senior).toBe(51);
-    expect(SENIORITY_DEFAULTS.Lead).toBe(67);
+    expect(SENIORITY_DEFAULTS.Senior).toBe(50);
+    expect(SENIORITY_DEFAULTS.Lead).toBe(62);
   });
 
   it('uses French 35h work week', () => {

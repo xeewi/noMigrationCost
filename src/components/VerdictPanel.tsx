@@ -11,7 +11,8 @@ import { formatEuro } from '@/lib/utils';
 interface VerdictPanelProps {
   sharedTotal: number;
   duplicatedTotal: number;
-  breakEvenMonths: number | null;
+  /** 0 = sharing cheaper from day one, null = not within the horizon. Read from the same curves as the totals. */
+  breakEvenMonth: number | null;
   horizonYears: number;
 }
 
@@ -45,22 +46,20 @@ function useTally(target: number, duration = 650): number {
   return shown;
 }
 
-function formatMonths(months: number): string {
-  const m = Math.max(1, Math.round(months));
+function formatMonths(m: number): string {
   return m === 1 ? '1 month' : `${m} months`;
 }
 
 export function VerdictPanel({
   sharedTotal,
   duplicatedTotal,
-  breakEvenMonths,
+  breakEvenMonth,
   horizonYears,
 }: VerdictPanelProps) {
   const gap = duplicatedTotal - sharedTotal;
   const sharedWins = gap > 0;
   const tallied = useTally(Math.abs(gap));
   const years = horizonYears === 1 ? '1 year' : `${horizonYears} years`;
-  const paysOffInHorizon = breakEvenMonths !== null && breakEvenMonths <= horizonYears * 12;
 
   return (
     <section
@@ -91,15 +90,17 @@ export function VerdictPanel({
 
         <div>
           <h3 className="font-sign text-[22px] sm:text-[24px] font-semibold leading-tight text-panel-soft">
-            Sharing pays off after
+            Sharing pays off
           </h3>
           <p className="mt-1 font-sign text-[44px] font-bold leading-none">
-            {paysOffInHorizon ? formatMonths(breakEvenMonths!) : 'Never'}
+            {breakEvenMonth === null ? 'Not yet' : breakEvenMonth === 0 ? 'From day one' : `After ${formatMonths(breakEvenMonth)}`}
           </p>
           <p className="mt-3 max-w-[30ch] text-[15px] text-[#dfe5fa]">
-            {paysOffInHorizon
-              ? 'Before that, the shared library costs more.'
-              : `Not within ${years}. Try more teams or a longer horizon.`}
+            {breakEvenMonth === null
+              ? `Copying stays cheaper over ${years}.`
+              : breakEvenMonth === 0
+                ? 'Building it once costs no more than building it for each app.'
+                : 'Before that, the shared library costs more.'}
           </p>
         </div>
 

@@ -17,8 +17,8 @@ import {
   ReferenceLine,
   CartesianGrid,
 } from 'recharts';
-import { buildMonthlyChartData, formatEuroAbbrev, formatEuro } from '@/lib/utils';
-import type { YearCost, BreakEvenResult } from '@/engine/types';
+import { formatEuroAbbrev, formatEuro } from '@/lib/utils';
+import type { MonthCostPoint } from '@/engine/types';
 
 const PANEL = '#1f3a93';
 const HAZARD = '#c8221b';
@@ -26,9 +26,8 @@ const INK = '#14171a';
 const SIGNAL = '#f7c600';
 
 interface CostChartProps {
-  sharedYearly: YearCost[];
-  duplicatedYearly: YearCost[];
-  breakEven: BreakEvenResult;
+  monthly: MonthCostPoint[];
+  breakEvenMonth: number | null;
   horizonYears: number;
 }
 
@@ -56,7 +55,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   return (
     <div className="rounded-sm border border-border bg-popover px-3 py-2.5 text-sm shadow-[0_6px_20px_-8px_rgba(20,23,26,0.35)]">
       <p className="font-sign text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-        Month {label}
+        {label === 0 ? 'Start' : `Month ${label}`}
       </p>
       <p className="mt-1 flex justify-between gap-6"><span>Shared</span><span className="font-semibold" style={{ color: PANEL }}>{formatEuro(shared)}</span></p>
       <p className="flex justify-between gap-6"><span>Duplicated</span><span className="font-semibold" style={{ color: HAZARD }}>{formatEuro(duplicated)}</span></p>
@@ -83,19 +82,18 @@ function BreakEvenFlag({ viewBox, months }: { viewBox?: { x: number; y: number }
 }
 
 export function CostChart({
-  sharedYearly,
-  duplicatedYearly,
-  breakEven,
+  monthly,
+  breakEvenMonth,
   horizonYears,
 }: CostChartProps) {
   const data = useMemo(
     () =>
-      buildMonthlyChartData(sharedYearly, duplicatedYearly).map((p) => ({
+      monthly.map((p) => ({
         ...p,
         // Hatched band only where copies cost more than sharing
         gap: [p.shared, Math.max(p.shared, p.duplicated)] as [number, number],
       })),
-    [sharedYearly, duplicatedYearly],
+    [monthly],
   );
 
   const ticks = useMemo(() => {
@@ -104,11 +102,6 @@ export function CostChart({
     for (let m = interval; m <= horizonYears * 12; m += interval) result.push(m);
     return result;
   }, [horizonYears]);
-
-  const breakEvenMonth =
-    breakEven.exists && breakEven.months !== null && breakEven.months <= horizonYears * 12
-      ? Math.max(1, Math.round(breakEven.months))
-      : null;
 
   return (
     <figure className="rounded-md border border-border bg-card px-4 pt-4 pb-2 sm:px-5">
@@ -119,7 +112,7 @@ export function CostChart({
           <span className="inline-flex items-center gap-1.5"><i className="inline-block h-[3px] w-4" style={{ background: HAZARD }} />Duplicated</span>
           <span className="inline-flex items-center gap-1.5">
             <i className="inline-block h-2.5 w-4" style={{ background: `repeating-linear-gradient(135deg, ${HAZARD} 0 3px, transparent 3px 7px)` }} />
-            Hidden cost of duplication
+            Extra cost of the copies
           </span>
         </span>
       </figcaption>
@@ -151,7 +144,7 @@ export function CostChart({
             <Area dataKey="gap" stroke="none" fill="url(#hazard-hatch)" isAnimationActive={false} activeDot={false} />
             <Line type="linear" dataKey="shared" stroke={PANEL} strokeWidth={3} dot={false} isAnimationActive={false} />
             <Line type="linear" dataKey="duplicated" stroke={HAZARD} strokeWidth={3} dot={false} isAnimationActive={false} />
-            {breakEvenMonth !== null && (
+            {breakEvenMonth !== null && breakEvenMonth > 0 && (
               <ReferenceLine
                 x={breakEvenMonth}
                 stroke={INK}
