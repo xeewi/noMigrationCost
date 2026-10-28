@@ -28,6 +28,7 @@ const base: EngineInputs = {
   horizonYears: 5,
   nbCodebases: 2,
   newLibrary: true,
+  nbTeams: 1,
 };
 const gap = (o: Partial<EngineInputs> = {}) => {
   const r = calcComparison({ ...base, ...o });
@@ -141,6 +142,18 @@ describe('calcComparison', () => {
     expect(gap({ extraCopyUpkeep: 1.3 })).toBeGreaterThan(gap());
     expect(gap({ divergenceRate: 0.15 })).toBeGreaterThan(gap());
     expect(gap({ coordinationRate: 0.1 })).toBeLessThan(gap());
+  });
+
+  it('each extra team changing the shared code adds τ of its upkeep', () => {
+    // shared upkeep = 0.2·1.2·50,000 = 12,000 a year; 3 teams → +2·0.1·12,000·5 y = 12,000
+    expect(calcComparison({ ...base, nbTeams: 3 }).shared.total - calcComparison(base).shared.total).toBeCloseTo(12_000);
+    expect(calcComparison({ ...base, nbTeams: 3 }).duplicated.total).toBeCloseTo(calcComparison(base).duplicated.total);
+  });
+
+  it('enough teams on the shared code flip the verdict to duplicating', () => {
+    expect(gap()).toBeGreaterThan(0);
+    expect(gap({ nbTeams: 10 })).toBeLessThan(0);
+    expect(calcComparison({ ...base, nbTeams: 10 }).breakEvenMonth).toBeNull();
   });
 
   it('an existing library removes setup and running costs', () => {

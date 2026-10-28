@@ -90,7 +90,7 @@ export function extraCopyRatio(e0: number, divergenceRate: number, year: number)
  * Shared library vs one copy per app, over the horizon (docs §7.2-7.3).
  *
  *   Shared     build  = G·C0 + i·C0·(N−1) + setupHours·w
- *              yearly = m·G·C0 + k·C0·(N−1) + runHours·w
+ *              yearly = m·G·C0·(1 + τ·(T−1)) + k·C0·(N−1) + runHours·w
  *   Duplicated build  = C0 + p·C0·(N−1)
  *              yearly = m·C0 · (1 + (N−1)·min(eMax, e0 + δ·(y−1)))
  *
@@ -111,6 +111,8 @@ export function calcComparison(inputs: EngineInputs): ComparisonOutputs {
     extraCopyUpkeep: e0,
     divergenceRate,
     coordinationRate: k,
+    teamOverhead: tau,
+    nbTeams,
   } = inputs;
 
   const C0 = devHours * w;
@@ -122,9 +124,11 @@ export function calcComparison(inputs: EngineInputs): ComparisonOutputs {
   const integration = i * C0 * extra;
   const setup = newLibrary ? LIB_SETUP_HOURS * w : 0;
   const sharedUpkeepYear = m * G * C0;
+  // Every extra team that changes the shared code makes each change dearer: agree, review, avoid breaking the others (docs §7.2).
+  const teamsYear = tau * Math.max(0, nbTeams - 1) * sharedUpkeepYear;
   const coordinationYear = k * C0 * extra;
   const runningYear = newLibrary ? LIB_RUN_HOURS_PER_YEAR * w : 0;
-  const sharedYear = sharedUpkeepYear + coordinationYear + runningYear;
+  const sharedYear = sharedUpkeepYear + teamsYear + coordinationYear + runningYear;
 
   // Duplicated
   const porting = p * C0 * extra;
@@ -160,6 +164,7 @@ export function calcComparison(inputs: EngineInputs): ComparisonOutputs {
         { label: 'Plug it into the other apps', cost: integration },
         { label: 'Set up the library', cost: setup },
         { label: 'Upkeep of the shared code', cost: sharedUpkeepYear * horizonYears },
+        { label: 'Several teams changing it', cost: teamsYear * horizonYears },
         { label: 'Coordination and upgrades', cost: coordinationYear * horizonYears },
         { label: 'Running the library', cost: runningYear * horizonYears },
       ],

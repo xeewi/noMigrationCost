@@ -179,6 +179,18 @@ Default **G = 1.20**. Values above 1.5 fit true multi-product platforms rather t
 
 Default **k = 0.04**: each extra app adds 4 % of the build cost per year. This is an **assumption** sized on the evidence above, not a measurement.
 
+### 3.3 Several teams changing the shared code (`τ`)
+
+`k` prices the link between the library and each app that *uses* it. A different cost appears when several teams *change* the shared code: every change has to suit all of them, be reviewed by people who don't own the code, and avoid breaking the others.
+
+- In Windows Vista, organisational metrics (how many engineers and teams touched a binary, how spread its ownership was) predicted failure-prone binaries better than code metrics such as churn or complexity [[52]](https://doi.org/10.1145/1368088.1368160).
+- In Windows Vista and 7, components with many minor contributors had more pre- and post-release failures; strong ownership went with fewer failures [[53]](https://doi.org/10.1145/2025113.2025119).
+- Brooks's n(n−1)/2 [32] is the worst case, with no owner and every team talking to every other. A library with a clear owning team is closer to hub-and-spoke, where links grow linearly.
+
+The calculator adds `τ × (nT − 1)` to the upkeep of the shared code, where nT is the number of teams that change it. The growth is linear, the conservative choice for sharing. Default **τ = 0.10**: each extra team makes the shared code 10 % dearer to keep up. The studies show the direction of the effect, not its size, so τ is an **assumption**. Copies are not affected: each copy stays with its own team. With nT = 1 (the default, one owner team) nothing changes.
+
+In the default scenario (§7.5, 2 apps), sharing stops paying off from **4 teams**. With 3 apps, from 15 teams. With 5 apps or more it still wins at 20 teams: the cost of the copies grows faster than the team overhead.
+
 ---
 
 ## 4. Duplicated code
@@ -296,7 +308,7 @@ Every formula below is implemented in `src/engine/formulas.ts`, and every number
   - Story points: `B = (story points / velocity) × sprint weeks × 35 h × headcount`. Velocity is the whole team's, so each sprint costs every team member's hours.
   - Direct mode: the value is already person-hours, or person-days × 7 h.
 - **C0 = B × w**: the cost of building the feature once, for one app. Every cost in the model is a multiple of C0, except library setup and running, which are fixed hours × w.
-- **N**: number of apps that need the feature (2 to 10 in the UI). **T**: horizon in years.
+- **N**: number of apps that need the feature (2 to 10 in the UI). **nT**: teams that change the shared code (1 to 20, default 1). **T**: horizon in years.
 - **Timing**: builds are paid at month 0. Yearly costs accrue evenly, one twelfth per month. Month t belongs to year y = ⌈t / 12⌉.
 
 ### 7.1 Standalone cost
@@ -313,7 +325,7 @@ Example with the default scenario (§7.5): 45,360 + 0.20 × 45,360 × 5 = **90,7
 
 ```
 Build_S  = G·C0  +  i·C0·(N−1)  +  280 h · w        (setup only for a new library)
-Yearly_S = m·G·C0  +  k·C0·(N−1)  +  100 h · w      (running only for a new library)
+Yearly_S = m·G·C0·(1 + τ·(nT−1))  +  k·C0·(N−1)  +  100 h · w      (running only for a new library)
 ```
 
 | Line in the app | Formula |
@@ -322,6 +334,7 @@ Yearly_S = m·G·C0  +  k·C0·(N−1)  +  100 h · w      (running only for a n
 | Plug it into the other apps | i · C0 · (N−1) |
 | Set up the library | 280 h · w (0 if the library exists) |
 | Upkeep of the shared code | m · G · C0 · T |
+| Several teams changing it | τ · (nT−1) · m · G · C0 · T |
 | Coordination and upgrades | k · C0 · (N−1) · T |
 | Running the library | 100 h · w · T (0 if the library exists) |
 
@@ -355,6 +368,7 @@ Tunable in the "Assumptions" step (Detailed view):
 | e0 | Upkeep of each extra copy | 1.00 | 0.5–1.5 | Assumption | Grounded by Ray & Kim: 10.7–15.5 % of changes ported between forks, at a steady rate (§4.2) |
 | δ | How fast the copies drift apart | 0.05 / year | 0–0.2 | Assumption | No measurement; forks stop syncing rather than pay more (§4.4) |
 | k | Coordination and upgrades per extra app | 0.04 / year | 0–0.15 | Assumption | Krüger & Berger coordination 5 % vs 7 %; Xavier et al. 14.78 % breaking API changes (§3.2) |
+| τ | Extra upkeep per extra team changing it | 0.10 | 0–0.5 | Assumption | Direction from Nagappan et al. 2008 and Bird et al. 2011; size not measured (§3.3) |
 
 Fixed constants (not exposed in the UI):
 
@@ -501,3 +515,5 @@ Numbered in order of first citation. Entries without a link are books, reports o
 49. GitClear, *AI Copilot Code Quality* report, 2025 (vendor analysis of 211 M changed lines, 2020–2024; read via press coverage).
 50. M. Borg et al., "Echoes of AI: investigating the downstream effects of AI assistants on software maintainability", *Empirical Software Engineering* 31, 2026. DOI 10.1007/s10664-026-10889-1. Preprint arXiv:2507.00788. <https://arxiv.org/abs/2507.00788>
 51. S. Pan et al., "Automating zero-shot patch porting for hard forks" (PPatHF), 2024, arXiv:2404.17964. <https://arxiv.org/abs/2404.17964>
+52. N. Nagappan, B. Murphy, V. Basili, "The influence of organizational structure on software quality: an empirical case study", ICSE 2008. DOI 10.1145/1368088.1368160. <https://doi.org/10.1145/1368088.1368160>
+53. C. Bird, N. Nagappan, B. Murphy, H. Gall, P. Devanbu, "Don't touch my code! Examining the effects of ownership on software quality", ESEC/FSE 2011. DOI 10.1145/2025113.2025119. <https://doi.org/10.1145/2025113.2025119>

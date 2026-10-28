@@ -34,6 +34,7 @@ export interface ModelParams {
   extraCopyUpkeep: number;      // e0: yearly upkeep of an extra copy / upkeep of the first (sync included)
   divergenceRate: number;       // δ: yearly growth of e0 as copies drift (capped)
   coordinationRate: number;     // k: yearly coordination + upgrades per extra app / first build
+  teamOverhead: number;         // τ: extra upkeep of the shared code per extra team that changes it
 }
 
 export interface EngineInputs extends ModelParams {
@@ -42,6 +43,7 @@ export interface EngineInputs extends ModelParams {
   horizonYears: number;
   nbCodebases: number;    // apps that need the feature (>= 2 for the comparison)
   newLibrary: boolean;    // false = the shared library already exists
+  nbTeams: number;        // teams that change the shared code (1 = a single owner team)
 }
 
 export interface BreakdownRow {
@@ -103,6 +105,7 @@ export const ENGINE_DEFAULTS: ModelParams = {
   extraCopyUpkeep: 1.0,
   divergenceRate: 0.05,
   coordinationRate: 0.04,
+  teamOverhead: 0.1,
 };
 
 /** One-off effort to stand up a new shared library: 8 weeks × 35 h (docs §3.1, assumption). */

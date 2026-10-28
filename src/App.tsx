@@ -41,6 +41,7 @@ const EXAMPLE = {
   horizonYears: 5,
   nbCodebases: 2,
   newLibrary: true,
+  nbTeams: 1,
 } as const;
 
 function exampleTeam(): SeniorityRow[] {
@@ -65,6 +66,7 @@ function App() {
 
   const [nbCodebases, setNbCodebases] = useState<number>(EXAMPLE.nbCodebases);
   const [newLibrary, setNewLibrary] = useState<boolean>(EXAMPLE.newLibrary);
+  const [nbTeams, setNbTeams] = useState<number>(EXAMPLE.nbTeams);
 
   const [activeTab, setActiveTab] = useState<string>('comparison');
 
@@ -77,7 +79,7 @@ function App() {
     applyStateToSetters(state, {
       setTeam, setSizingMode, setStoryPoints, setVelocity,
       setSprintWeeks, setDirectValue, setDirectUnit,
-      setHorizonYears, setAdvancedParams, setNbCodebases, setNewLibrary,
+      setHorizonYears, setAdvancedParams, setNbCodebases, setNewLibrary, setNbTeams,
       setActiveTab,
     });
   }, []);
@@ -89,13 +91,13 @@ function App() {
       window.location.hash = encodeAppState(
         team, sizingMode, storyPoints, velocity, sprintWeeks,
         directValue, directUnit, horizonYears, advancedParams,
-        nbCodebases, newLibrary, activeTab,
+        nbCodebases, newLibrary, nbTeams, activeTab,
       );
     }, 300);
     return () => clearTimeout(id);
   }, [view, team, sizingMode, storyPoints, velocity, sprintWeeks,
       directValue, directUnit, horizonYears, advancedParams,
-      nbCodebases, newLibrary, activeTab]);
+      nbCodebases, newLibrary, nbTeams, activeTab]);
 
   // Reset handler — clears all inputs to defaults and clears hash (D-04)
   const handleReset = useCallback(() => {
@@ -110,18 +112,19 @@ function App() {
     setAdvancedParams(getDefaultAdvancedParams());
     setNbCodebases(EXAMPLE.nbCodebases);
     setNewLibrary(EXAMPLE.newLibrary);
+    setNbTeams(EXAMPLE.nbTeams);
     setActiveTab('comparison');
   }, []);
 
   const isExample = useMemo(() => {
     const current = encodeAppState(team, sizingMode, storyPoints, velocity, sprintWeeks,
-      directValue, directUnit, horizonYears, advancedParams, nbCodebases, newLibrary, 'comparison');
+      directValue, directUnit, horizonYears, advancedParams, nbCodebases, newLibrary, nbTeams, 'comparison');
     const example = encodeAppState(exampleTeam(), 'story-points', EXAMPLE.storyPoints, EXAMPLE.velocity,
       EXAMPLE.sprintWeeks, 0, 'hours', EXAMPLE.horizonYears, getDefaultAdvancedParams(),
-      EXAMPLE.nbCodebases, EXAMPLE.newLibrary, 'comparison');
+      EXAMPLE.nbCodebases, EXAMPLE.newLibrary, EXAMPLE.nbTeams, 'comparison');
     return current === example;
   }, [team, sizingMode, storyPoints, velocity, sprintWeeks, directValue, directUnit,
-      horizonYears, advancedParams, nbCodebases, newLibrary]);
+      horizonYears, advancedParams, nbCodebases, newLibrary, nbTeams]);
 
   // Derived state — all via useMemo, never useState
   const teamAvgRate = useMemo(() => calcTeamAvgRate(team), [team]);
@@ -159,7 +162,8 @@ function App() {
     horizonYears,
     nbCodebases,
     newLibrary,
-  }), [advancedParams, teamAvgRate, devHours, horizonYears, nbCodebases, newLibrary]);
+    nbTeams,
+  }), [advancedParams, teamAvgRate, devHours, horizonYears, nbCodebases, newLibrary, nbTeams]);
 
   const ready = teamAvgRate > 0 && devHours > 0;
   const costOutput = useMemo(() => (ready ? calcStandaloneCost(engineInputs) : null), [ready, engineInputs]);
@@ -203,6 +207,8 @@ function App() {
               onNbCodebasesChange={setNbCodebases}
               newLibrary={newLibrary}
               onNewLibraryChange={setNewLibrary}
+              nbTeams={nbTeams}
+              onNbTeamsChange={setNbTeams}
             />
           </aside>
 

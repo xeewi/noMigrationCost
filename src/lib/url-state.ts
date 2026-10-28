@@ -8,7 +8,7 @@
 import type { SeniorityRow, SeniorityLevel, SizingMode, DirectHoursUnit } from '@/engine/types';
 import { SENIORITY_DEFAULTS, ENGINE_DEFAULTS } from '@/engine/types';
 import type { AdvancedParamsState } from '@/components/AdvancedParameters';
-import { PARAM_CONFIGS, MIN_CODEBASES, MAX_CODEBASES } from '@/components/AdvancedParameters';
+import { PARAM_CONFIGS, MIN_CODEBASES, MAX_CODEBASES, MIN_TEAMS, MAX_TEAMS } from '@/components/AdvancedParameters';
 
 /** v2: model rewritten in 2026-10 — v1 links carried parameters that no longer exist and are ignored. */
 export interface ShareableState {
@@ -25,6 +25,7 @@ export interface ShareableState {
   mp: AdvancedParamsState;               // model parameters
   nc: number;                            // nbCodebases
   nl: boolean;                           // newLibrary
+  nt: number;                            // nbTeams changing the shared code
   tab: 'c' | 's';                        // active tab (comparison/standalone)
 }
 
@@ -43,6 +44,7 @@ export function encodeAppState(
   advancedParams: AdvancedParamsState,
   nbCodebases: number,
   newLibrary: boolean,
+  nbTeams: number,
   activeTab: string,
 ): string {
   const th: [number, number, number, number] = [0, 0, 0, 0];
@@ -68,6 +70,7 @@ export function encodeAppState(
     mp: advancedParams,
     nc: nbCodebases,
     nl: newLibrary,
+    nt: nbTeams,
     tab: activeTab === 'comparison' ? 'c' : 's',
   };
 
@@ -112,6 +115,7 @@ export function decodeAppState(hash: string): ShareableState | null {
       mp,
       nc: Math.round(num(raw.nc, MIN_CODEBASES, MAX_CODEBASES, MIN_CODEBASES)),
       nl: raw.nl !== false,
+      nt: Math.round(num(raw.nt, MIN_TEAMS, MAX_TEAMS, MIN_TEAMS)),
       tab: raw.tab === 's' ? 's' : 'c',
     };
   } catch {
@@ -131,6 +135,7 @@ interface StateSetters {
   setAdvancedParams: (p: AdvancedParamsState) => void;
   setNbCodebases: (n: number) => void;
   setNewLibrary: (b: boolean) => void;
+  setNbTeams: (n: number) => void;
   setActiveTab: (t: string) => void;
 }
 
@@ -146,6 +151,7 @@ export function applyStateToSetters(state: ShareableState, s: StateSetters): voi
   s.setAdvancedParams(state.mp);
   s.setNbCodebases(state.nc);
   s.setNewLibrary(state.nl);
+  s.setNbTeams(state.nt);
   s.setActiveTab(state.tab === 'c' ? 'comparison' : 'standalone');
 }
 

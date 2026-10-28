@@ -26,6 +26,8 @@ interface AdvancedParametersProps {
   onNbCodebasesChange: (value: number) => void;
   newLibrary: boolean;
   onNewLibraryChange: (value: boolean) => void;
+  nbTeams: number;
+  onNbTeamsChange: (value: number) => void;
 }
 
 export interface ParamConfig {
@@ -42,6 +44,8 @@ export interface ParamConfig {
 
 export const MIN_CODEBASES = 2;
 export const MAX_CODEBASES = 10;
+export const MIN_TEAMS = 1;
+export const MAX_TEAMS = 20;
 
 export const PARAM_CONFIGS: ParamConfig[] = [
   {
@@ -92,6 +96,13 @@ export const PARAM_CONFIGS: ParamConfig[] = [
     hint: '0.04 = each extra app adds 4 % of the build a year in meetings and library upgrades.',
     min: 0, max: 0.15, step: 0.01, decimalPlaces: 2, evidence: 'Assumption',
     citation: 'Docs §3 and §7.4: coordination about 7 % of effort on a shared platform vs 5 % with copies (Krüger & Berger); 15 % of API changes break compatibility (Xavier et al., SANER 2017).',
+  },
+  {
+    key: 'teamOverhead',
+    label: 'Extra upkeep per extra team changing it',
+    hint: '0.10 = each extra team that changes the shared code makes its upkeep 10 % dearer.',
+    min: 0, max: 0.5, step: 0.01, decimalPlaces: 2, evidence: 'Assumption',
+    citation: 'Docs §3.3 and §7.4: code changed by many teams or minor contributors has more defects (Nagappan et al., ICSE 2008; Bird et al., FSE 2011); communication paths grow faster than headcount (Brooks). The size of the effect is not measured.',
   },
 ];
 
@@ -146,6 +157,23 @@ function ParamRow({ config, value, onValueChange }: { config: ParamConfig; value
 const stepBtn =
   'inline-flex size-8 items-center justify-center rounded-sm border border-input bg-card hover:bg-muted disabled:opacity-40 disabled:hover:bg-card';
 
+function Stepper({ label, unit, value, min, max, onChange }: {
+  label: string; unit: string; value: number; min: number; max: number; onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <p className="text-sm">{label}</p>
+      <div className="flex items-center gap-1.5" role="group" aria-label={label}>
+        <button type="button" className={stepBtn} aria-label={`One ${unit} fewer`} disabled={value <= min}
+          onClick={() => onChange(Math.max(min, value - 1))}><Minus size={14} /></button>
+        <span className="w-6 text-center font-semibold" aria-live="polite">{value}</span>
+        <button type="button" className={stepBtn} aria-label={`One ${unit} more`} disabled={value >= max}
+          onClick={() => onChange(Math.min(max, value + 1))}><Plus size={14} /></button>
+      </div>
+    </div>
+  );
+}
+
 export function AdvancedParameters({
   params,
   onChange,
@@ -155,23 +183,16 @@ export function AdvancedParameters({
   onNbCodebasesChange,
   newLibrary,
   onNewLibraryChange,
+  nbTeams,
+  onNbTeamsChange,
 }: AdvancedParametersProps) {
   const [mode, setMode] = useState<'simple' | 'detailed'>(isModified ? 'detailed' : 'simple');
-  const apps = nbCodebases;
 
   return (
     <>
       <RailStep number={3} title="Who needs it">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm">Apps that need this feature</p>
-          <div className="flex items-center gap-1.5" role="group" aria-label="Apps that need this feature">
-            <button type="button" className={stepBtn} aria-label="One app fewer" disabled={apps <= MIN_CODEBASES}
-              onClick={() => onNbCodebasesChange(Math.max(MIN_CODEBASES, apps - 1))}><Minus size={14} /></button>
-            <span className="w-6 text-center font-semibold" aria-live="polite">{apps}</span>
-            <button type="button" className={stepBtn} aria-label="One app more" disabled={apps >= MAX_CODEBASES}
-              onClick={() => onNbCodebasesChange(Math.min(MAX_CODEBASES, apps + 1))}><Plus size={14} /></button>
-          </div>
-        </div>
+        <Stepper label="Apps that need this feature" unit="app" value={nbCodebases}
+          min={MIN_CODEBASES} max={MAX_CODEBASES} onChange={onNbCodebasesChange} />
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-sm">Shared library</p>
           <Segmented
@@ -188,6 +209,15 @@ export function AdvancedParameters({
           {newLibrary
             ? 'Creating it costs about 8 weeks of setup, then 100 hours a year to run, all charged to this feature.'
             : 'No setup or running cost: the library is already paid for.'}
+        </p>
+        <div className="mt-4">
+          <Stepper label="Teams that change the shared code" unit="team" value={nbTeams}
+            min={MIN_TEAMS} max={MAX_TEAMS} onChange={onNbTeamsChange} />
+        </div>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          {nbTeams === 1
+            ? 'One team owns the shared code; the others only use it.'
+            : `Each change has to suit ${nbTeams} teams, so the shared code costs ${Math.round(params.teamOverhead * (nbTeams - 1) * 100)} % more to keep up. Copies stay with their own team.`}
         </p>
       </RailStep>
 

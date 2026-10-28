@@ -179,6 +179,18 @@ Défaut **G = 1,20**. Les valeurs au-dessus de 1,5 correspondent à de véritabl
 
 Défaut **k = 0,04** : chaque application supplémentaire ajoute 4 % du coût de construction par an. C'est une **hypothèse** calibrée sur les éléments ci-dessus, pas une mesure.
 
+### 3.3 Plusieurs équipes qui modifient le code partagé (`τ`)
+
+`k` chiffre le lien entre la bibliothèque et chaque application qui l'*utilise*. Un autre coût apparaît quand plusieurs équipes *modifient* le code partagé : chaque changement doit convenir à toutes, être relu par des gens qui ne possèdent pas le code, et ne rien casser chez les autres.
+
+- Sous Windows Vista, les métriques d'organisation (combien d'ingénieurs et d'équipes ont touché un binaire, à quel point sa propriété était dispersée) prédisaient les binaires fragiles mieux que les métriques de code comme le churn ou la complexité [[52]](https://doi.org/10.1145/1368088.1368160).
+- Sous Windows Vista et 7, les composants avec beaucoup de contributeurs mineurs avaient plus de défaillances avant et après release ; une propriété forte allait avec moins de défaillances [[53]](https://doi.org/10.1145/2025113.2025119).
+- Le n(n−1)/2 de Brooks [32] est le pire cas, sans propriétaire, où chaque équipe parle à toutes les autres. Une bibliothèque avec une équipe propriétaire claire ressemble plutôt à une étoile, où les liens croissent linéairement.
+
+Le calculateur ajoute `τ × (nT − 1)` à la maintenance du code partagé, nT étant le nombre d'équipes qui le modifient. La croissance est linéaire, le choix prudent pour le partage. Défaut **τ = 0,10** : chaque équipe supplémentaire rend le code partagé 10 % plus cher à maintenir. Les études montrent le sens de l'effet, pas sa taille : τ est donc une **hypothèse**. Les copies ne sont pas touchées : chaque copie reste à son équipe. Avec nT = 1 (le défaut, une seule équipe propriétaire), rien ne change.
+
+Dans le scénario par défaut (§7.5, 2 applications), le partage cesse d'être rentable à partir de **4 équipes**. Avec 3 applications, à partir de 15 équipes. À partir de 5 applications, il gagne encore à 20 équipes : le coût des copies croît plus vite que le surcoût des équipes.
+
 ---
 
 ## 4. Code dupliqué
@@ -296,7 +308,7 @@ Chaque formule ci-dessous est implémentée dans `src/engine/formulas.ts`, et ch
   - Story points : `B = (story points / vélocité) × semaines par sprint × 35 h × effectif`. La vélocité est celle de toute l'équipe, donc chaque sprint coûte les heures de chaque membre.
   - Mode direct : la valeur est déjà en heures-personne, ou en jours-personne × 7 h.
 - **C0 = B × w** : le coût de construction de la feature une fois, pour une application. Tous les coûts du modèle sont des multiples de C0, sauf la mise en place et le fonctionnement de la bibliothèque, qui sont des heures fixes × w.
-- **N** : nombre d'applications ayant besoin de la feature (de 2 à 10 dans l'interface). **T** : horizon en années.
+- **N** : nombre d'applications ayant besoin de la feature (de 2 à 10 dans l'interface). **nT** : équipes qui modifient le code partagé (de 1 à 20, 1 par défaut). **T** : horizon en années.
 - **Calendrier** : les constructions sont payées au mois 0. Les coûts annuels s'accumulent de façon régulière, un douzième par mois. Le mois t appartient à l'année y = ⌈t / 12⌉.
 
 ### 7.1 Coût autonome
@@ -313,7 +325,7 @@ Exemple avec le scénario par défaut (§7.5) : 45 360 + 0,20 × 45 360 × 5 = *
 
 ```
 Build_S  = G·C0  +  i·C0·(N−1)  +  280 h · w        (setup only for a new library)
-Yearly_S = m·G·C0  +  k·C0·(N−1)  +  100 h · w      (running only for a new library)
+Yearly_S = m·G·C0·(1 + τ·(nT−1))  +  k·C0·(N−1)  +  100 h · w      (running only for a new library)
 ```
 
 | Ligne dans l'application | Formule |
@@ -322,6 +334,7 @@ Yearly_S = m·G·C0  +  k·C0·(N−1)  +  100 h · w      (running only for a n
 | L'intégrer dans les autres applications | i · C0 · (N−1) |
 | Mettre en place la bibliothèque | 280 h · w (0 si la bibliothèque existe) |
 | Maintenance du code partagé | m · G · C0 · T |
+| Plusieurs équipes qui le modifient | τ · (nT−1) · m · G · C0 · T |
 | Coordination et montées de version | k · C0 · (N−1) · T |
 | Faire vivre la bibliothèque | 100 h · w · T (0 si la bibliothèque existe) |
 
@@ -355,6 +368,7 @@ Réglables dans le panneau « Paramètres avancés » :
 | e0 | Maintenance de chaque copie supplémentaire | 1,00 | 0,5–1,5 | Hypothèse | Étayé par Ray & Kim : 10,7–15,5 % des changements portés entre forks, à un rythme stable (§4.2) |
 | δ | Vitesse de divergence des copies | 0,05 / an | 0–0,2 | Hypothèse | Aucune mesure ; les forks cessent de se synchroniser plutôt que de payer davantage (§4.4) |
 | k | Coordination et montées de version par application supplémentaire | 0,04 / an | 0–0,15 | Hypothèse | Krüger & Berger coordination 5 % vs 7 % ; Xavier et al. 14,78 % de changements d'API cassants (§3.2) |
+| τ | Surcoût de maintenance par équipe supplémentaire qui le modifie | 0,10 | 0–0,5 | Hypothèse | Sens de l'effet : Nagappan et al. 2008 et Bird et al. 2011 ; taille non mesurée (§3.3) |
 
 Constantes fixes (non exposées dans l'interface) :
 
@@ -501,3 +515,5 @@ Numérotées par ordre de première citation. Les entrées sans lien sont des li
 49. GitClear, rapport *AI Copilot Code Quality*, 2025 (analyse d'éditeur portant sur 211 M de lignes modifiées, 2020–2024 ; lu via la couverture presse).
 50. M. Borg et al., « Echoes of AI: investigating the downstream effects of AI assistants on software maintainability », *Empirical Software Engineering* 31, 2026. DOI 10.1007/s10664-026-10889-1. Prépublication arXiv:2507.00788. <https://arxiv.org/abs/2507.00788>
 51. S. Pan et al., « Automating zero-shot patch porting for hard forks » (PPatHF), 2024, arXiv:2404.17964. <https://arxiv.org/abs/2404.17964>
+52. N. Nagappan, B. Murphy, V. Basili, « The influence of organizational structure on software quality: an empirical case study », ICSE 2008. DOI 10.1145/1368088.1368160. <https://doi.org/10.1145/1368088.1368160>
+53. C. Bird, N. Nagappan, B. Murphy, H. Gall, P. Devanbu, « Don't touch my code! Examining the effects of ownership on software quality », ESEC/FSE 2011. DOI 10.1145/2025113.2025119. <https://doi.org/10.1145/2025113.2025119>
